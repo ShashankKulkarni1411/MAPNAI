@@ -173,7 +173,9 @@ class NERAgent:
 
         if not text.strip():
             logger.warning(f"[NER Agent] Empty text for article {article_id[:8]}. Skipping.")
-            return self._build_output(article_id, [], "none", time.time() - start_time)
+            return self._build_output(
+                article_id, [], "none", time.time() - start_time, article_input=article_input
+            )
 
         raw_entities, model_used = self._extract(text)
         processed_entities = deduplicate_and_merge_entities(
@@ -195,7 +197,13 @@ class NERAgent:
             f"Latency: {latency:.2f}s"
         )
 
-        return self._build_output(article_id, processed_entities, model_used, latency)
+        return self._build_output(
+            article_id,
+            processed_entities,
+            model_used,
+            latency,
+            article_input=article_input,
+        )
 
     def process_batch(
         self,
@@ -260,8 +268,9 @@ class NERAgent:
         entities: List[Dict],
         model_used: str,
         latency: float,
+        article_input: Optional[dict] = None,
     ) -> Dict:
-        return {
+        output = {
             "article_id": article_id,
             "entities": entities,
             "_metadata": {
@@ -270,6 +279,18 @@ class NERAgent:
                 "entity_count": len(entities),
             },
         }
+        if article_input:
+            mongo_doc = article_input.get("_mongo_doc") or article_input
+            output["title"] = article_input.get("title") or mongo_doc.get("title", "")
+            output["body"] = article_input.get("body") or mongo_doc.get("body", "")
+            output["source_name"] = mongo_doc.get("source_name", "")
+            output["source_type"] = mongo_doc.get("source_type", "")
+            output["url"] = mongo_doc.get("url", "")
+            output["published_at"] = mongo_doc.get("published_at")
+            output["preprocess_domain"] = _normalize_domain(
+                article_input.get("domain") or mongo_doc.get("domain", "general")
+            )
+        return output
 
     def close(self):
         self.neo4j.close()

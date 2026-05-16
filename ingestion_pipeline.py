@@ -10,8 +10,8 @@ Pipeline flow:
   3. Store to MongoDB + FAISS + Neo4j (simultaneous)
   4. Log run statistics
 
-Agent 1 (NER) runs separately after ingestion:
-  python pipeline.py
+Agents 1–4 run separately after ingestion:
+  python pipeline.py             # NER → Classifier → Summarizer → Risk Scorer
 
 Usage:
   python ingestion_pipeline.py              # single run

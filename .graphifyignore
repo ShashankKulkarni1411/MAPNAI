@@ -1,0 +1,12 @@
+# Virtual environments
+venv/
+.venv/
+env/
+
+# Package markers (no semantic value for the graph)
+__init__.py
+**/__init__.py
+
+# Secrets / local config
+.env
+.env.*

@@ -63,6 +63,7 @@ neo4j==5.20.0
 networkx==3.4.2
 nltk==3.8.1
 numpy==1.26.4
+openai==2.37.0
 packaging==26.2
 parsel==1.11.0
 pillow==12.2.0
@@ -112,6 +113,7 @@ srsly==2.5.3
 sympy==1.14.0
 tbb==2021.13.1
 tenacity==8.3.0
+termcolor==3.3.0
 thinc==8.3.13
 threadpoolctl==3.6.0
 tldextract==5.3.1

@@ -6,9 +6,14 @@ All other modules import from here — no direct os.getenv() calls elsewhere.
 Note: Reddit has been replaced by the Bluesky Firehose (WebSocket, zero-auth).
 """
 
-from pydantic_settings import BaseSettings
-from pydantic import Field
+from pathlib import Path
+
+from pydantic import AliasChoices, Field
+from pydantic_settings import BaseSettings, SettingsConfigDict
 from functools import lru_cache
+
+# Resolve .env relative to project root (parent of config/), not the process cwd.
+_ENV_FILE = Path(__file__).resolve().parent.parent / ".env"
 
 
 class Settings(BaseSettings):
@@ -16,7 +21,10 @@ class Settings(BaseSettings):
     newsapi_key: str = Field(default="", env="NEWSAPI_KEY")
     gnews_api_key: str = Field(default="", env="GNEWS_API_KEY")
     newsdata_api_key: str = Field(default="", env="NEWSDATA_API_KEY")
-
+    groq_api_key: str = Field(
+        default="",
+        validation_alias=AliasChoices("GROQ_API_KEY", "OPENAI_API_KEY"),
+    )
     # ── Bluesky Firehose (zero-auth public WebSocket) ────────
     bluesky_firehose_url: str = Field(
         default="wss://bsky.network/xrpc/com.atproto.sync.subscribeRepos",
@@ -54,10 +62,24 @@ class Settings(BaseSettings):
     log_level: str = Field(default="INFO", env="LOG_LEVEL")
     log_file: str = Field(default="./logs/ingestion.log", env="LOG_FILE")
 
-    class Config:
-        env_file = ".env"
-        env_file_encoding = "utf-8"
-        case_sensitive = False
+    model_config = SettingsConfigDict(
+        env_file=str(_ENV_FILE),
+        env_file_encoding="utf-8",
+        case_sensitive=False,
+        extra="ignore",
+    )
+
+    @classmethod
+    def settings_customise_sources(
+        cls,
+        settings_cls,
+        init_settings,
+        env_settings,
+        dotenv_settings,
+        file_secret_settings,
+    ):
+        # .env wins over OS-level env vars (e.g. stale OPENAI_API_KEY on Windows).
+        return (init_settings, dotenv_settings, env_settings, file_secret_settings)
 
 
 @lru_cache()

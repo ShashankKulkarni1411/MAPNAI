@@ -64,6 +64,9 @@ class MongoStore:
         col.create_index([("source_name", ASCENDING)])
         col.create_index([("language", ASCENDING)])
         col.create_index([("ner_processed", ASCENDING)])
+        col.create_index([("classification_processed", ASCENDING)])
+        col.create_index([("summarization_processed", ASCENDING)])
+        col.create_index([("risk_processed", ASCENDING)])
         # Text index for full-text search (backup to vector store)
         col.create_index([("title", "text"), ("body", "text")])
         logger.debug("[MongoDB] Indexes verified.")
@@ -125,6 +128,123 @@ class MongoStore:
             self.db["ingestion_runs"].insert_one(stats)
         except Exception as e:
             logger.warning(f"[MongoDB] Could not log run stats: {e}")
+    def update_article_classification(self, article_id: str, classification_data: dict) -> bool:
+        """
+        Agent 2 (Event Classifier) updates classification fields on processed_articles.
+        Maps LLM `sentiment` float to sentiment_score / sentiment_label for the schema.
+        """
+        allowed_keys = {
+            "domain",
+            "category",
+            "urgency_flag",
+            "classification_confidence",
+            "taxonomy_version",
+        }
+        update_fields = {
+            k: v for k, v in classification_data.items() if k in allowed_keys
+        }
+
+        if "sentiment" in classification_data:
+            score = float(classification_data["sentiment"])
+            update_fields["sentiment_score"] = score
+            if score > 0.1:
+                update_fields["sentiment_label"] = "positive"
+            elif score < -0.1:
+                update_fields["sentiment_label"] = "negative"
+            else:
+                update_fields["sentiment_label"] = "neutral"
+
+        update_fields["classification_processed"] = True
+        update_fields["classification_processed_at"] = datetime.now(
+            timezone.utc
+        ).isoformat()
+
+        if not update_fields:
+            return False
+
+        try:
+            result = self.db["processed_articles"].update_one(
+                {"article_id": article_id},
+                {"$set": update_fields},
+            )
+            if result.matched_count == 0:
+                logger.warning(
+                    f"[MongoDB] Classification update skipped — article {article_id[:8]} not in DB."
+                )
+                return False
+            logger.debug(f"[MongoDB] Classification updated for article {article_id}")
+            return True
+        except Exception as e:
+            logger.error(f"[MongoDB] Classification update failed for {article_id}: {e}")
+            return False
+
+    def update_article_summaries(self, article_id: str, summary_data: dict) -> bool:
+        """
+        Agent 3 (Summarization) updates specific text summaries
+        (`summary_short` and `summary_long`) to the processed_articles table.
+        """
+        allowed_keys = {"summary_short", "summary_long"}
+        filtered_data = {k: v for k, v in summary_data.items() if k in allowed_keys}
+
+        if not filtered_data:
+            return False
+
+        filtered_data["summarization_processed"] = True
+        filtered_data["summarization_processed_at"] = datetime.now(
+            timezone.utc
+        ).isoformat()
+
+        try:
+            result = self.db["processed_articles"].update_one(
+                {"article_id": article_id},
+                {"$set": filtered_data},
+            )
+            if result.matched_count == 0:
+                logger.warning(
+                    f"[MongoDB] Summary update skipped — article {article_id[:8]} not in DB."
+                )
+                return False
+            logger.debug(f"[MongoDB] Summaries updated for article {article_id}")
+            return True
+        except Exception as e:
+            logger.error(f"[MongoDB] Summary update failed for {article_id}: {e}")
+            return False
+
+    def update_article_risk(self, article_id: str, risk_data: dict) -> bool:
+        """
+        Agent 4 (Risk Scoring) updates specific risk assessment fields
+        to the processed_articles table via $set.
+        Only writes: risk_score, risk_confidence, action_recommendation,
+        and risk_reasoning. Never touches fields written by Agents 1, 2, or 3.
+        """
+        allowed_keys = {
+            "risk_score",
+            "risk_confidence",
+            "action_recommendation",
+            "risk_reasoning",
+        }
+        filtered_data = {k: v for k, v in risk_data.items() if k in allowed_keys}
+        if not filtered_data:
+            return False
+
+        filtered_data["risk_processed"] = True
+        filtered_data["risk_processed_at"] = datetime.now(timezone.utc).isoformat()
+
+        try:
+            result = self.db["processed_articles"].update_one(
+                {"article_id": article_id},
+                {"$set": filtered_data},
+            )
+            if result.matched_count == 0:
+                logger.warning(
+                    f"[MongoDB] Risk update skipped — article {article_id[:8]} not in DB."
+                )
+                return False
+            logger.debug(f"[MongoDB] Risk fields updated for article {article_id}")
+            return True
+        except Exception as e:
+            logger.error(f"[MongoDB] Risk update failed for {article_id}: {e}")
+            return False
 
     # ── Read Operations ──────────────────────────────────────
 
@@ -286,6 +406,156 @@ class MongoStore:
             return self.db["processed_articles"].count_documents(query)
         except Exception as e:
             logger.error(f"[MongoDB] count_articles_pending_ner error: {e}")
+            return 0
+
+    # ── Agent 2 (Classifier) interface ────────────────────────
+
+    def get_articles_pending_classification(
+        self,
+        limit: int = 100,
+        skip: int = 0,
+    ) -> List[Dict]:
+        """Articles with NER done but not yet classified by Agent 2."""
+        query = {
+            "ner_processed": True,
+            "$or": [
+                {"classification_processed": {"$exists": False}},
+                {"classification_processed": False},
+            ],
+        }
+        try:
+            cursor = (
+                self.db["processed_articles"]
+                .find(query, {"_id": 0})
+                .sort("ner_processed_at", DESCENDING)
+                .skip(skip)
+                .limit(limit)
+            )
+            articles = list(cursor)
+            logger.info(
+                f"[MongoDB] {len(articles)} articles pending classification."
+            )
+            return articles
+        except Exception as e:
+            logger.error(
+                f"[MongoDB] get_articles_pending_classification error: {e}"
+            )
+            return []
+
+    def count_articles_pending_classification(self) -> int:
+        query = {
+            "ner_processed": True,
+            "$or": [
+                {"classification_processed": {"$exists": False}},
+                {"classification_processed": False},
+            ],
+        }
+        try:
+            return self.db["processed_articles"].count_documents(query)
+        except Exception as e:
+            logger.error(
+                f"[MongoDB] count_articles_pending_classification error: {e}"
+            )
+            return 0
+
+    # ── Agent 3 (Summarizer) interface ────────────────────────
+
+    def get_articles_pending_summarization(
+        self,
+        limit: int = 100,
+        skip: int = 0,
+    ) -> List[Dict]:
+        """Articles classified by Agent 2 but not yet summarized by Agent 3."""
+        query = {
+            "classification_processed": True,
+            "$or": [
+                {"summarization_processed": {"$exists": False}},
+                {"summarization_processed": False},
+            ],
+        }
+        try:
+            cursor = (
+                self.db["processed_articles"]
+                .find(query, {"_id": 0})
+                .sort("classification_processed_at", DESCENDING)
+                .skip(skip)
+                .limit(limit)
+            )
+            articles = list(cursor)
+            logger.info(
+                f"[MongoDB] {len(articles)} articles pending summarization."
+            )
+            return articles
+        except Exception as e:
+            logger.error(
+                f"[MongoDB] get_articles_pending_summarization error: {e}"
+            )
+            return []
+
+    def count_articles_pending_summarization(self) -> int:
+        query = {
+            "classification_processed": True,
+            "$or": [
+                {"summarization_processed": {"$exists": False}},
+                {"summarization_processed": False},
+            ],
+        }
+        try:
+            return self.db["processed_articles"].count_documents(query)
+        except Exception as e:
+            logger.error(
+                f"[MongoDB] count_articles_pending_summarization error: {e}"
+            )
+            return 0
+
+    # ── Agent 4 (Risk Scorer) interface ─────────────────────
+
+    def get_articles_pending_risk_scoring(
+        self,
+        limit: int = 100,
+        skip: int = 0,
+    ) -> List[Dict]:
+        """Articles summarized by Agent 3 but not yet risk-scored by Agent 4."""
+        query = {
+            "summarization_processed": True,
+            "$or": [
+                {"risk_processed": {"$exists": False}},
+                {"risk_processed": False},
+            ],
+        }
+        try:
+            cursor = (
+                self.db["processed_articles"]
+                .find(query, {"_id": 0})
+                .sort("summarization_processed_at", DESCENDING)
+                .skip(skip)
+                .limit(limit)
+            )
+            articles = list(cursor)
+            logger.info(
+                f"[MongoDB] {len(articles)} articles pending risk scoring."
+            )
+            return articles
+        except Exception as e:
+            logger.error(
+                f"[MongoDB] get_articles_pending_risk_scoring error: {e}"
+            )
+            return []
+
+    def count_articles_pending_risk_scoring(self) -> int:
+        query = {
+            "summarization_processed": True,
+            "$or": [
+                {"risk_processed": {"$exists": False}},
+                {"risk_processed": False},
+            ],
+        }
+        try:
+            return self.db["processed_articles"].count_documents(query)
+        except Exception as e:
+            logger.error(
+                f"[MongoDB] count_articles_pending_risk_scoring error: {e}"
+            )
             return 0
 
     def close(self):

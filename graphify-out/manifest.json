@@ -1,0 +1,152 @@
+{
+  "C:\\Users\\Kulkarni\\Downloads\\mapnai_ingestion_layer\\mapnai_ingestion\\.graphify_detect.json": {
+    "mtime": 1778944991.3592176,
+    "ast_hash": "9301a055f55431b10c2b22ec91deb2b6",
+    "semantic_hash": "9301a055f55431b10c2b22ec91deb2b6"
+  },
+  "C:\\Users\\Kulkarni\\Downloads\\mapnai_ingestion_layer\\mapnai_ingestion\\.graphify_run_ast.py": {
+    "mtime": 1778944999.3012438,
+    "ast_hash": "9ed272a103604e943acb27b8eecb3ef3",
+    "semantic_hash": "9ed272a103604e943acb27b8eecb3ef3"
+  },
+  "C:\\Users\\Kulkarni\\Downloads\\mapnai_ingestion_layer\\mapnai_ingestion\\.graphify_run_cache.py": {
+    "mtime": 1778944999.9813986,
+    "ast_hash": "8b3c6c9332cd31e922ef9abbfa5cc736",
+    "semantic_hash": "8b3c6c9332cd31e922ef9abbfa5cc736"
+  },
+  "C:\\Users\\Kulkarni\\Downloads\\mapnai_ingestion_layer\\mapnai_ingestion\\ingestion_pipeline.py": {
+    "mtime": 1778943934.0328202,
+    "ast_hash": "68e4f3a70c5cb8291997e87ac2dce258",
+    "semantic_hash": "68e4f3a70c5cb8291997e87ac2dce258"
+  },
+  "C:\\Users\\Kulkarni\\Downloads\\mapnai_ingestion_layer\\mapnai_ingestion\\pipeline.py": {
+    "mtime": 1778943934.031823,
+    "ast_hash": "833895a746a8ba0d16be5f2ffdfa8c39",
+    "semantic_hash": "833895a746a8ba0d16be5f2ffdfa8c39"
+  },
+  "C:\\Users\\Kulkarni\\Downloads\\mapnai_ingestion_layer\\mapnai_ingestion\\test.py": {
+    "mtime": 1778943934.028093,
+    "ast_hash": "8960fdf856ed0960217252647d64d753",
+    "semantic_hash": "8960fdf856ed0960217252647d64d753"
+  },
+  "C:\\Users\\Kulkarni\\Downloads\\mapnai_ingestion_layer\\mapnai_ingestion\\agents\\api_fetcher.py": {
+    "mtime": 1776610095.1387587,
+    "ast_hash": "e9fb76a6aae10b5e78351556c350de16",
+    "semantic_hash": "e9fb76a6aae10b5e78351556c350de16"
+  },
+  "C:\\Users\\Kulkarni\\Downloads\\mapnai_ingestion_layer\\mapnai_ingestion\\agents\\bluesky_fetcher.py": {
+    "mtime": 1778923207.7681103,
+    "ast_hash": "5e993ab68087e671995717414abef9ce",
+    "semantic_hash": "5e993ab68087e671995717414abef9ce"
+  },
+  "C:\\Users\\Kulkarni\\Downloads\\mapnai_ingestion_layer\\mapnai_ingestion\\agents\\enrichment_agent.py": {
+    "mtime": 1776610095.1502907,
+    "ast_hash": "09146920ee7fbe4889ddabd8e9b5eac6",
+    "semantic_hash": "09146920ee7fbe4889ddabd8e9b5eac6"
+  },
+  "C:\\Users\\Kulkarni\\Downloads\\mapnai_ingestion_layer\\mapnai_ingestion\\agents\\neo4j_writer.py": {
+    "mtime": 1778943934.031823,
+    "ast_hash": "cb704d07a86afc7766ce9b113c839b3d",
+    "semantic_hash": "cb704d07a86afc7766ce9b113c839b3d"
+  },
+  "C:\\Users\\Kulkarni\\Downloads\\mapnai_ingestion_layer\\mapnai_ingestion\\agents\\ner_agent.py": {
+    "mtime": 1778943934.024079,
+    "ast_hash": "87e40c58c4d77e95261f2a565a686599",
+    "semantic_hash": "87e40c58c4d77e95261f2a565a686599"
+  },
+  "C:\\Users\\Kulkarni\\Downloads\\mapnai_ingestion_layer\\mapnai_ingestion\\agents\\ner_utils.py": {
+    "mtime": 1778935019.6648343,
+    "ast_hash": "2ae38f4339780de2d9610df2673268d6",
+    "semantic_hash": "2ae38f4339780de2d9610df2673268d6"
+  },
+  "C:\\Users\\Kulkarni\\Downloads\\mapnai_ingestion_layer\\mapnai_ingestion\\agents\\preprocessing_agent.py": {
+    "mtime": 1776610095.114207,
+    "ast_hash": "dd48eed9728d76cdb694268d4437af8a",
+    "semantic_hash": "dd48eed9728d76cdb694268d4437af8a"
+  },
+  "C:\\Users\\Kulkarni\\Downloads\\mapnai_ingestion_layer\\mapnai_ingestion\\agents\\reddit_fetcher.py": {
+    "mtime": 1776610095.1022103,
+    "ast_hash": "e721474aac902a8111aff3c94434ad68",
+    "semantic_hash": "e721474aac902a8111aff3c94434ad68"
+  },
+  "C:\\Users\\Kulkarni\\Downloads\\mapnai_ingestion_layer\\mapnai_ingestion\\agents\\rss_fetcher.py": {
+    "mtime": 1776610095.1634316,
+    "ast_hash": "8b8ebf62a5d1e540e6be709074525bef",
+    "semantic_hash": "8b8ebf62a5d1e540e6be709074525bef"
+  },
+  "C:\\Users\\Kulkarni\\Downloads\\mapnai_ingestion_layer\\mapnai_ingestion\\agents\\web_scraper.py": {
+    "mtime": 1776610095.090208,
+    "ast_hash": "c7ebe3120bcfbfc8e395af1a3a5ffd4a",
+    "semantic_hash": "c7ebe3120bcfbfc8e395af1a3a5ffd4a"
+  },
+  "C:\\Users\\Kulkarni\\Downloads\\mapnai_ingestion_layer\\mapnai_ingestion\\config\\settings.py": {
+    "mtime": 1778932838.021763,
+    "ast_hash": "bb79c270241157d6dc72236dd6d30a8e",
+    "semantic_hash": "bb79c270241157d6dc72236dd6d30a8e"
+  },
+  "C:\\Users\\Kulkarni\\Downloads\\mapnai_ingestion_layer\\mapnai_ingestion\\config\\sources.py": {
+    "mtime": 1778923195.6485128,
+    "ast_hash": "d386973881dd810e09efed16fdaebaf4",
+    "semantic_hash": "d386973881dd810e09efed16fdaebaf4"
+  },
+  "C:\\Users\\Kulkarni\\Downloads\\mapnai_ingestion_layer\\mapnai_ingestion\\storage\\faiss_store.py": {
+    "mtime": 1776610095.0544899,
+    "ast_hash": "4ad2e2f3c8bd602dbf1d667150c35112",
+    "semantic_hash": "4ad2e2f3c8bd602dbf1d667150c35112"
+  },
+  "C:\\Users\\Kulkarni\\Downloads\\mapnai_ingestion_layer\\mapnai_ingestion\\storage\\mongo_store.py": {
+    "mtime": 1778943934.018015,
+    "ast_hash": "a68bbdd96fe7ef94dfa17a72f53245a3",
+    "semantic_hash": "a68bbdd96fe7ef94dfa17a72f53245a3"
+  },
+  "C:\\Users\\Kulkarni\\Downloads\\mapnai_ingestion_layer\\mapnai_ingestion\\storage\\neo4j_store.py": {
+    "mtime": 1776610095.0661962,
+    "ast_hash": "2a9426c35db8fc8a8ba71118716ac442",
+    "semantic_hash": "2a9426c35db8fc8a8ba71118716ac442"
+  },
+  "C:\\Users\\Kulkarni\\Downloads\\mapnai_ingestion_layer\\mapnai_ingestion\\tests\\test_fetchers.py": {
+    "mtime": 1776610094.9430635,
+    "ast_hash": "ecebf20c0878fbeaca4f8b360167be32",
+    "semantic_hash": "ecebf20c0878fbeaca4f8b360167be32"
+  },
+  "C:\\Users\\Kulkarni\\Downloads\\mapnai_ingestion_layer\\mapnai_ingestion\\tests\\test_preprocessing.py": {
+    "mtime": 1776610094.9637551,
+    "ast_hash": "ec7d910843c76a80ebd07fbdc3e84254",
+    "semantic_hash": "ec7d910843c76a80ebd07fbdc3e84254"
+  },
+  "C:\\Users\\Kulkarni\\Downloads\\mapnai_ingestion_layer\\mapnai_ingestion\\tests\\test_storage.py": {
+    "mtime": 1776610094.933052,
+    "ast_hash": "48971a2d9d93bd5d0fa0d91698449313",
+    "semantic_hash": "48971a2d9d93bd5d0fa0d91698449313"
+  },
+  "C:\\Users\\Kulkarni\\Downloads\\mapnai_ingestion_layer\\mapnai_ingestion\\utils\\deduplicator.py": {
+    "mtime": 1776610095.0147557,
+    "ast_hash": "3e60dec27b6f46e8dd39e7b1d2fba7af",
+    "semantic_hash": "3e60dec27b6f46e8dd39e7b1d2fba7af"
+  },
+  "C:\\Users\\Kulkarni\\Downloads\\mapnai_ingestion_layer\\mapnai_ingestion\\utils\\logger.py": {
+    "mtime": 1776610094.9807575,
+    "ast_hash": "ad1d8d8b1444fc3e2f9e431e6fda8415",
+    "semantic_hash": "ad1d8d8b1444fc3e2f9e431e6fda8415"
+  },
+  "C:\\Users\\Kulkarni\\Downloads\\mapnai_ingestion_layer\\mapnai_ingestion\\utils\\models.py": {
+    "mtime": 1778943934.028093,
+    "ast_hash": "3babb6dc4f032ada3cecfb0ca5414d9b",
+    "semantic_hash": "3babb6dc4f032ada3cecfb0ca5414d9b"
+  },
+  "C:\\Users\\Kulkarni\\Downloads\\mapnai_ingestion_layer\\mapnai_ingestion\\utils\\text_cleaner.py": {
+    "mtime": 1776610095.0257752,
+    "ast_hash": "bdd6fae8aa77c1a2f6ab74f9c9212fdf",
+    "semantic_hash": "bdd6fae8aa77c1a2f6ab74f9c9212fdf"
+  },
+  "C:\\Users\\Kulkarni\\Downloads\\mapnai_ingestion_layer\\mapnai_ingestion\\README.md": {
+    "mtime": 1776610094.9175136,
+    "ast_hash": "4c69f08c18ce72ffdc0e7c1b8a3cbbdc",
+    "semantic_hash": "4c69f08c18ce72ffdc0e7c1b8a3cbbdc"
+  },
+  "C:\\Users\\Kulkarni\\Downloads\\mapnai_ingestion_layer\\mapnai_ingestion\\requirements.txt": {
+    "mtime": 1778943934.0270922,
+    "ast_hash": "00daf722b0c174f6efb1348e8ef3ffd9",
+    "semantic_hash": "00daf722b0c174f6efb1348e8ef3ffd9"
+  }
+}
