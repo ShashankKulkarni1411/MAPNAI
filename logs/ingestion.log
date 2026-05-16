@@ -1,0 +1,58 @@
+2026-05-16 16:25:43 | WARNING  | __main__:__init__:45 — [Agent 2] OpenAI not configured or missing (OPENAI_API_KEY). Classification will fallback.
+2026-05-16 16:25:43 | INFO     | __main__:process_article:132 — [Agent 2] Classifying article: 03cd4cef-f16f-400d-a7a2-0957478dc942
+2026-05-16 16:25:43 | INFO     | storage.mongo_store:_connect:48 — [MongoDB] Connected to mongodb://localhost:27017 / mapnai
+2026-05-16 16:25:43 | DEBUG    | storage.mongo_store:_ensure_indexes:67 — [MongoDB] Indexes verified.
+2026-05-16 16:25:43 | DEBUG    | storage.mongo_store:update_article_classification:141 — [MongoDB] Article 03cd4cef-f16f-400d-a7a2-0957478dc942 not found or data identical
+2026-05-16 16:25:43 | WARNING  | __main__:process_article:145 — [Agent 2] Could not update MongoDB for 03cd4cef-f16f-400d-a7a2-0957478dc942. It may not exist in Layer 1.
+2026-05-16 16:25:43 | INFO     | __main__:process_article:153 — [Agent 2] Classification complete for 03cd4cef-f16f-400d-a7a2-0957478dc942 -> Domain: general | Urgency: False
+2026-05-16 16:38:27 | WARNING  | __main__:__init__:45 — [Agent 2] OpenAI not configured or missing (OPENAI_API_KEY). Classification will fallback.
+2026-05-16 16:38:27 | INFO     | __main__:process_article:132 — [Agent 2] Classifying article: 7c06fb7a-db98-4a4b-bde2-047711a70956
+2026-05-16 16:38:27 | INFO     | storage.mongo_store:_connect:48 — [MongoDB] Connected to mongodb://localhost:27017 / mapnai
+2026-05-16 16:38:27 | DEBUG    | storage.mongo_store:_ensure_indexes:67 — [MongoDB] Indexes verified.
+2026-05-16 16:38:27 | DEBUG    | storage.mongo_store:update_article_classification:141 — [MongoDB] Article 7c06fb7a-db98-4a4b-bde2-047711a70956 not found or data identical
+2026-05-16 16:38:27 | WARNING  | __main__:process_article:145 — [Agent 2] Could not update MongoDB for 7c06fb7a-db98-4a4b-bde2-047711a70956. It may not exist in Layer 1.
+2026-05-16 16:38:27 | INFO     | __main__:process_article:153 — [Agent 2] Classification complete for 7c06fb7a-db98-4a4b-bde2-047711a70956 -> Domain: general | Urgency: False
+2026-05-16 16:39:36 | WARNING  | __main__:__init__:45 — [Agent 2] OpenAI not configured or missing (OPENAI_API_KEY). Classification will fallback.
+2026-05-16 16:39:36 | INFO     | __main__:process_article:132 — [Agent 2] Classifying article: c7a7efcd-25e2-4fa4-8cfd-dbd9fc65f998
+2026-05-16 16:39:36 | INFO     | storage.mongo_store:_connect:48 — [MongoDB] Connected to mongodb://localhost:27017 / mapnai
+2026-05-16 16:39:36 | DEBUG    | storage.mongo_store:_ensure_indexes:67 — [MongoDB] Indexes verified.
+2026-05-16 16:39:36 | DEBUG    | storage.mongo_store:update_article_classification:141 — [MongoDB] Article c7a7efcd-25e2-4fa4-8cfd-dbd9fc65f998 not found or data identical
+2026-05-16 16:39:36 | WARNING  | __main__:process_article:145 — [Agent 2] Could not update MongoDB for c7a7efcd-25e2-4fa4-8cfd-dbd9fc65f998. It may not exist in Layer 1.
+2026-05-16 16:39:36 | INFO     | __main__:process_article:153 — [Agent 2] Classification complete for c7a7efcd-25e2-4fa4-8cfd-dbd9fc65f998 -> Domain: general | Urgency: False
+2026-05-16 16:43:10 | WARNING  | __main__:__init__:45 — [Agent 2] OpenAI not configured or missing (OPENAI_API_KEY). Classification will fallback.
+2026-05-16 16:43:10 | INFO     | __main__:process_article:142 — [Agent 2] Classifying article: 11a544ff-1f96-43cf-8a95-e2407656fad9
+2026-05-16 16:43:10 | INFO     | storage.mongo_store:_connect:48 — [MongoDB] Connected to mongodb://localhost:27017 / mapnai
+2026-05-16 16:43:10 | DEBUG    | storage.mongo_store:_ensure_indexes:67 — [MongoDB] Indexes verified.
+2026-05-16 16:43:10 | DEBUG    | storage.mongo_store:update_article_classification:141 — [MongoDB] Article 11a544ff-1f96-43cf-8a95-e2407656fad9 not found or data identical
+2026-05-16 16:43:10 | WARNING  | __main__:process_article:155 — [Agent 2] Could not update MongoDB for 11a544ff-1f96-43cf-8a95-e2407656fad9. It may not exist in Layer 1.
+2026-05-16 16:43:10 | INFO     | __main__:process_article:163 — [Agent 2] Classification complete for 11a544ff-1f96-43cf-8a95-e2407656fad9 -> Domain: general | Urgency: False
+2026-05-16 16:45:32 | INFO     | __main__:process_article:142 — [Agent 2] Classifying article: f87e7566-222f-44cf-a1bd-c3f8f75200ba
+2026-05-16 16:45:37 | INFO     | storage.mongo_store:_connect:48 — [MongoDB] Connected to mongodb://localhost:27017 / mapnai
+2026-05-16 16:45:37 | DEBUG    | storage.mongo_store:_ensure_indexes:67 — [MongoDB] Indexes verified.
+2026-05-16 16:45:37 | DEBUG    | storage.mongo_store:update_article_classification:141 — [MongoDB] Article f87e7566-222f-44cf-a1bd-c3f8f75200ba not found or data identical
+2026-05-16 16:45:37 | WARNING  | __main__:process_article:155 — [Agent 2] Could not update MongoDB for f87e7566-222f-44cf-a1bd-c3f8f75200ba. It may not exist in Layer 1.
+2026-05-16 16:45:37 | INFO     | __main__:process_article:163 — [Agent 2] Classification complete for f87e7566-222f-44cf-a1bd-c3f8f75200ba -> Domain: finance | Urgency: False
+2026-05-16 16:46:01 | INFO     | __main__:process_article:142 — [Agent 2] Classifying article: 6f0e8e2c-b29c-443f-979d-a09e9347ac6c
+2026-05-16 16:46:02 | INFO     | storage.mongo_store:_connect:48 — [MongoDB] Connected to mongodb://localhost:27017 / mapnai
+2026-05-16 16:46:02 | DEBUG    | storage.mongo_store:_ensure_indexes:67 — [MongoDB] Indexes verified.
+2026-05-16 16:46:02 | DEBUG    | storage.mongo_store:update_article_classification:141 — [MongoDB] Article 6f0e8e2c-b29c-443f-979d-a09e9347ac6c not found or data identical
+2026-05-16 16:46:02 | WARNING  | __main__:process_article:155 — [Agent 2] Could not update MongoDB for 6f0e8e2c-b29c-443f-979d-a09e9347ac6c. It may not exist in Layer 1.
+2026-05-16 16:46:02 | INFO     | __main__:process_article:163 — [Agent 2] Classification complete for 6f0e8e2c-b29c-443f-979d-a09e9347ac6c -> Domain: finance | Urgency: False
+2026-05-16 16:46:48 | INFO     | __main__:process_article:142 — [Agent 2] Classifying article: ec848a31-5ed3-4909-8f3f-84c5ceed1bf2
+2026-05-16 16:46:49 | INFO     | storage.mongo_store:_connect:48 — [MongoDB] Connected to mongodb://localhost:27017 / mapnai
+2026-05-16 16:46:49 | DEBUG    | storage.mongo_store:_ensure_indexes:67 — [MongoDB] Indexes verified.
+2026-05-16 16:46:49 | DEBUG    | storage.mongo_store:update_article_classification:141 — [MongoDB] Article ec848a31-5ed3-4909-8f3f-84c5ceed1bf2 not found or data identical
+2026-05-16 16:46:49 | WARNING  | __main__:process_article:155 — [Agent 2] Could not update MongoDB for ec848a31-5ed3-4909-8f3f-84c5ceed1bf2. It may not exist in Layer 1.
+2026-05-16 16:46:49 | INFO     | __main__:process_article:163 — [Agent 2] Classification complete for ec848a31-5ed3-4909-8f3f-84c5ceed1bf2 -> Domain: finance | Urgency: False
+2026-05-16 19:03:42 | INFO     | __main__:process_article:152 — [Agent 3] Summarizing article: 26cead7c-a010-45f6-8461-2193572b2f7d
+2026-05-16 19:03:45 | INFO     | storage.mongo_store:_connect:48 — [MongoDB] Connected to mongodb://localhost:27017 / mapnai
+2026-05-16 19:03:45 | DEBUG    | storage.mongo_store:_ensure_indexes:67 — [MongoDB] Indexes verified.
+2026-05-16 19:03:45 | DEBUG    | storage.mongo_store:update_article_summaries:168 — [MongoDB] Article 26cead7c-a010-45f6-8461-2193572b2f7d not found or summaries identical
+2026-05-16 19:03:45 | WARNING  | __main__:process_article:162 — [Agent 3] Could not update MongoDB summaries for 26cead7c-a010-45f6-8461-2193572b2f7d. It may not exist in Layer 1.
+2026-05-16 19:03:45 | INFO     | __main__:process_article:170 — [Agent 3] Summarization complete for 26cead7c-a010-45f6-8461-2193572b2f7d.
+2026-05-16 19:12:56 | INFO     | __main__:process_article:152 — [Agent 3] Summarizing article: 52dcb1c1-ce13-4b67-9855-c2f68a5b6ed7
+2026-05-16 19:12:59 | INFO     | storage.mongo_store:_connect:48 — [MongoDB] Connected to mongodb://localhost:27017 / mapnai
+2026-05-16 19:12:59 | DEBUG    | storage.mongo_store:_ensure_indexes:67 — [MongoDB] Indexes verified.
+2026-05-16 19:12:59 | DEBUG    | storage.mongo_store:update_article_summaries:168 — [MongoDB] Article 52dcb1c1-ce13-4b67-9855-c2f68a5b6ed7 not found or summaries identical
+2026-05-16 19:12:59 | WARNING  | __main__:process_article:162 — [Agent 3] Could not update MongoDB summaries for 52dcb1c1-ce13-4b67-9855-c2f68a5b6ed7. It may not exist in Layer 1.
+2026-05-16 19:12:59 | INFO     | __main__:process_article:170 — [Agent 3] Summarization complete for 52dcb1c1-ce13-4b67-9855-c2f68a5b6ed7.

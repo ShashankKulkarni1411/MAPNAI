@@ -15,6 +15,9 @@ class Settings(BaseSettings):
     gnews_api_key: str = Field(default="", env="GNEWS_API_KEY")
     newsdata_api_key: str = Field(default="", env="NEWSDATA_API_KEY")
 
+    # ── LLMs ─────────────────────────────────────────────────
+    openai_api_key: str = Field(default="", env="OPENAI_API_KEY")
+
     # ── Reddit ───────────────────────────────────────────────
     reddit_client_id: str = Field(default="", env="REDDIT_CLIENT_ID")
     reddit_client_secret: str = Field(default="", env="REDDIT_CLIENT_SECRET")

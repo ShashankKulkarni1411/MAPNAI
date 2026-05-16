@@ -124,6 +124,53 @@ class MongoStore:
         except Exception as e:
             logger.warning(f"[MongoDB] Could not log run stats: {e}")
 
+    def update_article_classification(self, article_id: str, classification_data: dict) -> bool:
+        """
+        Agent 2 (Event Classifier) updates specific classification 
+        fields to the processed_articles table.
+        """
+        try:
+            result = self.db["processed_articles"].update_one(
+                {"article_id": article_id},
+                {"$set": classification_data}
+            )
+            if result.modified_count > 0:
+                logger.debug(f"[MongoDB] Classification updated for article {article_id}")
+                return True
+            else:
+                logger.debug(f"[MongoDB] Article {article_id} not found or data identical")
+                return False
+        except Exception as e:
+            logger.error(f"[MongoDB] Classification update failed for {article_id}: {e}")
+            return False
+
+    def update_article_summaries(self, article_id: str, summary_data: dict) -> bool:
+        """
+        Agent 3 (Summarization) updates specific text summaries
+        (`summary_short` and `summary_long`) to the processed_articles table.
+        """
+        # Ensure we only update permitted fields
+        allowed_keys = {"summary_short", "summary_long"}
+        filtered_data = {k: v for k, v in summary_data.items() if k in allowed_keys}
+        
+        if not filtered_data:
+            return False
+
+        try:
+            result = self.db["processed_articles"].update_one(
+                {"article_id": article_id},
+                {"$set": filtered_data}
+            )
+            if result.modified_count > 0:
+                logger.debug(f"[MongoDB] Summaries updated for article {article_id}")
+                return True
+            else:
+                logger.debug(f"[MongoDB] Article {article_id} not found or summaries identical")
+                return False
+        except Exception as e:
+            logger.error(f"[MongoDB] Summary update failed for {article_id}: {e}")
+            return False
+
     # ── Read Operations ──────────────────────────────────────
 
     def get_existing_hashes(self, limit: int = 100_000) -> List[str]:
