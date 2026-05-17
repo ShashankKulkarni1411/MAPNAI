@@ -171,6 +171,34 @@ class MongoStore:
             logger.error(f"[MongoDB] Summary update failed for {article_id}: {e}")
             return False
 
+    def update_article_risk(self, article_id: str, risk_data: dict) -> bool:
+        """
+        Agent 4 (Risk Scoring) updates specific risk assessment fields
+        to the processed_articles table via $set.
+        Only writes: risk_score, risk_confidence, action_recommendation,
+        and risk_reasoning. Never touches fields written by Agents 1, 2, or 3.
+        """
+        allowed_keys = {"risk_score", "risk_confidence", "action_recommendation", "risk_reasoning"}
+        filtered_data = {k: v for k, v in risk_data.items() if k in allowed_keys}
+
+        if not filtered_data:
+            return False
+
+        try:
+            result = self.db["processed_articles"].update_one(
+                {"article_id": article_id},
+                {"$set": filtered_data}
+            )
+            if result.modified_count > 0:
+                logger.debug(f"[MongoDB] Risk fields updated for article {article_id}")
+                return True
+            else:
+                logger.debug(f"[MongoDB] Article {article_id} not found or risk data identical")
+                return False
+        except Exception as e:
+            logger.error(f"[MongoDB] Risk update failed for {article_id}: {e}")
+            return False
+
     # ── Read Operations ──────────────────────────────────────
 
     def get_existing_hashes(self, limit: int = 100_000) -> List[str]:

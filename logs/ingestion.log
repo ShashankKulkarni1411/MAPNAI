@@ -56,3 +56,21 @@
 2026-05-16 19:12:59 | DEBUG    | storage.mongo_store:update_article_summaries:168 — [MongoDB] Article 52dcb1c1-ce13-4b67-9855-c2f68a5b6ed7 not found or summaries identical
 2026-05-16 19:12:59 | WARNING  | __main__:process_article:162 — [Agent 3] Could not update MongoDB summaries for 52dcb1c1-ce13-4b67-9855-c2f68a5b6ed7. It may not exist in Layer 1.
 2026-05-16 19:12:59 | INFO     | __main__:process_article:170 — [Agent 3] Summarization complete for 52dcb1c1-ce13-4b67-9855-c2f68a5b6ed7.
+2026-05-17 00:04:38 | INFO     | __main__:process_article:232 — [Agent 4] Risk scoring article: 1812cea9-f791-4dda-aaff-ff1e5426fcc1
+2026-05-17 00:04:40 | INFO     | storage.mongo_store:_connect:48 — [MongoDB] Connected to mongodb://localhost:27017 / mapnai
+2026-05-17 00:04:40 | DEBUG    | storage.mongo_store:_ensure_indexes:67 — [MongoDB] Indexes verified.
+2026-05-17 00:04:40 | DEBUG    | storage.mongo_store:update_article_risk:196 — [MongoDB] Article 1812cea9-f791-4dda-aaff-ff1e5426fcc1 not found or risk data identical
+2026-05-17 00:04:40 | WARNING  | __main__:process_article:243 — [Agent 4] Could not update MongoDB risk for 1812cea9-f791-4dda-aaff-ff1e5426fcc1. It may not exist in Layer 1.
+2026-05-17 00:04:40 | INFO     | __main__:process_article:254 — [Agent 4] Risk scoring complete for 1812cea9-f791-4dda-aaff-ff1e5426fcc1 → Score: 80 | Confidence: 0.85
+2026-05-17 00:11:17 | INFO     | __main__:process_article:232 — [Agent 4] Risk scoring article: 9ad38f4c-b26c-4b39-8702-b968ee9f3778
+2026-05-17 00:11:22 | INFO     | storage.mongo_store:_connect:48 — [MongoDB] Connected to mongodb://localhost:27017 / mapnai
+2026-05-17 00:11:22 | DEBUG    | storage.mongo_store:_ensure_indexes:67 — [MongoDB] Indexes verified.
+2026-05-17 00:11:22 | DEBUG    | storage.mongo_store:update_article_risk:196 — [MongoDB] Article 9ad38f4c-b26c-4b39-8702-b968ee9f3778 not found or risk data identical
+2026-05-17 00:11:23 | WARNING  | __main__:process_article:243 — [Agent 4] Could not update MongoDB risk for 9ad38f4c-b26c-4b39-8702-b968ee9f3778. It may not exist in Layer 1.
+2026-05-17 00:11:23 | INFO     | __main__:process_article:254 — [Agent 4] Risk scoring complete for 9ad38f4c-b26c-4b39-8702-b968ee9f3778 → Score: 80 | Confidence: 0.85
+2026-05-17 00:16:43 | INFO     | __main__:process_article:152 — [Agent 3] Summarizing article: d0611bb7-34ed-4484-8d02-b0ce328deb75
+2026-05-17 00:16:45 | INFO     | storage.mongo_store:_connect:48 — [MongoDB] Connected to mongodb://localhost:27017 / mapnai
+2026-05-17 00:16:45 | DEBUG    | storage.mongo_store:_ensure_indexes:67 — [MongoDB] Indexes verified.
+2026-05-17 00:16:45 | DEBUG    | storage.mongo_store:update_article_summaries:168 — [MongoDB] Article d0611bb7-34ed-4484-8d02-b0ce328deb75 not found or summaries identical
+2026-05-17 00:16:45 | WARNING  | __main__:process_article:162 — [Agent 3] Could not update MongoDB summaries for d0611bb7-34ed-4484-8d02-b0ce328deb75. It may not exist in Layer 1.
+2026-05-17 00:16:45 | INFO     | __main__:process_article:170 — [Agent 3] Summarization complete for d0611bb7-34ed-4484-8d02-b0ce328deb75.
