@@ -26,7 +26,7 @@ class SourceType(str, Enum):
     NEWS_API    = "news_api"
     GNEWS       = "gnews"
     NEWSDATA    = "newsdata"
-    REDDIT      = "reddit"
+    BLUESKY     = "bluesky"
     SCRAPER     = "scraper"
     GOVERNMENT  = "government"
 
@@ -82,8 +82,8 @@ class ProcessedArticle(BaseModel):
     dedup_hash:     str      = ""     # SimHash hex string
 
     # ── Enrichment (filled by enrichment step) ────────────────
-    entities:       List[Dict[str, str]] = Field(default_factory=list)
-    # e.g. [{"name": "RBI", "type": "ORG"}, {"name": "India", "type": "GPE"}]
+    entities:       List[Dict[str, Any]] = Field(default_factory=list)
+    # e.g. [{"name": "RBI", "type": "ORG", "salience": 0.91}]
 
     sentiment_score:  float  = 0.0    # -1.0 to +1.0
     sentiment_label:  SentimentLabel = SentimentLabel.NEUTRAL

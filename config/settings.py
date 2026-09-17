@@ -2,6 +2,8 @@
 MAPNAI — config/settings.py
 Central configuration loaded from .env via pydantic-settings.
 All other modules import from here — no direct os.getenv() calls elsewhere.
+
+Note: Reddit has been replaced by the Bluesky Firehose (WebSocket, zero-auth).
 """
 
 from pydantic_settings import BaseSettings
@@ -15,10 +17,16 @@ class Settings(BaseSettings):
     gnews_api_key: str = Field(default="", env="GNEWS_API_KEY")
     newsdata_api_key: str = Field(default="", env="NEWSDATA_API_KEY")
 
-    # ── Reddit ───────────────────────────────────────────────
-    reddit_client_id: str = Field(default="", env="REDDIT_CLIENT_ID")
-    reddit_client_secret: str = Field(default="", env="REDDIT_CLIENT_SECRET")
-    reddit_user_agent: str = Field(default="MAPNAI/1.0", env="REDDIT_USER_AGENT")
+    # ── Bluesky Firehose (zero-auth public WebSocket) ────────
+    bluesky_firehose_url: str = Field(
+        default="wss://bsky.network/xrpc/com.atproto.sync.subscribeRepos",
+        env="BLUESKY_FIREHOSE_URL",
+    )
+    bluesky_max_posts: int = Field(default=200, env="BLUESKY_MAX_POSTS")
+
+    # ── LLM / Groq Settings ──────────────────────────────────
+    groq_api_key: str = Field(default="", env="GROQ_API_KEY")
+    groq_model: str = Field(default="llama-3.3-70b-versatile", env="GROQ_MODEL")
 
     # ── MongoDB ──────────────────────────────────────────────
     mongo_uri: str = Field(default="mongodb://localhost:27017", env="MONGO_URI")

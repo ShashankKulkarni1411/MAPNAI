@@ -1,158 +1,212 @@
 """
 MAPNAI — agents/ner_agent.py
 Agent 1: Named Entity Recognition & Entity Extraction
-Uses GLiNER (zero-shot) with spaCy fallback to extract 8 specific entity types.
-Wraps as an AutoGen ConversableAgent.
-Reads/writes using PostgreSQL and upserts to Neo4j.
+
+Uses fine-tuned BERT model (models/mapnai-ner-bert) to extract entities.
+
+Reads/writes using MongoDB (primary store) and upserts to Neo4j.
+All credentials come from config.settings (loaded from .env).
 """
 
-import os
-import json
-import time
 import logging
-from typing import Dict, Any, List, Tuple
+import os
+import time
+from typing import Dict, Any, List
 
-import psycopg2
-from psycopg2.extras import Json
+from pymongo import MongoClient
+from pymongo.errors import PyMongoError
+from transformers import pipeline
 
-from agents.ner_utils import (
-    ENTITY_TYPES, 
-    deduplicate_and_merge_entities, 
-    extract_entities_fallback
-)
+from agents.ner_utils import deduplicate_and_merge_entities
 from agents.neo4j_writer import Neo4jWriter
+from config.settings import settings
 
-# GLiNER Thresholds
-GLINER_CONFIDENCE_THRESHOLD = 0.5
+
+logger = logging.getLogger(__name__)
+
+LABEL_MAP = {
+    "PER": "Person",
+    "ORG": "Organization",
+    "LOC": "Location",
+    "MISC": "Product"
+}
+
 
 class NERAgent:
-    def __init__(self, db_url: str = None):
-        self.db_url = db_url or os.getenv("POSTGRES_URL", "postgresql://user:password@localhost:5432/mapnai")
-        self.neo4j_writer = Neo4jWriter()
-        self._gliner_model = None
+    """
+    Standalone NER Agent.
+    Call  agent.process(article_dict) → returns the NER output contract dict.
 
-    def _get_gliner(self):
-        """Lazy load GLiNER model to save memory if unused."""
-        if self._gliner_model is None:
-            try:
-                from gliner import GLiNER
-                # Load the standard model; this downloads weights on first run
-                self._gliner_model = GLiNER.from_pretrained("urchade/gliner_medium-v2.1")
-            except ImportError:
-                logging.error("[NER Agent] GLiNER not installed. Will use fallback exclusively.")
-        return self._gliner_model
+    Expected article dict keys:
+        article_id  (str)
+        title       (str)
+        body        (str)
+        domain      (str)  — e.g. "finance", "geopolitics"
+    """
+
+    def __init__(self, model_path: str = "models/mapnai-ner-bert"):
+        # ── MongoDB ──────────────────────────────────────────
+        try:
+            self._mongo_client = MongoClient(settings.mongo_uri, serverSelectionTimeoutMS=2000)
+            self._db = self._mongo_client[settings.mongo_db_name]
+            self._articles_col = self._db["processed_articles"]
+        except Exception as e:
+            logger.warning(f"[NER Agent] MongoDB client init failed: {e}")
+            self._mongo_client = None
+            self._db = None
+            self._articles_col = None
+
+        # ── Neo4j ────────────────────────────────────────────
+        self.neo4j_writer = Neo4jWriter()
+
+        # ── BERT Pipeline ────────────────────────────────────
+        resolved_path = model_path
+        if not os.path.exists(resolved_path):
+            base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+            alt_path = os.path.join(base_dir, model_path)
+            if os.path.exists(alt_path):
+                resolved_path = alt_path
+
+        logger.info(f"[NER Agent] Loading fine-tuned BERT model from: {resolved_path}")
+        self.ner_pipeline = pipeline(
+            "token-classification",
+            model=resolved_path,
+            tokenizer=resolved_path,
+            aggregation_strategy="first"
+        )
+        logger.info(f"[NER Agent] Loaded BERT model: {resolved_path}")
+
+    # ── Public API ───────────────────────────────────────────
 
     def process(self, article: dict) -> dict:
         """
-        Main handler for incoming messages.
-        Expects a dictionary containing article data.
+        Main entry point.  Accepts an article dict, returns the NER contract:
+
+            {
+                "article_id": str,
+                "entities":   [ { name, type, domain, salience, mention_count } ],
+                "_metadata":  { model_used, latency_seconds, entity_count }
+            }
         """
         required_keys = {"article_id", "title", "body", "domain"}
-        if not required_keys.issubset(article.keys()):
-            raise ValueError(f"Article missing required keys: {required_keys - set(article.keys())}")
-            
+        missing = required_keys - set(article.keys())
+        if missing:
+            raise ValueError(f"[NER Agent] Article missing required keys: {missing}")
+
+        start_time = time.time()
+        article_id = article["article_id"]
+        domain = article["domain"]
+        # Accept Domain enum or plain string
+        domain_str = domain.value if hasattr(domain, "value") else str(domain)
+        text = f"{article['title']}\n\n{article['body']}"
+
+        # ── Edge case: empty text ────────────────────────────
+        if not text.strip():
+            logger.warning(f"[NER Agent] Empty text for article {article_id[:8]}. Skipping.")
+            return self._build_output(article_id, [], "none", time.time() - start_time)
+
+        # ── Entity extraction ────────────────────────────────
+        raw_entities, model_used = self._extract(text)
+
+        # ── Deduplication, salience scoring, domain stamp ────
+        processed_entities = deduplicate_and_merge_entities(
+            raw_entities, len(text), domain_str
+        )
+
+        latency = time.time() - start_time
+
+        # ── Persist ──────────────────────────────────────────
+        self._write_to_mongo(article_id, processed_entities)
+        upserted = self.neo4j_writer.upsert_entities(article_id, processed_entities)
+
+        logger.info(
+            f"[NER Agent] {article_id[:8]} | "
+            f"Entities: {len(processed_entities)} | "
+            f"Neo4j upserted: {upserted} | "
+            f"Model: {model_used} | "
+            f"Latency: {latency:.2f}s"
+        )
+
+        return self._build_output(article_id, processed_entities, model_used, latency)
+
+    # ── Internal helpers ─────────────────────────────────────
+
+    def _extract(self, text: str):
+        """
+        Run fine-tuned BERT NER pipeline.
+
+        Returns (raw_entities: list[dict], model_used: str).
+        """
+        model_used = "BERT-finetuned"
         try:
-            start_time = time.time()
-            
-            # Combine title and body
-            text = f"{article['title']}\n\n{article['body']}"
-            domain = article["domain"]
-            article_id = article["article_id"]
-            
-            # Edge case: empty body
-            if not text.strip():
-                final_output = self._finalize_output(article_id, [], "none", time.time() - start_time)
-                return final_output
-                
-            entities, model_used = self._extract_entities(text)
-            
-            # Deduplicate, score salience, stamp domain
-            processed_entities = deduplicate_and_merge_entities(entities, len(text), domain)
-            
-            latency = time.time() - start_time
-            
-            # Write to databases
-            self._write_to_postgres(article_id, processed_entities)
-            self.neo4j_writer.upsert_entities(article_id, processed_entities)
-            
-            # Log stats
-            logging.info(
-                f"[NER Agent] Processed {article_id[:8]} | "
-                f"Entities: {len(processed_entities)} | Model: {model_used} | Latency: {latency:.2f}s"
-            )
-            
-            final_output = self._finalize_output(article_id, processed_entities, model_used, latency)
-            return final_output
-            
+            raw_output = self.ner_pipeline(text)
+            raw_entities = []
+            for ent in raw_output:
+                group = ent.get("entity_group") or ent.get("entity") or ""
+                clean_group = group.replace("B-", "").replace("I-", "")
+                mapped_type = LABEL_MAP.get(clean_group, LABEL_MAP.get(group))
+                if mapped_type:
+                    raw_entities.append({
+                        "text": ent.get("word", "").strip(),
+                        "label": mapped_type,
+                        "start": ent.get("start", 0),
+                        "end": ent.get("end", 0),
+                        "score": float(ent.get("score", 1.0)),
+                    })
+            return raw_entities, model_used
         except Exception as e:
-            logging.error(f"[NER Agent] Error processing message: {e}")
-            raise
+            logger.error(f"[NER Agent] BERT inference error: {e}")
+            return [], model_used
 
-    def _extract_entities(self, text: str) -> Tuple[List[Dict], str]:
-        """Runs GLiNER and falls back to spaCy if needed."""
-        gliner = self._get_gliner()
-        if gliner:
-            try:
-                # Truncate text to avoid context window issues
-                # GLiNER handles moderate length, but we should be safe
-                truncated_text = text[:10000]
-                
-                # Zero-shot extraction using the 8 requested types
-                predictions = gliner.predict_entities(
-                    truncated_text, 
-                    list(ENTITY_TYPES), 
-                    flat_ner=True, 
-                    threshold=GLINER_CONFIDENCE_THRESHOLD
-                )
-                
-                if predictions:
-                    return predictions, "GLiNER"
-            except Exception as e:
-                logging.warning(f"[NER Agent] GLiNER extraction failed: {e}")
-                
-        # Fallback to spaCy
-        fallback_entities = extract_entities_fallback(text)
-        return fallback_entities, "spaCy"
+    def _write_to_mongo(self, article_id: str, entities: List[Dict]) -> None:
+        """
+        Upserts the entities field on the processed_articles document.
+        Creates the document if it doesn't exist yet.
+        """
+        if self._articles_col is None:
+            return
+        try:
+            self._articles_col.update_one(
+                {"article_id": article_id},
+                {"$set": {"entities": entities}},
+                upsert=True,
+            )
+        except PyMongoError as e:
+            logger.error(f"[NER Agent] MongoDB write failed for {article_id}: {e}")
 
-    def _finalize_output(self, article_id: str, entities: List[Dict], model_used: str, latency: float) -> Dict:
-        """Formats the final JSON contract."""
-        # Note: metadata is added here for logging/debugging, 
-        # but the required contract format is maintained at the root.
+    @staticmethod
+    def _build_output(
+        article_id: str,
+        entities: List[Dict],
+        model_used: str,
+        latency: float,
+    ) -> Dict:
+        """Constructs the standard NER output contract."""
         return {
             "article_id": article_id,
             "entities": entities,
             "_metadata": {
                 "model_used": model_used,
-                "latency_seconds": round(latency, 2),
-                "entity_count": len(entities)
-            }
+                "latency_seconds": round(latency, 3),
+                "entity_count": len(entities),
+            },
         }
 
-    def _write_to_postgres(self, article_id: str, entities: List[Dict]):
-        """
-        Updates the processed_articles table in PostgreSQL.
-        Sets the entities JSONB field.
-        """
-        try:
-            conn = psycopg2.connect(self.db_url)
-            cursor = conn.cursor()
-            
-            # Upsert into processed_articles. If it already exists, update entities.
-            # Assuming schema has article_id as primary key/unique constraint.
-            query = """
-                INSERT INTO processed_articles (article_id, entities)
-                VALUES (%s, %s)
-                ON CONFLICT (article_id) 
-                DO UPDATE SET entities = EXCLUDED.entities;
-            """
-            cursor.execute(query, (article_id, Json(entities)))
-            conn.commit()
-            
-            cursor.close()
-            conn.close()
-        except psycopg2.Error as e:
-            logging.error(f"[NER Agent] PostgreSQL write failed for {article_id}: {e}")
+    # ── Cleanup ──────────────────────────────────────────────
+
+    def close(self):
+        """Release all external connections."""
+        self.neo4j_writer.close()
+        if self._mongo_client:
+            try:
+                self._mongo_client.close()
+            except Exception:
+                pass
+            logger.debug("[NER Agent] MongoDB connection closed.")
 
     def __del__(self):
-        if hasattr(self, 'neo4j_writer'):
-            self.neo4j_writer.close()
+        # Best-effort cleanup — avoid raising inside __del__
+        try:
+            self.close()
+        except Exception:
+            pass

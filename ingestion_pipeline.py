@@ -5,7 +5,7 @@ Coordinates all fetchers, preprocessing, enrichment, and 3-way storage.
 This is the single entry point for one complete ingestion run.
 
 Pipeline flow:
-  1. Fetch from RSS + APIs + Reddit + Scrapers (parallel)
+  1. Fetch from RSS + APIs + Bluesky Firehose + Scrapers (parallel)
   2. Preprocess batch (clean, dedupe, classify, normalize)
   3. Enrich with entities (spaCy NER)
   4. Store to MongoDB + FAISS + Neo4j (simultaneous)
@@ -24,7 +24,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 
 from agents.rss_fetcher       import fetch_all_rss_sources
 from agents.api_fetcher        import fetch_all_apis
-from agents.reddit_fetcher     import fetch_all_reddit
+from agents.bluesky_fetcher    import fetch_all_bluesky
 from agents.web_scraper        import scrape_all_targets
 from agents.preprocessing_agent import PreprocessingAgent
 from agents.enrichment_agent   import EnrichmentAgent
@@ -79,7 +79,7 @@ def _fetch_phase(max_per_source: int = None) -> List[RawArticle]:
     fetch_tasks = {
         "RSS":     lambda: fetch_all_rss_sources(max_per_source=max_per_source),
         "APIs":    lambda: fetch_all_apis(max_per_domain=max_per_source),
-        "Reddit":  lambda: fetch_all_reddit(),
+        "Bluesky": lambda: fetch_all_bluesky(),
         "Scraper": lambda: scrape_all_targets(max_per_target=10),
     }
 

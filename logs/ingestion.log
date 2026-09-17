@@ -1,0 +1,1252 @@
+2026-05-16 17:48:47 | INFO     | __main__:run_ingestion_pipeline:194 — ============================================================
+2026-05-16 17:48:47 | INFO     | __main__:run_ingestion_pipeline:195 — [Pipeline] INGESTION RUN STARTED — 89301a48
+2026-05-16 17:48:47 | INFO     | __main__:run_ingestion_pipeline:196 — ============================================================
+2026-05-16 17:48:47 | INFO     | storage.mongo_store:_connect:48 — [MongoDB] Connected to mongodb+srv://mapnaiUser:Mapnai%4012345@cluster0.8rhhosm.mongodb.net/?appName=Cluster0 / mapnai
+2026-05-16 17:48:47 | DEBUG    | storage.mongo_store:_ensure_indexes:67 — [MongoDB] Indexes verified.
+2026-05-16 17:48:47 | INFO     | storage.mongo_store:get_existing_hashes:141 — [MongoDB] Loaded 519 existing hashes for deduplication.
+2026-05-16 17:48:47 | INFO     | agents.bluesky_fetcher:fetch_bluesky_firehose:175 — [Bluesky] Connecting to wss://bsky.network/xrpc/com.atproto.sync.subscribeRepos
+2026-05-16 17:48:47 | DEBUG    | agents.web_scraper:scrape_target:110 — [Scraper] Fetching listing: https://www.business-standard.com/finance
+2026-05-16 17:48:47 | WARNING  | agents.rss_fetcher:_fetch_feed:77 — RSS fetch error (https://feeds.reuters.com/reuters/businessNews): HTTPSConnectionPool(host='feeds.reuters.com', port=443): Max retries exceeded with url: /reuters/businessNews (Caused by NameResolutionError("HTTPSConnection(host='feeds.reuters.com', port=443): Failed to resolve 'feeds.reuters.com' ([Errno 11001] getaddrinfo failed)"))
+2026-05-16 17:48:48 | WARNING  | agents.web_scraper:_fetch_page:77 — [Scraper] HTTP 403: https://www.business-standard.com/finance
+2026-05-16 17:48:48 | WARNING  | agents.web_scraper:scrape_target:113 — [Scraper] Could not fetch listing for Business Standard
+2026-05-16 17:48:48 | DEBUG    | agents.web_scraper:scrape_target:110 — [Scraper] Fetching listing: https://www.livemint.com/politics
+2026-05-16 17:48:48 | INFO     | agents.api_fetcher:fetch:134 — [NewsAPI] Fetched 0 articles for query: 'finance OR economy OR stock market OR in'
+2026-05-16 17:48:48 | INFO     | agents.bluesky_fetcher:_on_open:173 — [Bluesky] Firehose connected — collecting up to 200 posts.
+2026-05-16 17:48:48 | DEBUG    | agents.web_scraper:scrape_target:126 — [Scraper] Found 10 links on LiveMint Policy
+2026-05-16 17:48:49 | INFO     | agents.api_fetcher:fetch:134 — [NewsAPI] Fetched 0 articles for query: 'geopolitics OR war OR election OR diplom'
+2026-05-16 17:48:49 | WARNING  | agents.rss_fetcher:_fetch_feed:77 — RSS fetch error (https://feeds.reuters.com/reuters/businessNews): HTTPSConnectionPool(host='feeds.reuters.com', port=443): Max retries exceeded with url: /reuters/businessNews (Caused by NameResolutionError("HTTPSConnection(host='feeds.reuters.com', port=443): Failed to resolve 'feeds.reuters.com' ([Errno 11001] getaddrinfo failed)"))
+2026-05-16 17:48:50 | INFO     | agents.api_fetcher:fetch:134 — [NewsAPI] Fetched 0 articles for query: 'technology OR AI OR artificial intellige'
+2026-05-16 17:48:51 | INFO     | agents.api_fetcher:fetch:134 — [NewsAPI] Fetched 0 articles for query: 'health OR pandemic OR vaccine OR WHO OR '
+2026-05-16 17:48:51 | WARNING  | agents.rss_fetcher:_fetch_feed:77 — RSS fetch error (https://feeds.reuters.com/reuters/businessNews): HTTPSConnectionPool(host='feeds.reuters.com', port=443): Max retries exceeded with url: /reuters/businessNews (Caused by NameResolutionError("HTTPSConnection(host='feeds.reuters.com', port=443): Failed to resolve 'feeds.reuters.com' ([Errno 11001] getaddrinfo failed)"))
+2026-05-16 17:48:51 | ERROR    | agents.rss_fetcher:fetch_rss_source:128 — [RSS] Failed to fetch Reuters Business (https://feeds.reuters.com/reuters/businessNews): RetryError[<Future at 0x287c38b1b50 state=finished raised ConnectionError>]
+2026-05-16 17:48:53 | INFO     | agents.api_fetcher:fetch:134 — [NewsAPI] Fetched 0 articles for query: 'supply chain OR logistics OR shipping OR'
+2026-05-16 17:48:53 | INFO     | agents.api_fetcher:fetch_all_domains:145 — [NewsAPI] Total fetched: 0
+2026-05-16 17:48:54 | INFO     | agents.rss_fetcher:fetch_rss_source:125 — [RSS] Fetched 30 articles from Bloomberg Markets
+2026-05-16 17:48:54 | INFO     | agents.api_fetcher:fetch:204 — [GNews] Fetched 10 for 'finance OR economy OR stock market OR in'
+2026-05-16 17:48:55 | INFO     | agents.rss_fetcher:fetch_rss_source:125 — [RSS] Fetched 30 articles from CNBC Finance
+2026-05-16 17:48:56 | INFO     | agents.api_fetcher:fetch:204 — [GNews] Fetched 10 for 'geopolitics OR war OR election OR diplom'
+2026-05-16 17:48:58 | INFO     | agents.rss_fetcher:fetch_rss_source:125 — [RSS] Fetched 8 articles from Financial Times
+2026-05-16 17:48:58 | INFO     | agents.web_scraper:scrape_target:160 — [Scraper] Scraped 0 articles from LiveMint Policy
+2026-05-16 17:48:58 | DEBUG    | agents.web_scraper:scrape_target:110 — [Scraper] Fetching listing: https://www.ndtv.com/technology
+2026-05-16 17:48:58 | INFO     | agents.rss_fetcher:fetch_rss_source:125 — [RSS] Fetched 15 articles from Moneycontrol
+2026-05-16 17:48:59 | WARNING  | agents.web_scraper:_fetch_page:77 — [Scraper] HTTP 403: https://www.ndtv.com/technology
+2026-05-16 17:48:59 | WARNING  | agents.web_scraper:scrape_target:113 — [Scraper] Could not fetch listing for NDTV Tech
+2026-05-16 17:48:59 | INFO     | agents.web_scraper:scrape_all_targets:174 — [Scraper] Total scraped: 0
+2026-05-16 17:48:59 | INFO     | __main__:_fetch_phase:96 — [Pipeline] Scraper completed: 0 raw articles
+2026-05-16 17:48:59 | INFO     | agents.api_fetcher:fetch:204 — [GNews] Fetched 10 for 'technology OR AI OR artificial intellige'
+2026-05-16 17:48:59 | INFO     | agents.rss_fetcher:fetch_rss_source:125 — [RSS] Fetched 50 articles from Economic Times
+2026-05-16 17:48:59 | INFO     | agents.rss_fetcher:fetch_rss_source:125 — [RSS] Fetched 35 articles from Mint
+2026-05-16 17:49:00 | INFO     | agents.api_fetcher:fetch:204 — [GNews] Fetched 10 for 'health OR pandemic OR vaccine OR WHO OR '
+2026-05-16 17:49:00 | INFO     | agents.rss_fetcher:fetch_rss_source:125 — [RSS] Fetched 10 articles from MarketWatch
+2026-05-16 17:49:01 | INFO     | agents.rss_fetcher:fetch_rss_source:125 — [RSS] Fetched 30 articles from Seeking Alpha
+2026-05-16 17:49:03 | INFO     | agents.rss_fetcher:fetch_rss_source:125 — [RSS] Fetched 42 articles from Yahoo Finance
+2026-05-16 17:49:03 | WARNING  | agents.rss_fetcher:_fetch_feed:77 — RSS fetch error (https://feeds.reuters.com/reuters/worldNews): HTTPSConnectionPool(host='feeds.reuters.com', port=443): Max retries exceeded with url: /reuters/worldNews (Caused by NameResolutionError("HTTPSConnection(host='feeds.reuters.com', port=443): Failed to resolve 'feeds.reuters.com' ([Errno 11001] getaddrinfo failed)"))
+2026-05-16 17:49:05 | WARNING  | agents.rss_fetcher:_fetch_feed:77 — RSS fetch error (https://feeds.reuters.com/reuters/worldNews): HTTPSConnectionPool(host='feeds.reuters.com', port=443): Max retries exceeded with url: /reuters/worldNews (Caused by NameResolutionError("HTTPSConnection(host='feeds.reuters.com', port=443): Failed to resolve 'feeds.reuters.com' ([Errno 11001] getaddrinfo failed)"))
+2026-05-16 17:49:07 | WARNING  | agents.rss_fetcher:_fetch_feed:77 — RSS fetch error (https://feeds.reuters.com/reuters/worldNews): HTTPSConnectionPool(host='feeds.reuters.com', port=443): Max retries exceeded with url: /reuters/worldNews (Caused by NameResolutionError("HTTPSConnection(host='feeds.reuters.com', port=443): Failed to resolve 'feeds.reuters.com' ([Errno 11001] getaddrinfo failed)"))
+2026-05-16 17:49:07 | ERROR    | agents.rss_fetcher:fetch_rss_source:128 — [RSS] Failed to fetch Reuters World (https://feeds.reuters.com/reuters/worldNews): RetryError[<Future at 0x287c40a6150 state=finished raised ConnectionError>]
+2026-05-16 17:49:08 | INFO     | agents.api_fetcher:fetch:204 — [GNews] Fetched 10 for 'supply chain OR logistics OR shipping OR'
+2026-05-16 17:49:08 | INFO     | agents.api_fetcher:fetch_all_domains:215 — [GNews] Total fetched: 50
+2026-05-16 17:49:09 | INFO     | agents.rss_fetcher:fetch_rss_source:125 — [RSS] Fetched 28 articles from BBC World
+2026-05-16 17:49:09 | INFO     | agents.rss_fetcher:fetch_rss_source:125 — [RSS] Fetched 25 articles from Al Jazeera
+2026-05-16 17:49:09 | INFO     | agents.api_fetcher:fetch:277 — [NewsData] Fetched 10 for 'finance OR economy OR stock market OR in'
+2026-05-16 17:49:10 | INFO     | agents.rss_fetcher:fetch_rss_source:125 — [RSS] Fetched 25 articles from Foreign Policy
+2026-05-16 17:49:10 | INFO     | agents.rss_fetcher:fetch_rss_source:125 — [RSS] Fetched 50 articles from The Diplomat
+2026-05-16 17:49:11 | INFO     | agents.api_fetcher:fetch:277 — [NewsData] Fetched 10 for 'geopolitics OR war OR election OR diplom'
+2026-05-16 17:49:12 | WARNING  | agents.rss_fetcher:_fetch_feed:74 — HTTP 404 for RSS: https://www.cfr.org/rss.xml
+2026-05-16 17:49:12 | INFO     | agents.api_fetcher:fetch:277 — [NewsData] Fetched 10 for 'technology OR AI OR artificial intellige'
+2026-05-16 17:49:14 | INFO     | agents.api_fetcher:fetch:277 — [NewsData] Fetched 10 for 'health OR pandemic OR vaccine OR WHO OR '
+2026-05-16 17:49:15 | WARNING  | agents.rss_fetcher:_fetch_feed:74 — HTTP 404 for RSS: https://www.cfr.org/rss.xml
+2026-05-16 17:49:16 | INFO     | agents.api_fetcher:fetch:277 — [NewsData] Fetched 10 for 'supply chain OR logistics OR shipping OR'
+2026-05-16 17:49:16 | INFO     | agents.api_fetcher:fetch_all_domains:288 — [NewsData] Total fetched: 50
+2026-05-16 17:49:16 | INFO     | agents.api_fetcher:fetch_all_apis:306 — [APIs] Combined total: 100 articles
+2026-05-16 17:49:16 | INFO     | __main__:_fetch_phase:96 — [Pipeline] APIs completed: 100 raw articles
+2026-05-16 17:49:17 | WARNING  | agents.bluesky_fetcher:fetch_bluesky_firehose:196 — [Bluesky] Timeout reached — closing connection.
+2026-05-16 17:49:19 | WARNING  | agents.rss_fetcher:_fetch_feed:74 — HTTP 404 for RSS: https://www.cfr.org/rss.xml
+2026-05-16 17:49:19 | ERROR    | agents.rss_fetcher:fetch_rss_source:128 — [RSS] Failed to fetch Council on Foreign Relations (https://www.cfr.org/rss.xml): RetryError[<Future at 0x287c33517d0 state=finished raised HTTPError>]
+2026-05-16 17:49:20 | INFO     | agents.bluesky_fetcher:fetch_bluesky_firehose:202 — [Bluesky] Collected 0 posts from Firehose.
+2026-05-16 17:49:20 | INFO     | __main__:_fetch_phase:96 — [Pipeline] Bluesky completed: 0 raw articles
+2026-05-16 17:49:21 | INFO     | agents.rss_fetcher:fetch_rss_source:125 — [RSS] Fetched 20 articles from NDTV World
+2026-05-16 17:49:21 | INFO     | agents.rss_fetcher:fetch_rss_source:125 — [RSS] Fetched 0 articles from The Wire
+2026-05-16 17:49:22 | INFO     | agents.rss_fetcher:fetch_rss_source:125 — [RSS] Fetched 20 articles from TechCrunch
+2026-05-16 17:49:22 | INFO     | agents.rss_fetcher:fetch_rss_source:125 — [RSS] Fetched 10 articles from The Verge
+2026-05-16 17:49:23 | INFO     | agents.rss_fetcher:fetch_rss_source:125 — [RSS] Fetched 50 articles from Wired
+2026-05-16 17:49:24 | INFO     | agents.rss_fetcher:fetch_rss_source:125 — [RSS] Fetched 10 articles from MIT Tech Review
+2026-05-16 17:49:25 | INFO     | agents.rss_fetcher:fetch_rss_source:125 — [RSS] Fetched 20 articles from Ars Technica
+2026-05-16 17:49:26 | INFO     | agents.rss_fetcher:fetch_rss_source:125 — [RSS] Fetched 20 articles from Hacker News
+2026-05-16 17:49:27 | INFO     | agents.rss_fetcher:fetch_rss_source:125 — [RSS] Fetched 7 articles from VentureBeat
+2026-05-16 17:49:32 | INFO     | agents.rss_fetcher:fetch_rss_source:125 — [RSS] Fetched 12 articles from AI News
+2026-05-16 17:49:33 | INFO     | agents.rss_fetcher:fetch_rss_source:125 — [RSS] Fetched 25 articles from WHO News
+2026-05-16 17:49:33 | WARNING  | agents.rss_fetcher:_fetch_feed:77 — RSS fetch error (https://feeds.reuters.com/reuters/healthNews): HTTPSConnectionPool(host='feeds.reuters.com', port=443): Max retries exceeded with url: /reuters/healthNews (Caused by NameResolutionError("HTTPSConnection(host='feeds.reuters.com', port=443): Failed to resolve 'feeds.reuters.com' ([Errno 11001] getaddrinfo failed)"))
+2026-05-16 17:49:35 | WARNING  | agents.rss_fetcher:_fetch_feed:77 — RSS fetch error (https://feeds.reuters.com/reuters/healthNews): HTTPSConnectionPool(host='feeds.reuters.com', port=443): Max retries exceeded with url: /reuters/healthNews (Caused by NameResolutionError("HTTPSConnection(host='feeds.reuters.com', port=443): Failed to resolve 'feeds.reuters.com' ([Errno 11001] getaddrinfo failed)"))
+2026-05-16 17:49:37 | WARNING  | agents.rss_fetcher:_fetch_feed:77 — RSS fetch error (https://feeds.reuters.com/reuters/healthNews): HTTPSConnectionPool(host='feeds.reuters.com', port=443): Max retries exceeded with url: /reuters/healthNews (Caused by NameResolutionError("HTTPSConnection(host='feeds.reuters.com', port=443): Failed to resolve 'feeds.reuters.com' ([Errno 11001] getaddrinfo failed)"))
+2026-05-16 17:49:37 | ERROR    | agents.rss_fetcher:fetch_rss_source:128 — [RSS] Failed to fetch Reuters Health (https://feeds.reuters.com/reuters/healthNews): RetryError[<Future at 0x287c41837d0 state=finished raised ConnectionError>]
+2026-05-16 17:49:40 | WARNING  | agents.rss_fetcher:_fetch_feed:74 — HTTP 404 for RSS: https://www.nih.gov/news-events/news-releases/feed.xml
+2026-05-16 17:49:44 | WARNING  | agents.rss_fetcher:_fetch_feed:74 — HTTP 404 for RSS: https://www.nih.gov/news-events/news-releases/feed.xml
+2026-05-16 17:49:48 | WARNING  | agents.rss_fetcher:_fetch_feed:74 — HTTP 404 for RSS: https://www.nih.gov/news-events/news-releases/feed.xml
+2026-05-16 17:49:48 | ERROR    | agents.rss_fetcher:fetch_rss_source:128 — [RSS] Failed to fetch NIH News (https://www.nih.gov/news-events/news-releases/feed.xml): RetryError[<Future at 0x287c32ab790 state=finished raised HTTPError>]
+2026-05-16 17:49:50 | INFO     | agents.rss_fetcher:fetch_rss_source:125 — [RSS] Fetched 50 articles from CDC Media
+2026-05-16 17:49:51 | INFO     | agents.rss_fetcher:fetch_rss_source:125 — [RSS] Fetched 20 articles from STAT News
+2026-05-16 17:49:52 | WARNING  | agents.rss_fetcher:_fetch_feed:74 — HTTP 404 for RSS: https://www.medscape.com/cx/rss/professional.xml
+2026-05-16 17:49:55 | WARNING  | agents.rss_fetcher:_fetch_feed:74 — HTTP 404 for RSS: https://www.medscape.com/cx/rss/professional.xml
+2026-05-16 17:49:57 | WARNING  | agents.rss_fetcher:_fetch_feed:74 — HTTP 404 for RSS: https://www.medscape.com/cx/rss/professional.xml
+2026-05-16 17:49:57 | ERROR    | agents.rss_fetcher:fetch_rss_source:128 — [RSS] Failed to fetch Medscape (https://www.medscape.com/cx/rss/professional.xml): RetryError[<Future at 0x287c3d16c90 state=finished raised HTTPError>]
+2026-05-16 17:49:59 | INFO     | agents.rss_fetcher:fetch_rss_source:125 — [RSS] Fetched 10 articles from Supply Chain Dive
+2026-05-16 17:50:00 | INFO     | agents.rss_fetcher:fetch_rss_source:125 — [RSS] Fetched 0 articles from Logistics Management
+2026-05-16 17:50:00 | WARNING  | agents.rss_fetcher:_fetch_feed:77 — RSS fetch error (https://feeds.reuters.com/reuters/companyNews): HTTPSConnectionPool(host='feeds.reuters.com', port=443): Max retries exceeded with url: /reuters/companyNews (Caused by NameResolutionError("HTTPSConnection(host='feeds.reuters.com', port=443): Failed to resolve 'feeds.reuters.com' ([Errno 11001] getaddrinfo failed)"))
+2026-05-16 17:50:02 | WARNING  | agents.rss_fetcher:_fetch_feed:77 — RSS fetch error (https://feeds.reuters.com/reuters/companyNews): HTTPSConnectionPool(host='feeds.reuters.com', port=443): Max retries exceeded with url: /reuters/companyNews (Caused by NameResolutionError("HTTPSConnection(host='feeds.reuters.com', port=443): Failed to resolve 'feeds.reuters.com' ([Errno 11001] getaddrinfo failed)"))
+2026-05-16 17:50:04 | WARNING  | agents.rss_fetcher:_fetch_feed:77 — RSS fetch error (https://feeds.reuters.com/reuters/companyNews): HTTPSConnectionPool(host='feeds.reuters.com', port=443): Max retries exceeded with url: /reuters/companyNews (Caused by NameResolutionError("HTTPSConnection(host='feeds.reuters.com', port=443): Failed to resolve 'feeds.reuters.com' ([Errno 11001] getaddrinfo failed)"))
+2026-05-16 17:50:04 | ERROR    | agents.rss_fetcher:fetch_rss_source:128 — [RSS] Failed to fetch Reuters Commodities (https://feeds.reuters.com/reuters/companyNews): RetryError[<Future at 0x287c46f9690 state=finished raised ConnectionError>]
+2026-05-16 17:50:14 | INFO     | agents.rss_fetcher:fetch_rss_source:125 — [RSS] Fetched 10 articles from Freightos
+2026-05-16 17:50:15 | INFO     | agents.rss_fetcher:fetch_rss_source:125 — [RSS] Fetched 0 articles from RBI Press Releases
+2026-05-16 17:50:16 | WARNING  | agents.rss_fetcher:_fetch_feed:74 — HTTP 403 for RSS: https://www.imf.org/en/News/rss?language=eng
+2026-05-16 17:50:18 | WARNING  | agents.rss_fetcher:_fetch_feed:74 — HTTP 403 for RSS: https://www.imf.org/en/News/rss?language=eng
+2026-05-16 17:50:20 | WARNING  | agents.rss_fetcher:_fetch_feed:74 — HTTP 403 for RSS: https://www.imf.org/en/News/rss?language=eng
+2026-05-16 17:50:20 | ERROR    | agents.rss_fetcher:fetch_rss_source:128 — [RSS] Failed to fetch IMF News (https://www.imf.org/en/News/rss?language=eng): RetryError[<Future at 0x287c46f9a10 state=finished raised HTTPError>]
+2026-05-16 17:50:20 | WARNING  | agents.rss_fetcher:_fetch_feed:77 — RSS fetch error (https://feeds.worldbank.org/worldbank/world/feeds/rss): HTTPSConnectionPool(host='feeds.worldbank.org', port=443): Max retries exceeded with url: /worldbank/world/feeds/rss (Caused by NameResolutionError("HTTPSConnection(host='feeds.worldbank.org', port=443): Failed to resolve 'feeds.worldbank.org' ([Errno 11001] getaddrinfo failed)"))
+2026-05-16 17:50:22 | WARNING  | agents.rss_fetcher:_fetch_feed:77 — RSS fetch error (https://feeds.worldbank.org/worldbank/world/feeds/rss): HTTPSConnectionPool(host='feeds.worldbank.org', port=443): Max retries exceeded with url: /worldbank/world/feeds/rss (Caused by NameResolutionError("HTTPSConnection(host='feeds.worldbank.org', port=443): Failed to resolve 'feeds.worldbank.org' ([Errno 11001] getaddrinfo failed)"))
+2026-05-16 17:50:24 | WARNING  | agents.rss_fetcher:_fetch_feed:77 — RSS fetch error (https://feeds.worldbank.org/worldbank/world/feeds/rss): HTTPSConnectionPool(host='feeds.worldbank.org', port=443): Max retries exceeded with url: /worldbank/world/feeds/rss (Caused by NameResolutionError("HTTPSConnection(host='feeds.worldbank.org', port=443): Failed to resolve 'feeds.worldbank.org' ([Errno 11001] getaddrinfo failed)"))
+2026-05-16 17:50:24 | ERROR    | agents.rss_fetcher:fetch_rss_source:128 — [RSS] Failed to fetch World Bank (https://feeds.worldbank.org/worldbank/world/feeds/rss): RetryError[<Future at 0x287c355ad10 state=finished raised ConnectionError>]
+2026-05-16 17:50:25 | INFO     | agents.rss_fetcher:fetch_rss_source:125 — [RSS] Fetched 0 articles from SEBI
+2026-05-16 17:50:26 | INFO     | agents.rss_fetcher:fetch_rss_source:125 — [RSS] Fetched 20 articles from US Fed Reserve
+2026-05-16 17:50:27 | INFO     | agents.rss_fetcher:fetch_rss_source:125 — [RSS] Fetched 30 articles from UN News
+2026-05-16 17:50:27 | WARNING  | agents.rss_fetcher:_fetch_feed:74 — HTTP 404 for RSS: https://www.who.int/feeds/entity/csr/don/en/rss.xml
+2026-05-16 17:50:30 | WARNING  | agents.rss_fetcher:_fetch_feed:74 — HTTP 404 for RSS: https://www.who.int/feeds/entity/csr/don/en/rss.xml
+2026-05-16 17:50:32 | WARNING  | agents.rss_fetcher:_fetch_feed:74 — HTTP 404 for RSS: https://www.who.int/feeds/entity/csr/don/en/rss.xml
+2026-05-16 17:50:32 | ERROR    | agents.rss_fetcher:fetch_rss_source:128 — [RSS] Failed to fetch WHO Outbreaks (https://www.who.int/feeds/entity/csr/don/en/rss.xml): RetryError[<Future at 0x287c46a3610 state=finished raised HTTPError>]
+2026-05-16 17:50:34 | INFO     | agents.rss_fetcher:fetch_rss_source:125 — [RSS] Fetched 0 articles from PIB India
+2026-05-16 17:50:34 | INFO     | agents.rss_fetcher:fetch_all_rss_sources:153 — [RSS] Total fetched across all sources: 712
+2026-05-16 17:50:34 | INFO     | __main__:_fetch_phase:96 — [Pipeline] RSS completed: 712 raw articles
+2026-05-16 17:50:34 | INFO     | __main__:_fetch_phase:101 — [Pipeline] FETCH PHASE COMPLETE — Total raw: 812
+2026-05-16 17:50:34 | INFO     | utils.deduplicator:load_existing_hashes:146 — Deduplicator seeded with 519 existing hashes from DB.
+2026-05-16 17:50:35 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: eae600ea
+2026-05-16 17:50:35 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 1011b567
+2026-05-16 17:50:35 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 4b4fa892
+2026-05-16 17:50:35 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 15fc5f5a
+2026-05-16 17:50:35 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 44b56661
+2026-05-16 17:50:35 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 259ae828
+2026-05-16 17:50:35 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 0636efda
+2026-05-16 17:50:35 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 9bdc1ac6
+2026-05-16 17:50:35 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: bb1bf7a6
+2026-05-16 17:50:35 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 66889485
+2026-05-16 17:50:35 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 1bb03a9e
+2026-05-16 17:50:35 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: fd8e1dfc
+2026-05-16 17:50:35 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 6b5e9940
+2026-05-16 17:50:35 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 3ac2031c
+2026-05-16 17:50:35 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 07a158c3
+2026-05-16 17:50:35 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: bd3084e6
+2026-05-16 17:50:35 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 9cf20642
+2026-05-16 17:50:35 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 0121b1a4
+2026-05-16 17:50:35 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 9e34f296
+2026-05-16 17:50:35 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 4b72edbb
+2026-05-16 17:50:35 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 5c2956dd
+2026-05-16 17:50:35 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: dfb804a1
+2026-05-16 17:50:35 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 9836a2f6
+2026-05-16 17:50:35 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: bbb23acd
+2026-05-16 17:50:35 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 8523d095
+2026-05-16 17:50:35 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 1e83acc6
+2026-05-16 17:50:35 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 02de16bb
+2026-05-16 17:50:35 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 7226a28a
+2026-05-16 17:50:35 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 3f3ba9ee
+2026-05-16 17:50:35 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 3a087d95
+2026-05-16 17:50:35 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 193f0b3e
+2026-05-16 17:50:35 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 913031a2
+2026-05-16 17:50:35 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 3df51c9f
+2026-05-16 17:50:35 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 38fb2ded
+2026-05-16 17:50:35 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 71163782
+2026-05-16 17:50:35 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 63c6fb6c
+2026-05-16 17:50:35 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 16df724f
+2026-05-16 17:50:35 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 4be5d9a5
+2026-05-16 17:50:35 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 5e86128b
+2026-05-16 17:50:35 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 66b097b5
+2026-05-16 17:50:35 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: aecf69cc
+2026-05-16 17:50:35 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 0a079a14
+2026-05-16 17:50:35 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 1b2b5e40
+2026-05-16 17:50:35 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 9fe642fe
+2026-05-16 17:50:35 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 426fb1cb
+2026-05-16 17:50:35 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 0c08687d
+2026-05-16 17:50:35 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 8a967db2
+2026-05-16 17:50:35 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 6e4cc4bd
+2026-05-16 17:50:35 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [bc15e2ef]: Body too short (28 < 100 chars)
+2026-05-16 17:50:35 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [bd12e3b8]: Body too short (28 < 100 chars)
+2026-05-16 17:50:35 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [ef134d8d]: Body too short (28 < 100 chars)
+2026-05-16 17:50:35 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [6ba14051]: Body too short (28 < 100 chars)
+2026-05-16 17:50:35 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [1b9bf16b]: Body too short (28 < 100 chars)
+2026-05-16 17:50:35 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [455b5fe2]: Body too short (28 < 100 chars)
+2026-05-16 17:50:35 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [8635d37f]: Body too short (28 < 100 chars)
+2026-05-16 17:50:35 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [e447ce3c]: Body too short (28 < 100 chars)
+2026-05-16 17:50:35 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [cc11d4a3]: Body too short (28 < 100 chars)
+2026-05-16 17:50:35 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [a2368085]: Body too short (28 < 100 chars)
+2026-05-16 17:50:35 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [4ac3f439]: Body too short (28 < 100 chars)
+2026-05-16 17:50:35 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [e104e5d6]: Body too short (28 < 100 chars)
+2026-05-16 17:50:35 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [df2e28c8]: Body too short (28 < 100 chars)
+2026-05-16 17:50:35 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [e912338b]: Body too short (28 < 100 chars)
+2026-05-16 17:50:35 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [bab2f52e]: Body too short (28 < 100 chars)
+2026-05-16 17:50:35 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [58c47f34]: Body too short (28 < 100 chars)
+2026-05-16 17:50:35 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [7cd641c9]: Body too short (28 < 100 chars)
+2026-05-16 17:50:35 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [2d559bef]: Body too short (28 < 100 chars)
+2026-05-16 17:50:35 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [dba670fa]: Body too short (28 < 100 chars)
+2026-05-16 17:50:35 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [63b4b0c1]: Body too short (28 < 100 chars)
+2026-05-16 17:50:35 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [ca6dde92]: Body too short (28 < 100 chars)
+2026-05-16 17:50:35 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [51327eef]: Body too short (28 < 100 chars)
+2026-05-16 17:50:35 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [54a4e8c4]: Body too short (28 < 100 chars)
+2026-05-16 17:50:35 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [d7b2f87b]: Body too short (28 < 100 chars)
+2026-05-16 17:50:35 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [61d6926e]: Body too short (28 < 100 chars)
+2026-05-16 17:50:35 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [2e660874]: Body too short (28 < 100 chars)
+2026-05-16 17:50:35 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [2a01f3bd]: Body too short (28 < 100 chars)
+2026-05-16 17:50:35 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [be1a128f]: Body too short (28 < 100 chars)
+2026-05-16 17:50:35 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [7344df5d]: Body too short (28 < 100 chars)
+2026-05-16 17:50:35 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [fb09f275]: Body too short (28 < 100 chars)
+2026-05-16 17:50:35 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [e2ac5246]: Body too short (28 < 100 chars)
+2026-05-16 17:50:35 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [11add520]: Body too short (28 < 100 chars)
+2026-05-16 17:50:35 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [9bfa8318]: Body too short (28 < 100 chars)
+2026-05-16 17:50:35 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [7ae16012]: Body too short (28 < 100 chars)
+2026-05-16 17:50:35 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [2b7b0ce1]: Body too short (28 < 100 chars)
+2026-05-16 17:50:35 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [73475843]: Body too short (28 < 100 chars)
+2026-05-16 17:50:35 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [471b6b2b]: Body too short (28 < 100 chars)
+2026-05-16 17:50:35 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [556fb0dd]: Body too short (28 < 100 chars)
+2026-05-16 17:50:35 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [5ef9db0f]: Body too short (28 < 100 chars)
+2026-05-16 17:50:35 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [6b8340d2]: Body too short (28 < 100 chars)
+2026-05-16 17:50:35 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [f16dd115]: Body too short (28 < 100 chars)
+2026-05-16 17:50:35 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [1f7c1430]: Body too short (28 < 100 chars)
+2026-05-16 17:50:35 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [59fc3ea6]: Body too short (28 < 100 chars)
+2026-05-16 17:50:35 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [56bcfefe]: Body too short (28 < 100 chars)
+2026-05-16 17:50:35 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [9f591b32]: Body too short (28 < 100 chars)
+2026-05-16 17:50:35 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [58fa5c0b]: Body too short (28 < 100 chars)
+2026-05-16 17:50:35 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [44baf8b2]: Body too short (28 < 100 chars)
+2026-05-16 17:50:35 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [61aa9dde]: Body too short (28 < 100 chars)
+2026-05-16 17:50:35 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [8bf07222]: Body too short (28 < 100 chars)
+2026-05-16 17:50:35 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [c4006f2e]: Body too short (28 < 100 chars)
+2026-05-16 17:50:35 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: bed95515
+2026-05-16 17:50:35 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [67c8359b]: Empty body
+2026-05-16 17:50:35 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: cd9d8222
+2026-05-16 17:50:35 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: ce5ed0b2
+2026-05-16 17:50:35 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [c5dac7ef]: Body too short (67 < 100 chars)
+2026-05-16 17:50:35 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 29fd9249
+2026-05-16 17:50:35 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 1b3518ec
+2026-05-16 17:50:35 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [e80d4c7d]: Body too short (83 < 100 chars)
+2026-05-16 17:50:35 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 2ccdf693
+2026-05-16 17:50:35 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [a988fc83]: Empty body
+2026-05-16 17:50:35 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [dd310866]: Body too short (84 < 100 chars)
+2026-05-16 17:50:35 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: c9e23811
+2026-05-16 17:50:35 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 6d9cc4fa
+2026-05-16 17:50:35 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [9a6ecb15]: Empty body
+2026-05-16 17:50:35 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [6274f5f8]: Empty body
+2026-05-16 17:50:35 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 03cd9b46
+2026-05-16 17:50:35 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 0a733a80
+2026-05-16 17:50:35 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: c155bf98
+2026-05-16 17:50:35 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [0860787f]: Body too short (72 < 100 chars)
+2026-05-16 17:50:35 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: d89b8b55
+2026-05-16 17:50:36 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [2435d99c]: Body too short (77 < 100 chars)
+2026-05-16 17:50:36 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [f8e76f50]: Body too short (66 < 100 chars)
+2026-05-16 17:50:36 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [ea49b542]: Empty body
+2026-05-16 17:50:36 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [64d4377e]: Empty body
+2026-05-16 17:50:36 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [0cb5fc7d]: Body too short (72 < 100 chars)
+2026-05-16 17:50:36 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 12ffa030
+2026-05-16 17:50:36 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [803fba2f]: Body too short (52 < 100 chars)
+2026-05-16 17:50:36 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [8aa4788d]: Empty body
+2026-05-16 17:50:36 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [273a7174]: Body too short (66 < 100 chars)
+2026-05-16 17:50:36 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [3c29f5fb]: Empty body
+2026-05-16 17:50:36 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: b0c01d68
+2026-05-16 17:50:36 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 9f819607
+2026-05-16 17:50:36 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 0f4a0e80
+2026-05-16 17:50:36 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: ba8e1efc
+2026-05-16 17:50:36 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [8ee70ecd]: Body too short (67 < 100 chars)
+2026-05-16 17:50:36 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 35403c37
+2026-05-16 17:50:36 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [64be8eea]: Body too short (95 < 100 chars)
+2026-05-16 17:50:36 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 6e75157d
+2026-05-16 17:50:36 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [707c9a75]: Body too short (85 < 100 chars)
+2026-05-16 17:50:36 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 953ccf2a
+2026-05-16 17:50:36 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 25506d31
+2026-05-16 17:50:36 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: caca657d
+2026-05-16 17:50:36 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 1ae33140
+2026-05-16 17:50:36 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: e2c14e7d
+2026-05-16 17:50:36 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 63b3c92d
+2026-05-16 17:50:36 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 44c81b08
+2026-05-16 17:50:36 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 350dc84a
+2026-05-16 17:50:36 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: d0230998
+2026-05-16 17:50:36 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 79c49f4e
+2026-05-16 17:50:36 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: ffbca52c
+2026-05-16 17:50:36 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 63597461
+2026-05-16 17:50:36 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 5fede751
+2026-05-16 17:50:36 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 77e7a7b9
+2026-05-16 17:50:36 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 11dccbfd
+2026-05-16 17:50:36 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 10f91c3e
+2026-05-16 17:50:36 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 1b656d1f
+2026-05-16 17:50:36 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 5c7f29a2
+2026-05-16 17:50:36 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 3d0cda67
+2026-05-16 17:50:36 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 3d62e09a
+2026-05-16 17:50:36 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: ee94c646
+2026-05-16 17:50:36 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [e2898cb9]: Body too short (85 < 100 chars)
+2026-05-16 17:50:36 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [11e16fdd]: Body too short (84 < 100 chars)
+2026-05-16 17:50:36 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [a33c8e43]: Body too short (59 < 100 chars)
+2026-05-16 17:50:36 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 2b32703b
+2026-05-16 17:50:36 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: d4016f61
+2026-05-16 17:50:36 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [c3401988]: Body too short (90 < 100 chars)
+2026-05-16 17:50:36 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 17b92ce6
+2026-05-16 17:50:36 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [34153672]: Body too short (80 < 100 chars)
+2026-05-16 17:50:36 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 2ba38f52
+2026-05-16 17:50:36 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 950d0644
+2026-05-16 17:50:36 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 01fb9efa
+2026-05-16 17:50:36 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: e03c60d3
+2026-05-16 17:50:36 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 272e07b7
+2026-05-16 17:50:36 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 95c6c640
+2026-05-16 17:50:36 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: d2a8cf11
+2026-05-16 17:50:36 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: d5358a1a
+2026-05-16 17:50:36 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: c8fa4ecc
+2026-05-16 17:50:36 | DEBUG    | utils.deduplicator:is_duplicate:105 — MinHash duplicate detected: c7f7bef2 matches e90cde3d
+2026-05-16 17:50:36 | DEBUG    | utils.deduplicator:is_duplicate:105 — MinHash duplicate detected: f6f69aee matches e90cde3d
+2026-05-16 17:50:36 | DEBUG    | utils.deduplicator:is_duplicate:105 — MinHash duplicate detected: 4e0f1517 matches e90cde3d
+2026-05-16 17:50:36 | DEBUG    | utils.deduplicator:is_duplicate:105 — MinHash duplicate detected: 800d8fc6 matches e90cde3d
+2026-05-16 17:50:36 | DEBUG    | utils.deduplicator:is_duplicate:105 — MinHash duplicate detected: fa96006e matches e90cde3d
+2026-05-16 17:50:36 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [d38949c7]: Body too short (46 < 100 chars)
+2026-05-16 17:50:36 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [06016dfa]: Body too short (50 < 100 chars)
+2026-05-16 17:50:36 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [866e7a0b]: Body too short (47 < 100 chars)
+2026-05-16 17:50:36 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [f2a238fc]: Body too short (49 < 100 chars)
+2026-05-16 17:50:36 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [81ac50fd]: Body too short (46 < 100 chars)
+2026-05-16 17:50:36 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [e1cbd093]: Body too short (41 < 100 chars)
+2026-05-16 17:50:36 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [cabed23b]: Body too short (50 < 100 chars)
+2026-05-16 17:50:36 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [407487f6]: Body too short (47 < 100 chars)
+2026-05-16 17:50:36 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [64570d42]: Body too short (49 < 100 chars)
+2026-05-16 17:50:36 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [c1e309dd]: Body too short (46 < 100 chars)
+2026-05-16 17:50:36 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [1463f767]: Body too short (44 < 100 chars)
+2026-05-16 17:50:36 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [9e5d40df]: Body too short (47 < 100 chars)
+2026-05-16 17:50:36 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [d712eeb4]: Body too short (46 < 100 chars)
+2026-05-16 17:50:36 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [2a6740d0]: Body too short (49 < 100 chars)
+2026-05-16 17:50:36 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [953185bb]: Body too short (52 < 100 chars)
+2026-05-16 17:50:36 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [e44a56e4]: Body too short (40 < 100 chars)
+2026-05-16 17:50:36 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [141be459]: Body too short (51 < 100 chars)
+2026-05-16 17:50:36 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [d9d98245]: Body too short (51 < 100 chars)
+2026-05-16 17:50:36 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [03e04730]: Body too short (40 < 100 chars)
+2026-05-16 17:50:36 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [200aa1e2]: Body too short (49 < 100 chars)
+2026-05-16 17:50:36 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [1a059aae]: Body too short (49 < 100 chars)
+2026-05-16 17:50:36 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [b9d73d51]: Body too short (44 < 100 chars)
+2026-05-16 17:50:36 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [aadcc2c6]: Body too short (40 < 100 chars)
+2026-05-16 17:50:36 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [0a1e8838]: Body too short (31 < 100 chars)
+2026-05-16 17:50:36 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [255d1002]: Body too short (41 < 100 chars)
+2026-05-16 17:50:36 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [55c3ec24]: Body too short (41 < 100 chars)
+2026-05-16 17:50:36 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [eb28299f]: Body too short (45 < 100 chars)
+2026-05-16 17:50:36 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [bd2a2f3c]: Body too short (42 < 100 chars)
+2026-05-16 17:50:36 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [62b60e37]: Body too short (48 < 100 chars)
+2026-05-16 17:50:36 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [ea82af71]: Body too short (49 < 100 chars)
+2026-05-16 17:50:36 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [79a43035]: Body too short (49 < 100 chars)
+2026-05-16 17:50:36 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [20c8347d]: Body too short (51 < 100 chars)
+2026-05-16 17:50:36 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [0f0e2fae]: Body too short (46 < 100 chars)
+2026-05-16 17:50:36 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [6d80eeb4]: Body too short (40 < 100 chars)
+2026-05-16 17:50:36 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [5b5cde88]: Body too short (38 < 100 chars)
+2026-05-16 17:50:36 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [03dae3b9]: Body too short (42 < 100 chars)
+2026-05-16 17:50:36 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [1ca8aa8c]: Body too short (39 < 100 chars)
+2026-05-16 17:50:36 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [c165783c]: Body too short (33 < 100 chars)
+2026-05-16 17:50:36 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [c057eb88]: Body too short (40 < 100 chars)
+2026-05-16 17:50:36 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [d6a54268]: Body too short (38 < 100 chars)
+2026-05-16 17:50:36 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 437eeebe
+2026-05-16 17:50:36 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 65eb2d6c
+2026-05-16 17:50:36 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 7c2d1a98
+2026-05-16 17:50:36 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 430b9a96
+2026-05-16 17:50:36 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 311cc002
+2026-05-16 17:50:36 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [27b69c1d]: Body too short (88 < 100 chars)
+2026-05-16 17:50:36 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [f9e5aaf9]: Body too short (91 < 100 chars)
+2026-05-16 17:50:36 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 6acb5f78
+2026-05-16 17:50:36 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 414d3fcb
+2026-05-16 17:50:36 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: d95e45a1
+2026-05-16 17:50:36 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: e82d19c3
+2026-05-16 17:50:36 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: f47b7e26
+2026-05-16 17:50:36 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 71f2735f
+2026-05-16 17:50:36 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 1c2c3003
+2026-05-16 17:50:36 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: badfd920
+2026-05-16 17:50:36 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 72db7522
+2026-05-16 17:50:36 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [565f58e3]: Body too short (93 < 100 chars)
+2026-05-16 17:50:36 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 0fba8de2
+2026-05-16 17:50:36 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 4d35661e
+2026-05-16 17:50:36 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 196f5376
+2026-05-16 17:50:36 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: c7064359
+2026-05-16 17:50:36 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [d64a1730]: Body too short (96 < 100 chars)
+2026-05-16 17:50:36 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 60568b78
+2026-05-16 17:50:36 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: da9d725d
+2026-05-16 17:50:36 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: ce5edb1c
+2026-05-16 17:50:36 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: af2139c0
+2026-05-16 17:50:36 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [5880a1ff]: Body too short (96 < 100 chars)
+2026-05-16 17:50:37 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [9aebda5b]: Body too short (76 < 100 chars)
+2026-05-16 17:50:37 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 3f47985b
+2026-05-16 17:50:37 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 45d11ec5
+2026-05-16 17:50:37 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: ce902f2e
+2026-05-16 17:50:37 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: e89718c9
+2026-05-16 17:50:37 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 4da706dc
+2026-05-16 17:50:37 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 33ec5bee
+2026-05-16 17:50:37 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 710974dd
+2026-05-16 17:50:37 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: badc0b5f
+2026-05-16 17:50:37 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 6e758057
+2026-05-16 17:50:37 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 676a4889
+2026-05-16 17:50:37 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 58a301ee
+2026-05-16 17:50:37 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: b042a346
+2026-05-16 17:50:37 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: a47b4969
+2026-05-16 17:50:37 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 6745789b
+2026-05-16 17:50:37 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 06a21df3
+2026-05-16 17:50:37 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 340f35b6
+2026-05-16 17:50:37 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 121a3ca9
+2026-05-16 17:50:37 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: ab046aa4
+2026-05-16 17:50:37 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 1669a85c
+2026-05-16 17:50:37 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [8474f55c]: Body too short (79 < 100 chars)
+2026-05-16 17:50:37 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 372cc12c
+2026-05-16 17:50:37 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 069d12fc
+2026-05-16 17:50:37 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: da3a9742
+2026-05-16 17:50:37 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 80b61501
+2026-05-16 17:50:37 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 4f5ee653
+2026-05-16 17:50:37 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 95d95db3
+2026-05-16 17:50:37 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [b45d508b]: Body too short (80 < 100 chars)
+2026-05-16 17:50:37 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [ca1105fc]: Body too short (49 < 100 chars)
+2026-05-16 17:50:37 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [77aee2a9]: Body too short (64 < 100 chars)
+2026-05-16 17:50:37 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [733d319d]: Body too short (32 < 100 chars)
+2026-05-16 17:50:37 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [dd021197]: Body too short (23 < 100 chars)
+2026-05-16 17:50:37 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [13251024]: Body too short (82 < 100 chars)
+2026-05-16 17:50:37 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [0e58f834]: Body too short (49 < 100 chars)
+2026-05-16 17:50:37 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [8d79c99b]: Body too short (70 < 100 chars)
+2026-05-16 17:50:37 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [0077e423]: Body too short (46 < 100 chars)
+2026-05-16 17:50:37 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [58fb005e]: Body too short (51 < 100 chars)
+2026-05-16 17:50:37 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [6bb20e02]: Body too short (59 < 100 chars)
+2026-05-16 17:50:37 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [f2a28f84]: Body too short (69 < 100 chars)
+2026-05-16 17:50:37 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [d9730058]: Body too short (55 < 100 chars)
+2026-05-16 17:50:37 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [e175e3e6]: Body too short (64 < 100 chars)
+2026-05-16 17:50:37 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [3f202a75]: Body too short (52 < 100 chars)
+2026-05-16 17:50:37 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [db702fe7]: Body too short (74 < 100 chars)
+2026-05-16 17:50:37 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [1e766c55]: Body too short (28 < 100 chars)
+2026-05-16 17:50:37 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [6ab29540]: Body too short (58 < 100 chars)
+2026-05-16 17:50:37 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [924ce9cc]: Body too short (68 < 100 chars)
+2026-05-16 17:50:37 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [eec88707]: Body too short (56 < 100 chars)
+2026-05-16 17:50:37 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [c4d43995]: Body too short (27 < 100 chars)
+2026-05-16 17:50:37 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [2bdf4990]: Body too short (59 < 100 chars)
+2026-05-16 17:50:37 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [ef7fa828]: Body too short (53 < 100 chars)
+2026-05-16 17:50:37 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [34144947]: Body too short (69 < 100 chars)
+2026-05-16 17:50:37 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [6de3cb69]: Body too short (61 < 100 chars)
+2026-05-16 17:50:37 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [22b53559]: Body too short (51 < 100 chars)
+2026-05-16 17:50:37 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [ec9b2ecf]: Body too short (31 < 100 chars)
+2026-05-16 17:50:37 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [9aa482d3]: Body too short (58 < 100 chars)
+2026-05-16 17:50:37 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [0f22fe48]: Body too short (34 < 100 chars)
+2026-05-16 17:50:37 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [dec69269]: Body too short (74 < 100 chars)
+2026-05-16 17:50:37 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [dc8e1717]: Body too short (67 < 100 chars)
+2026-05-16 17:50:37 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [10155296]: Body too short (51 < 100 chars)
+2026-05-16 17:50:37 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [fc3b9b5c]: Body too short (96 < 100 chars)
+2026-05-16 17:50:37 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: ff531375
+2026-05-16 17:50:37 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [1a8f1b72]: Body too short (61 < 100 chars)
+2026-05-16 17:50:37 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 4d6e1e62
+2026-05-16 17:50:37 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [2a926f36]: Body too short (60 < 100 chars)
+2026-05-16 17:50:37 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 01fcb2dc
+2026-05-16 17:50:37 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [2e437b2c]: Body too short (84 < 100 chars)
+2026-05-16 17:50:37 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: fb06fa11
+2026-05-16 17:50:37 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [60dfe4bb]: Body too short (56 < 100 chars)
+2026-05-16 17:50:37 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [3b31564e]: Body too short (78 < 100 chars)
+2026-05-16 17:50:37 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [0098398c]: Body too short (93 < 100 chars)
+2026-05-16 17:50:37 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [3ff1adb3]: Body too short (75 < 100 chars)
+2026-05-16 17:50:37 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: ce9c03bd
+2026-05-16 17:50:37 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 631be2ac
+2026-05-16 17:50:37 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [b07d1ee8]: Body too short (54 < 100 chars)
+2026-05-16 17:50:37 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [24800368]: Body too short (82 < 100 chars)
+2026-05-16 17:50:37 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [b83eb403]: Body too short (31 < 100 chars)
+2026-05-16 17:50:37 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [e36890ce]: Body too short (41 < 100 chars)
+2026-05-16 17:50:37 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 50f0c79e
+2026-05-16 17:50:37 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [f3ba3f4d]: Body too short (71 < 100 chars)
+2026-05-16 17:50:37 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: efe4c31b
+2026-05-16 17:50:37 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [76f1dc41]: Body too short (90 < 100 chars)
+2026-05-16 17:50:37 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [eb55781c]: Body too short (52 < 100 chars)
+2026-05-16 17:50:37 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [b9e08a93]: Body too short (97 < 100 chars)
+2026-05-16 17:50:37 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [cff224c1]: Body too short (60 < 100 chars)
+2026-05-16 17:50:37 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [793ca9d8]: Body too short (90 < 100 chars)
+2026-05-16 17:50:37 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [8533706f]: Body too short (73 < 100 chars)
+2026-05-16 17:50:37 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [bb3af467]: Body too short (53 < 100 chars)
+2026-05-16 17:50:37 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [f3a6f1e2]: Body too short (88 < 100 chars)
+2026-05-16 17:50:37 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [fbe1cc59]: Body too short (62 < 100 chars)
+2026-05-16 17:50:37 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [6c34daea]: Body too short (73 < 100 chars)
+2026-05-16 17:50:37 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [e8c9cdf9]: Body too short (69 < 100 chars)
+2026-05-16 17:50:37 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [fd456273]: Body too short (61 < 100 chars)
+2026-05-16 17:50:37 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [1c436c71]: Body too short (67 < 100 chars)
+2026-05-16 17:50:37 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: d1c26826
+2026-05-16 17:50:37 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 45d4514b
+2026-05-16 17:50:37 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [53351801]: Body too short (34 < 100 chars)
+2026-05-16 17:50:37 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [5bf8266f]: Body too short (72 < 100 chars)
+2026-05-16 17:50:37 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [82c28b5e]: Body too short (54 < 100 chars)
+2026-05-16 17:50:37 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 58e745d9
+2026-05-16 17:50:37 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [9c62e786]: Body too short (69 < 100 chars)
+2026-05-16 17:50:37 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 17888081
+2026-05-16 17:50:37 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 9d3044ea
+2026-05-16 17:50:37 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [fc0589f6]: Body too short (97 < 100 chars)
+2026-05-16 17:50:37 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [9adc0985]: Body too short (96 < 100 chars)
+2026-05-16 17:50:37 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: ec5ae29f
+2026-05-16 17:50:37 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 1b84243b
+2026-05-16 17:50:37 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: ee405d01
+2026-05-16 17:50:37 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [df622f82]: Body too short (84 < 100 chars)
+2026-05-16 17:50:37 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 3d11b5ee
+2026-05-16 17:50:37 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: c345c639
+2026-05-16 17:50:37 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 7f6bc234
+2026-05-16 17:50:38 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [13bbd027]: Body too short (88 < 100 chars)
+2026-05-16 17:50:38 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 645aa431
+2026-05-16 17:50:38 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 4bf09660
+2026-05-16 17:50:38 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [2d7ac816]: Body too short (70 < 100 chars)
+2026-05-16 17:50:38 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 81d5b432
+2026-05-16 17:50:38 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: bbbee2fc
+2026-05-16 17:50:38 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 75f0e344
+2026-05-16 17:50:38 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: d36d3b98
+2026-05-16 17:50:38 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [17beaa44]: Body too short (95 < 100 chars)
+2026-05-16 17:50:38 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [35bc75b8]: Body too short (96 < 100 chars)
+2026-05-16 17:50:38 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: e2ef4be8
+2026-05-16 17:50:38 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 0718fb23
+2026-05-16 17:50:38 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [38d9924a]: Body too short (76 < 100 chars)
+2026-05-16 17:50:38 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: d80ca935
+2026-05-16 17:50:38 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 85f17147
+2026-05-16 17:50:38 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 71ce6a54
+2026-05-16 17:50:38 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [6e0f10b1]: Body too short (99 < 100 chars)
+2026-05-16 17:50:38 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [b5ca7fc6]: Body too short (65 < 100 chars)
+2026-05-16 17:50:38 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [5df18da2]: Body too short (92 < 100 chars)
+2026-05-16 17:50:38 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: f1cc899a
+2026-05-16 17:50:38 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: a0839020
+2026-05-16 17:50:38 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 25d731a4
+2026-05-16 17:50:38 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [3be994bd]: Body too short (94 < 100 chars)
+2026-05-16 17:50:38 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 2b0f28c6
+2026-05-16 17:50:38 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 9457dffe
+2026-05-16 17:50:38 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 53e116a6
+2026-05-16 17:50:38 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [6676e8a6]: Body too short (96 < 100 chars)
+2026-05-16 17:50:38 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [0fe232e2]: Body too short (94 < 100 chars)
+2026-05-16 17:50:38 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 6c9a0e8d
+2026-05-16 17:50:38 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [3e8e375e]: Body too short (99 < 100 chars)
+2026-05-16 17:50:38 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: e653c145
+2026-05-16 17:50:38 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 18dfc746
+2026-05-16 17:50:38 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: c639f6d7
+2026-05-16 17:50:38 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 8150b299
+2026-05-16 17:50:38 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 99d9c926
+2026-05-16 17:50:38 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: cf1094d1
+2026-05-16 17:50:38 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 17f2d274
+2026-05-16 17:50:38 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 538a5ce6
+2026-05-16 17:50:38 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [0c55780d]: Body too short (77 < 100 chars)
+2026-05-16 17:50:38 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 67001b8c
+2026-05-16 17:50:38 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [e89d7e35]: Body too short (97 < 100 chars)
+2026-05-16 17:50:38 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: c310a1ab
+2026-05-16 17:50:38 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [98236d01]: Body too short (72 < 100 chars)
+2026-05-16 17:50:38 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 57fdaf29
+2026-05-16 17:50:38 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [aa70b17b]: Body too short (61 < 100 chars)
+2026-05-16 17:50:38 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [03bab893]: Body too short (72 < 100 chars)
+2026-05-16 17:50:38 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 81485cc8
+2026-05-16 17:50:38 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [b8f51a04]: Body too short (77 < 100 chars)
+2026-05-16 17:50:38 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [f3688a71]: Body too short (64 < 100 chars)
+2026-05-16 17:50:38 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [6c1939e3]: Body too short (66 < 100 chars)
+2026-05-16 17:50:38 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 01c5c91e
+2026-05-16 17:50:38 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [ff07d615]: Body too short (90 < 100 chars)
+2026-05-16 17:50:38 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [8fb0fe87]: Body too short (70 < 100 chars)
+2026-05-16 17:50:38 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [bbe6968d]: Body too short (67 < 100 chars)
+2026-05-16 17:50:38 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [d2f1c59d]: Body too short (23 < 100 chars)
+2026-05-16 17:50:38 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 8da27a71
+2026-05-16 17:50:38 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 95571b0d
+2026-05-16 17:50:38 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [b09f6913]: Body too short (40 < 100 chars)
+2026-05-16 17:50:38 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 44b9e351
+2026-05-16 17:50:38 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [e2afdd2c]: Body too short (99 < 100 chars)
+2026-05-16 17:50:38 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 306752ed
+2026-05-16 17:50:38 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [d99f3b13]: Body too short (85 < 100 chars)
+2026-05-16 17:50:38 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [9003965f]: Body too short (82 < 100 chars)
+2026-05-16 17:50:38 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [fe283595]: Body too short (82 < 100 chars)
+2026-05-16 17:50:38 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [84535fef]: Body too short (72 < 100 chars)
+2026-05-16 17:50:38 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [91239722]: Body too short (78 < 100 chars)
+2026-05-16 17:50:38 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [44012fbe]: Body too short (96 < 100 chars)
+2026-05-16 17:50:38 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 2a8426d6
+2026-05-16 17:50:38 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: bb9b42e8
+2026-05-16 17:50:38 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 186f72f6
+2026-05-16 17:50:38 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 866c7614
+2026-05-16 17:50:38 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [30637f4a]: Body too short (98 < 100 chars)
+2026-05-16 17:50:38 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: f382d01d
+2026-05-16 17:50:38 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 28916527
+2026-05-16 17:50:38 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 6771d351
+2026-05-16 17:50:38 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 54be4a23
+2026-05-16 17:50:38 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 91994562
+2026-05-16 17:50:38 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 58610fe7
+2026-05-16 17:50:38 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 1f08ed8e
+2026-05-16 17:50:38 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: b6f8aeda
+2026-05-16 17:50:38 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [0c3b3b8f]: Body too short (91 < 100 chars)
+2026-05-16 17:50:38 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 3b84d8ca
+2026-05-16 17:50:38 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [1c0e77fd]: Body too short (94 < 100 chars)
+2026-05-16 17:50:38 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 86d981e1
+2026-05-16 17:50:38 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 9718dfc7
+2026-05-16 17:50:38 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 4b66b579
+2026-05-16 17:50:38 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [3ef2d0e3]: Body too short (87 < 100 chars)
+2026-05-16 17:50:38 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 968de858
+2026-05-16 17:50:38 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: a3a24592
+2026-05-16 17:50:38 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 90d1dd96
+2026-05-16 17:50:38 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: f857a252
+2026-05-16 17:50:38 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 0e69f561
+2026-05-16 17:50:38 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 4876c74e
+2026-05-16 17:50:38 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: a6d880ac
+2026-05-16 17:50:38 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: eaad0c45
+2026-05-16 17:50:38 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 113e21f9
+2026-05-16 17:50:38 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: a04c1f06
+2026-05-16 17:50:38 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [0fb6156d]: Body too short (26 < 100 chars)
+2026-05-16 17:50:38 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 68ea5961
+2026-05-16 17:50:38 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 19c1d111
+2026-05-16 17:50:38 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 9efb0f70
+2026-05-16 17:50:38 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 0da0a455
+2026-05-16 17:50:38 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [615fee51]: Body too short (92 < 100 chars)
+2026-05-16 17:50:38 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [b08d512d]: Body too short (85 < 100 chars)
+2026-05-16 17:50:38 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 17590373
+2026-05-16 17:50:38 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 767f80c6
+2026-05-16 17:50:38 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: e4c25908
+2026-05-16 17:50:38 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: c10b14e4
+2026-05-16 17:50:38 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [7d710898]: Body too short (76 < 100 chars)
+2026-05-16 17:50:38 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 1bcb5bc1
+2026-05-16 17:50:38 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: a0c0f2f1
+2026-05-16 17:50:38 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 84f0f8e3
+2026-05-16 17:50:38 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 2133a4c3
+2026-05-16 17:50:38 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 0de33fee
+2026-05-16 17:50:38 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 20ea5435
+2026-05-16 17:50:38 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [a46be38f]: Body too short (92 < 100 chars)
+2026-05-16 17:50:38 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 9c34eec1
+2026-05-16 17:50:38 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: e1c6d4f0
+2026-05-16 17:50:38 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 6786a378
+2026-05-16 17:50:38 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 19579d7b
+2026-05-16 17:50:38 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 75858ed1
+2026-05-16 17:50:38 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 781c7623
+2026-05-16 17:50:38 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 491d6492
+2026-05-16 17:50:38 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: f3f11ec0
+2026-05-16 17:50:38 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: bfba6a12
+2026-05-16 17:50:38 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [14e97be0]: Body too short (91 < 100 chars)
+2026-05-16 17:50:38 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: e8bdf54b
+2026-05-16 17:50:38 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: f8234c1a
+2026-05-16 17:50:38 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 7d539b1b
+2026-05-16 17:50:38 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 59cb7ce1
+2026-05-16 17:50:38 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 793f9f8c
+2026-05-16 17:50:38 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 1a2740fb
+2026-05-16 17:50:38 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 68085d93
+2026-05-16 17:50:38 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 7407ef83
+2026-05-16 17:50:38 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 3be0af8d
+2026-05-16 17:50:38 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 82f7c48a
+2026-05-16 17:50:38 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [f0d67a1d]: Body too short (87 < 100 chars)
+2026-05-16 17:50:38 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 6cc5ac86
+2026-05-16 17:50:38 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 92487542
+2026-05-16 17:50:38 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 11b34130
+2026-05-16 17:50:38 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: bfd6e08a
+2026-05-16 17:50:38 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 75960e9e
+2026-05-16 17:50:38 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 48024b70
+2026-05-16 17:50:38 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 4fdb75f9
+2026-05-16 17:50:38 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 67924e7f
+2026-05-16 17:50:38 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 8bbb46d6
+2026-05-16 17:50:38 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 5680c83b
+2026-05-16 17:50:38 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 7986aff6
+2026-05-16 17:50:38 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [9adf65de]: Body too short (65 < 100 chars)
+2026-05-16 17:50:38 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 7108ad33
+2026-05-16 17:50:38 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [f835a4ac]: Body too short (85 < 100 chars)
+2026-05-16 17:50:38 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 6f6cbd7c
+2026-05-16 17:50:38 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 214f0f97
+2026-05-16 17:50:38 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: d5c24700
+2026-05-16 17:50:38 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: e6124fc3
+2026-05-16 17:50:39 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 29e3c55c
+2026-05-16 17:50:39 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: a4f81093
+2026-05-16 17:50:39 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 3dd84b8b
+2026-05-16 17:50:39 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 61f3f281
+2026-05-16 17:50:39 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: d005c9d4
+2026-05-16 17:50:39 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 9d000fb0
+2026-05-16 17:50:39 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 14195fd1
+2026-05-16 17:50:39 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 91bc0ea9
+2026-05-16 17:50:39 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [d04f884b]: Body too short (56 < 100 chars)
+2026-05-16 17:50:39 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: bd519498
+2026-05-16 17:50:39 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 9ac4dd21
+2026-05-16 17:50:39 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: b75003fa
+2026-05-16 17:50:39 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 5f842c1e
+2026-05-16 17:50:39 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 85ea0db8
+2026-05-16 17:50:39 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 9f1e998b
+2026-05-16 17:50:39 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [bf393688]: Body too short (93 < 100 chars)
+2026-05-16 17:50:39 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 39f68a81
+2026-05-16 17:50:39 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: ffabef16
+2026-05-16 17:50:39 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: d9b49ae7
+2026-05-16 17:50:39 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [ce932342]: Body too short (72 < 100 chars)
+2026-05-16 17:50:39 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 2c0b6db7
+2026-05-16 17:50:39 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: aba679a1
+2026-05-16 17:50:39 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 639e0efa
+2026-05-16 17:50:39 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: a5cdf816
+2026-05-16 17:50:39 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: d5ab2c9d
+2026-05-16 17:50:39 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 6acf0fa3
+2026-05-16 17:50:39 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: b5c741a9
+2026-05-16 17:50:39 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: ca1ccba0
+2026-05-16 17:50:39 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 4f427be4
+2026-05-16 17:50:39 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [5bf5099d]: Body too short (85 < 100 chars)
+2026-05-16 17:50:39 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [e14d1787]: Body too short (93 < 100 chars)
+2026-05-16 17:50:39 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: a43d7051
+2026-05-16 17:50:39 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: dbcd1b99
+2026-05-16 17:50:39 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: a660eaf7
+2026-05-16 17:50:39 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 5c1fabbb
+2026-05-16 17:50:39 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: f4c57ac9
+2026-05-16 17:50:39 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 598c3d64
+2026-05-16 17:50:39 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 477e8da8
+2026-05-16 17:50:39 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 9d7be326
+2026-05-16 17:50:39 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [d0959692]: Body too short (89 < 100 chars)
+2026-05-16 17:50:39 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 737ff50b
+2026-05-16 17:50:39 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [e1cd13e2]: Body too short (73 < 100 chars)
+2026-05-16 17:50:39 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 93fc4d21
+2026-05-16 17:50:39 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 18be9c76
+2026-05-16 17:50:39 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: a91b847c
+2026-05-16 17:50:39 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [59abe46d]: Body too short (86 < 100 chars)
+2026-05-16 17:50:39 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 711ded25
+2026-05-16 17:50:39 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 303b2fd1
+2026-05-16 17:50:39 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 45b13630
+2026-05-16 17:50:39 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: e5d4e439
+2026-05-16 17:50:39 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 7f02de44
+2026-05-16 17:50:39 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 09f7fcbb
+2026-05-16 17:50:39 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 2c54bdba
+2026-05-16 17:50:39 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 267c9c56
+2026-05-16 17:50:39 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 2c351b96
+2026-05-16 17:50:39 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: da1805a4
+2026-05-16 17:50:39 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 96dcbd18
+2026-05-16 17:50:39 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: ed76cdff
+2026-05-16 17:50:39 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: da0155d5
+2026-05-16 17:50:39 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 6a8a5cc9
+2026-05-16 17:50:39 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 2544abc7
+2026-05-16 17:50:39 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 2977da81
+2026-05-16 17:50:39 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 178fab57
+2026-05-16 17:50:39 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 26d8bf29
+2026-05-16 17:50:39 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 98a522c6
+2026-05-16 17:50:39 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: e9bc0d7a
+2026-05-16 17:50:39 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: be8bcc86
+2026-05-16 17:50:39 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: e537d464
+2026-05-16 17:50:39 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: b385ef21
+2026-05-16 17:50:39 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: d15012bd
+2026-05-16 17:50:39 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: df02c902
+2026-05-16 17:50:39 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 5508d9ff
+2026-05-16 17:50:39 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 1cc35422
+2026-05-16 17:50:39 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 04c55665
+2026-05-16 17:50:39 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 589c1fef
+2026-05-16 17:50:39 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: d0490e2e
+2026-05-16 17:50:39 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 3d690294
+2026-05-16 17:50:39 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 6894e2f7
+2026-05-16 17:50:40 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: d2d06339
+2026-05-16 17:50:40 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 2eaba839
+2026-05-16 17:50:40 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 59424346
+2026-05-16 17:50:40 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 31d8ba5e
+2026-05-16 17:50:40 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 95e15470
+2026-05-16 17:50:40 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 401429d1
+2026-05-16 17:50:40 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 707cac39
+2026-05-16 17:50:40 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 990481ca
+2026-05-16 17:50:40 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: b0046bfa
+2026-05-16 17:50:40 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [2b47c072]: Body too short (84 < 100 chars)
+2026-05-16 17:50:40 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [32aaccbe]: Body too short (86 < 100 chars)
+2026-05-16 17:50:40 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 13c29be6
+2026-05-16 17:50:40 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [e31484a5]: Body too short (83 < 100 chars)
+2026-05-16 17:50:40 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [eba7447d]: Body too short (98 < 100 chars)
+2026-05-16 17:50:40 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [05c64e8c]: Body too short (92 < 100 chars)
+2026-05-16 17:50:40 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [d7f7f793]: Body too short (98 < 100 chars)
+2026-05-16 17:50:40 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [912d2040]: Body too short (95 < 100 chars)
+2026-05-16 17:50:40 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [96a05c7d]: Body too short (77 < 100 chars)
+2026-05-16 17:50:40 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [7c399113]: Body too short (74 < 100 chars)
+2026-05-16 17:50:40 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [035dbbce]: Body too short (96 < 100 chars)
+2026-05-16 17:50:40 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 8d6012f4
+2026-05-16 17:50:40 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 8d2a9f4f
+2026-05-16 17:50:40 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: ccd63811
+2026-05-16 17:50:40 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 985a2d2c
+2026-05-16 17:50:40 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: a1cccc71
+2026-05-16 17:50:40 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: cca65ec2
+2026-05-16 17:50:40 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 513f35fd
+2026-05-16 17:50:40 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: ad7c8405
+2026-05-16 17:50:40 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 512b513b
+2026-05-16 17:50:40 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 3492db75
+2026-05-16 17:50:40 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 24b8bdb6
+2026-05-16 17:50:40 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 77995d5f
+2026-05-16 17:50:40 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 8a4fd1df
+2026-05-16 17:50:40 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 7e78f69e
+2026-05-16 17:50:40 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: f2860d8d
+2026-05-16 17:50:40 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 050a5452
+2026-05-16 17:50:40 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 5dd26aef
+2026-05-16 17:50:40 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 3975d454
+2026-05-16 17:50:40 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: c7f82ffb
+2026-05-16 17:50:40 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 78d681b0
+2026-05-16 17:50:40 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 7d518b2b
+2026-05-16 17:50:40 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 41e9ece2
+2026-05-16 17:50:40 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 397a69d2
+2026-05-16 17:50:40 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 23124648
+2026-05-16 17:50:40 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: a0e5ff6b
+2026-05-16 17:50:41 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 68b50a0c
+2026-05-16 17:50:41 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: d60a65c4
+2026-05-16 17:50:41 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 667e3449
+2026-05-16 17:50:41 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 9b4944b3
+2026-05-16 17:50:41 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: aed05f7f
+2026-05-16 17:50:41 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: a66d87f8
+2026-05-16 17:50:41 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 28daed43
+2026-05-16 17:50:41 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: e9cbcb6f
+2026-05-16 17:50:41 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 3da45229
+2026-05-16 17:50:41 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: e570126a
+2026-05-16 17:50:41 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 351eed28
+2026-05-16 17:50:41 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 10a4c2f8
+2026-05-16 17:50:41 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 4b3c4bad
+2026-05-16 17:50:41 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 429fd3d0
+2026-05-16 17:50:41 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 82a8d862
+2026-05-16 17:50:41 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 59c86856
+2026-05-16 17:50:41 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: b2d58de7
+2026-05-16 17:50:41 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: d3dd21d3
+2026-05-16 17:50:41 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 29ed99a6
+2026-05-16 17:50:41 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [8e6e19d0]: Body too short (58 < 100 chars)
+2026-05-16 17:50:41 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [d46b2ced]: Body too short (82 < 100 chars)
+2026-05-16 17:50:41 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [3e4091dd]: Body too short (58 < 100 chars)
+2026-05-16 17:50:41 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [2c59970b]: Body too short (58 < 100 chars)
+2026-05-16 17:50:41 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 5f5705cd
+2026-05-16 17:50:41 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [a0cdab08]: Body too short (99 < 100 chars)
+2026-05-16 17:50:41 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [53d266e7]: Body too short (75 < 100 chars)
+2026-05-16 17:50:41 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [273f99c3]: Body too short (88 < 100 chars)
+2026-05-16 17:50:41 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [b104340f]: Body too short (78 < 100 chars)
+2026-05-16 17:50:41 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [6570068e]: Body too short (96 < 100 chars)
+2026-05-16 17:50:41 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [23403bbb]: Body too short (91 < 100 chars)
+2026-05-16 17:50:41 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [a64417ff]: Body too short (80 < 100 chars)
+2026-05-16 17:50:41 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [0acc2524]: Body too short (79 < 100 chars)
+2026-05-16 17:50:41 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [5cdc5e8f]: Body too short (97 < 100 chars)
+2026-05-16 17:50:41 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [545bbca2]: Body too short (70 < 100 chars)
+2026-05-16 17:50:41 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [527b9427]: Body too short (85 < 100 chars)
+2026-05-16 17:50:41 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [d3ff0e0c]: Body too short (96 < 100 chars)
+2026-05-16 17:50:41 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [b0c1df03]: Body too short (74 < 100 chars)
+2026-05-16 17:50:41 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [76e77ad7]: Body too short (96 < 100 chars)
+2026-05-16 17:50:41 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [018cbd12]: Body too short (80 < 100 chars)
+2026-05-16 17:50:41 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [2be11cd7]: Body too short (88 < 100 chars)
+2026-05-16 17:50:41 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [b4518f12]: Body too short (88 < 100 chars)
+2026-05-16 17:50:41 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [3365e236]: Body too short (35 < 100 chars)
+2026-05-16 17:50:41 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [ccdc6052]: Body too short (83 < 100 chars)
+2026-05-16 17:50:41 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [64a87acd]: Body too short (80 < 100 chars)
+2026-05-16 17:50:41 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [ff4e09b9]: Body too short (84 < 100 chars)
+2026-05-16 17:50:41 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [9dc06620]: Body too short (87 < 100 chars)
+2026-05-16 17:50:41 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [3da7f2d2]: Body too short (77 < 100 chars)
+2026-05-16 17:50:41 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [78a92d2d]: Body too short (95 < 100 chars)
+2026-05-16 17:50:41 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [4dcd463f]: Body too short (98 < 100 chars)
+2026-05-16 17:50:41 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [d5bffb6c]: Body too short (93 < 100 chars)
+2026-05-16 17:50:41 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [83b3fba2]: Body too short (72 < 100 chars)
+2026-05-16 17:50:41 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [4f50d543]: Body too short (82 < 100 chars)
+2026-05-16 17:50:41 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [070fded5]: Body too short (97 < 100 chars)
+2026-05-16 17:50:41 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [608b561e]: Body too short (86 < 100 chars)
+2026-05-16 17:50:41 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [62959edc]: Body too short (81 < 100 chars)
+2026-05-16 17:50:41 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [977f387b]: Body too short (82 < 100 chars)
+2026-05-16 17:50:41 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [99b84d72]: Body too short (78 < 100 chars)
+2026-05-16 17:50:41 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [ecb9aa29]: Body too short (98 < 100 chars)
+2026-05-16 17:50:41 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 0f2ad89b
+2026-05-16 17:50:41 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [94b9ab3c]: Body too short (75 < 100 chars)
+2026-05-16 17:50:41 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [ae7992e5]: Body too short (63 < 100 chars)
+2026-05-16 17:50:41 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [d1af9873]: Body too short (96 < 100 chars)
+2026-05-16 17:50:41 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [07760c36]: Body too short (95 < 100 chars)
+2026-05-16 17:50:41 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [f0ff9208]: Body too short (99 < 100 chars)
+2026-05-16 17:50:41 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [80eb0770]: Body too short (96 < 100 chars)
+2026-05-16 17:50:41 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [0df3f2be]: Body too short (89 < 100 chars)
+2026-05-16 17:50:41 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [54cd24af]: Body too short (99 < 100 chars)
+2026-05-16 17:50:41 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [bcfeda5b]: Body too short (96 < 100 chars)
+2026-05-16 17:50:41 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [336b54ab]: Body too short (97 < 100 chars)
+2026-05-16 17:50:41 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 5745893e
+2026-05-16 17:50:41 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 74c37897
+2026-05-16 17:50:41 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 2ab5f59d
+2026-05-16 17:50:41 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: d3e995f1
+2026-05-16 17:50:41 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 12edc395
+2026-05-16 17:50:41 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 92486f86
+2026-05-16 17:50:41 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 1155f25f
+2026-05-16 17:50:41 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 740bfc5e
+2026-05-16 17:50:41 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: c3e14b87
+2026-05-16 17:50:41 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 23d71813
+2026-05-16 17:50:41 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: d4166cf5
+2026-05-16 17:50:41 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: e37dc419
+2026-05-16 17:50:41 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: ada098b7
+2026-05-16 17:50:41 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 8fbed46c
+2026-05-16 17:50:41 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 61f7a938
+2026-05-16 17:50:41 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 97373461
+2026-05-16 17:50:41 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 7c245fdf
+2026-05-16 17:50:41 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: a01b6b14
+2026-05-16 17:50:41 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 707f4e93
+2026-05-16 17:50:41 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 71818a6a
+2026-05-16 17:50:41 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 476960e7
+2026-05-16 17:50:41 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: d11092f2
+2026-05-16 17:50:41 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: bff851a0
+2026-05-16 17:50:41 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 7831eeb1
+2026-05-16 17:50:41 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: b29c9810
+2026-05-16 17:50:41 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 592cbe2f
+2026-05-16 17:50:41 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: a411ce58
+2026-05-16 17:50:41 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 32081496
+2026-05-16 17:50:41 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 3dff5569
+2026-05-16 17:50:41 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: c25a4bd2
+2026-05-16 17:50:41 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: f01702fb
+2026-05-16 17:50:41 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: c00a5ca6
+2026-05-16 17:50:41 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 4c605d18
+2026-05-16 17:50:41 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 56858c34
+2026-05-16 17:50:42 | DEBUG    | utils.deduplicator:is_duplicate:105 — MinHash duplicate detected: a723fa18 matches c9331886
+2026-05-16 17:50:42 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: c8a5b095
+2026-05-16 17:50:42 | DEBUG    | utils.deduplicator:is_duplicate:105 — MinHash duplicate detected: c9bd97e6 matches c9331886
+2026-05-16 17:50:42 | DEBUG    | utils.deduplicator:is_duplicate:105 — MinHash duplicate detected: 4c88f37b matches 40b259c1
+2026-05-16 17:50:42 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 29160651
+2026-05-16 17:50:42 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [ae3d5e93]: Body too short (89 < 100 chars)
+2026-05-16 17:50:42 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: d511c891
+2026-05-16 17:50:42 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 6be8b30c
+2026-05-16 17:50:42 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 2c403dee
+2026-05-16 17:50:42 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 7fa1a484
+2026-05-16 17:50:42 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [ebff344b]: Body too short (82 < 100 chars)
+2026-05-16 17:50:42 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 0970f37c
+2026-05-16 17:50:42 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 9e7d8d0f
+2026-05-16 17:50:42 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [ac5bfec6]: Body too short (48 < 100 chars)
+2026-05-16 17:50:42 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [ac17ec4d]: Body too short (37 < 100 chars)
+2026-05-16 17:50:42 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [e919832b]: Body too short (85 < 100 chars)
+2026-05-16 17:50:42 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [f5ea9c86]: Body too short (84 < 100 chars)
+2026-05-16 17:50:42 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [c97cf663]: Body too short (66 < 100 chars)
+2026-05-16 17:50:42 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [9183b3df]: Body too short (92 < 100 chars)
+2026-05-16 17:50:42 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [b7086a96]: Body too short (79 < 100 chars)
+2026-05-16 17:50:42 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [2a6e8155]: Body too short (78 < 100 chars)
+2026-05-16 17:50:42 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [d0cf2363]: Body too short (99 < 100 chars)
+2026-05-16 17:50:42 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 8dd3bb97
+2026-05-16 17:50:42 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [724f1772]: Body too short (63 < 100 chars)
+2026-05-16 17:50:42 | INFO     | agents.preprocessing_agent:process_batch:252 — [Preprocessing] Batch complete | Input=812 | Processed=49 | Dupes=453 | QualityFail=310
+2026-05-16 17:50:42 | INFO     | __main__:_preprocess_phase:119 — [Pipeline] PREPROCESS PHASE COMPLETE — Processed=49 | Dupes dropped=453 | Quality dropped=310
+2026-05-16 17:50:42 | WARNING  | agents.enrichment_agent:_load_spacy_model:30 — [Enrichment] spaCy not installed. Entity extraction skipped.
+2026-05-16 17:50:42 | WARNING  | agents.enrichment_agent:_load_spacy_model:30 — [Enrichment] spaCy not installed. Entity extraction skipped.
+2026-05-16 17:50:42 | WARNING  | agents.enrichment_agent:_load_spacy_model:30 — [Enrichment] spaCy not installed. Entity extraction skipped.
+2026-05-16 17:50:42 | WARNING  | agents.enrichment_agent:_load_spacy_model:30 — [Enrichment] spaCy not installed. Entity extraction skipped.
+2026-05-16 17:50:42 | WARNING  | agents.enrichment_agent:_load_spacy_model:30 — [Enrichment] spaCy not installed. Entity extraction skipped.
+2026-05-16 17:50:42 | WARNING  | agents.enrichment_agent:_load_spacy_model:30 — [Enrichment] spaCy not installed. Entity extraction skipped.
+2026-05-16 17:50:42 | WARNING  | agents.enrichment_agent:_load_spacy_model:30 — [Enrichment] spaCy not installed. Entity extraction skipped.
+2026-05-16 17:50:42 | WARNING  | agents.enrichment_agent:_load_spacy_model:30 — [Enrichment] spaCy not installed. Entity extraction skipped.
+2026-05-16 17:50:42 | WARNING  | agents.enrichment_agent:_load_spacy_model:30 — [Enrichment] spaCy not installed. Entity extraction skipped.
+2026-05-16 17:50:42 | WARNING  | agents.enrichment_agent:_load_spacy_model:30 — [Enrichment] spaCy not installed. Entity extraction skipped.
+2026-05-16 17:50:42 | WARNING  | agents.enrichment_agent:_load_spacy_model:30 — [Enrichment] spaCy not installed. Entity extraction skipped.
+2026-05-16 17:50:42 | WARNING  | agents.enrichment_agent:_load_spacy_model:30 — [Enrichment] spaCy not installed. Entity extraction skipped.
+2026-05-16 17:50:42 | WARNING  | agents.enrichment_agent:_load_spacy_model:30 — [Enrichment] spaCy not installed. Entity extraction skipped.
+2026-05-16 17:50:42 | WARNING  | agents.enrichment_agent:_load_spacy_model:30 — [Enrichment] spaCy not installed. Entity extraction skipped.
+2026-05-16 17:50:42 | WARNING  | agents.enrichment_agent:_load_spacy_model:30 — [Enrichment] spaCy not installed. Entity extraction skipped.
+2026-05-16 17:50:42 | WARNING  | agents.enrichment_agent:_load_spacy_model:30 — [Enrichment] spaCy not installed. Entity extraction skipped.
+2026-05-16 17:50:42 | WARNING  | agents.enrichment_agent:_load_spacy_model:30 — [Enrichment] spaCy not installed. Entity extraction skipped.
+2026-05-16 17:50:42 | WARNING  | agents.enrichment_agent:_load_spacy_model:30 — [Enrichment] spaCy not installed. Entity extraction skipped.
+2026-05-16 17:50:42 | WARNING  | agents.enrichment_agent:_load_spacy_model:30 — [Enrichment] spaCy not installed. Entity extraction skipped.
+2026-05-16 17:50:42 | WARNING  | agents.enrichment_agent:_load_spacy_model:30 — [Enrichment] spaCy not installed. Entity extraction skipped.
+2026-05-16 17:50:42 | WARNING  | agents.enrichment_agent:_load_spacy_model:30 — [Enrichment] spaCy not installed. Entity extraction skipped.
+2026-05-16 17:50:42 | WARNING  | agents.enrichment_agent:_load_spacy_model:30 — [Enrichment] spaCy not installed. Entity extraction skipped.
+2026-05-16 17:50:42 | WARNING  | agents.enrichment_agent:_load_spacy_model:30 — [Enrichment] spaCy not installed. Entity extraction skipped.
+2026-05-16 17:50:42 | WARNING  | agents.enrichment_agent:_load_spacy_model:30 — [Enrichment] spaCy not installed. Entity extraction skipped.
+2026-05-16 17:50:42 | WARNING  | agents.enrichment_agent:_load_spacy_model:30 — [Enrichment] spaCy not installed. Entity extraction skipped.
+2026-05-16 17:50:42 | WARNING  | agents.enrichment_agent:_load_spacy_model:30 — [Enrichment] spaCy not installed. Entity extraction skipped.
+2026-05-16 17:50:42 | WARNING  | agents.enrichment_agent:_load_spacy_model:30 — [Enrichment] spaCy not installed. Entity extraction skipped.
+2026-05-16 17:50:42 | WARNING  | agents.enrichment_agent:_load_spacy_model:30 — [Enrichment] spaCy not installed. Entity extraction skipped.
+2026-05-16 17:50:42 | WARNING  | agents.enrichment_agent:_load_spacy_model:30 — [Enrichment] spaCy not installed. Entity extraction skipped.
+2026-05-16 17:50:42 | WARNING  | agents.enrichment_agent:_load_spacy_model:30 — [Enrichment] spaCy not installed. Entity extraction skipped.
+2026-05-16 17:50:42 | WARNING  | agents.enrichment_agent:_load_spacy_model:30 — [Enrichment] spaCy not installed. Entity extraction skipped.
+2026-05-16 17:50:42 | WARNING  | agents.enrichment_agent:_load_spacy_model:30 — [Enrichment] spaCy not installed. Entity extraction skipped.
+2026-05-16 17:50:42 | WARNING  | agents.enrichment_agent:_load_spacy_model:30 — [Enrichment] spaCy not installed. Entity extraction skipped.
+2026-05-16 17:50:42 | WARNING  | agents.enrichment_agent:_load_spacy_model:30 — [Enrichment] spaCy not installed. Entity extraction skipped.
+2026-05-16 17:50:42 | WARNING  | agents.enrichment_agent:_load_spacy_model:30 — [Enrichment] spaCy not installed. Entity extraction skipped.
+2026-05-16 17:50:42 | WARNING  | agents.enrichment_agent:_load_spacy_model:30 — [Enrichment] spaCy not installed. Entity extraction skipped.
+2026-05-16 17:50:42 | WARNING  | agents.enrichment_agent:_load_spacy_model:30 — [Enrichment] spaCy not installed. Entity extraction skipped.
+2026-05-16 17:50:42 | WARNING  | agents.enrichment_agent:_load_spacy_model:30 — [Enrichment] spaCy not installed. Entity extraction skipped.
+2026-05-16 17:50:42 | WARNING  | agents.enrichment_agent:_load_spacy_model:30 — [Enrichment] spaCy not installed. Entity extraction skipped.
+2026-05-16 17:50:42 | WARNING  | agents.enrichment_agent:_load_spacy_model:30 — [Enrichment] spaCy not installed. Entity extraction skipped.
+2026-05-16 17:50:42 | WARNING  | agents.enrichment_agent:_load_spacy_model:30 — [Enrichment] spaCy not installed. Entity extraction skipped.
+2026-05-16 17:50:42 | WARNING  | agents.enrichment_agent:_load_spacy_model:30 — [Enrichment] spaCy not installed. Entity extraction skipped.
+2026-05-16 17:50:42 | WARNING  | agents.enrichment_agent:_load_spacy_model:30 — [Enrichment] spaCy not installed. Entity extraction skipped.
+2026-05-16 17:50:42 | WARNING  | agents.enrichment_agent:_load_spacy_model:30 — [Enrichment] spaCy not installed. Entity extraction skipped.
+2026-05-16 17:50:42 | WARNING  | agents.enrichment_agent:_load_spacy_model:30 — [Enrichment] spaCy not installed. Entity extraction skipped.
+2026-05-16 17:50:42 | WARNING  | agents.enrichment_agent:_load_spacy_model:30 — [Enrichment] spaCy not installed. Entity extraction skipped.
+2026-05-16 17:50:42 | WARNING  | agents.enrichment_agent:_load_spacy_model:30 — [Enrichment] spaCy not installed. Entity extraction skipped.
+2026-05-16 17:50:42 | WARNING  | agents.enrichment_agent:_load_spacy_model:30 — [Enrichment] spaCy not installed. Entity extraction skipped.
+2026-05-16 17:50:42 | WARNING  | agents.enrichment_agent:_load_spacy_model:30 — [Enrichment] spaCy not installed. Entity extraction skipped.
+2026-05-16 17:50:42 | WARNING  | agents.enrichment_agent:_load_spacy_model:30 — [Enrichment] spaCy not installed. Entity extraction skipped.
+2026-05-16 17:50:42 | INFO     | agents.enrichment_agent:enrich_batch:137 — [Enrichment] Enriched 0/49 articles with entities.
+2026-05-16 17:50:42 | INFO     | storage.mongo_store:upsert_articles:107 — [MongoDB] Upserted 49 new + 0 updated articles.
+2026-05-16 17:50:43 | INFO     | storage.faiss_store:_load_or_create:112 — [FAISS] New index created (dim=384)
+2026-05-16 17:51:02 | INFO     | storage.faiss_store:_load_sentence_transformer:24 — [FAISS] Embedding model loaded: all-MiniLM-L6-v2
+2026-05-16 17:51:04 | INFO     | storage.faiss_store:add_articles:181 — [FAISS] Added 49 vectors. Total index size: 49
+2026-05-16 17:51:04 | INFO     | storage.faiss_store:save:240 — [FAISS] Saved index (49 vectors) to ./data/faiss_index
+2026-05-16 17:51:05 | INFO     | storage.neo4j_store:_connect:56 — [Neo4j] Connected to neo4j+s://387a7a7b.databases.neo4j.io
+2026-05-16 17:51:05 | DEBUG    | storage.neo4j_store:_ensure_constraints:81 — [Neo4j] Constraints verified.
+2026-05-16 17:51:06 | INFO     | storage.neo4j_store:upsert_articles:122 — [Neo4j] Upserted 49 article nodes.
+2026-05-16 17:51:06 | INFO     | __main__:_store_phase:175 — [Pipeline] STORE PHASE COMPLETE — MongoDB=49 | FAISS=49 | Neo4j=49
+2026-05-16 17:51:06 | INFO     | __main__:run_ingestion_pipeline:254 — ============================================================
+2026-05-16 17:51:06 | INFO     | __main__:run_ingestion_pipeline:255 — [Pipeline] RUN COMPLETE — Run 89301a48 | Fetched=812 | Cleaned=49 | Dupes=763 | Stored=49 | Errors=0
+2026-05-16 17:51:06 | INFO     | __main__:run_ingestion_pipeline:256 — [Pipeline] Duration: 139.1s
+2026-05-16 17:51:06 | INFO     | __main__:run_ingestion_pipeline:257 — ============================================================
+2026-08-24 22:53:24 | ERROR    | storage.mongo_store:count_articles:207 — [MongoDB] count_articles error: The DNS query name does not exist: _mongodb._tcp.cluster0.8rhhosm.mongodb.net.
+2026-08-24 22:53:53 | ERROR    | storage.mongo_store:_connect:51 — [MongoDB] Connection failed: localhost:27017: [WinError 10061] No connection could be made because the target machine actively refused it (configured timeouts: socketTimeoutMS: 5000.0ms, connectTimeoutMS: 5000.0ms), Timeout: 5.0s, Topology Description: <TopologyDescription id: 6a8c7e24b691a96b78f06a99, topology_type: Unknown, servers: [<ServerDescription ('localhost', 27017) server_type: Unknown, rtt: None, error=AutoReconnect('localhost:27017: [WinError 10061] No connection could be made because the target machine actively refused it (configured timeouts: socketTimeoutMS: 5000.0ms, connectTimeoutMS: 5000.0ms)')>]>
+2026-08-24 22:53:53 | ERROR    | storage.mongo_store:count_articles:207 — [MongoDB] count_articles error: localhost:27017: [WinError 10061] No connection could be made because the target machine actively refused it (configured timeouts: socketTimeoutMS: 5000.0ms, connectTimeoutMS: 5000.0ms), Timeout: 5.0s, Topology Description: <TopologyDescription id: 6a8c7e24b691a96b78f06a99, topology_type: Unknown, servers: [<ServerDescription ('localhost', 27017) server_type: Unknown, rtt: None, error=AutoReconnect('localhost:27017: [WinError 10061] No connection could be made because the target machine actively refused it (configured timeouts: socketTimeoutMS: 5000.0ms, connectTimeoutMS: 5000.0ms)')>]>
+2026-08-24 23:00:27 | WARNING  | __main__:setup_test_environment:102 — [TestSetup] Live MongoDB unreachable (The DNS query name does not exist: _mongodb._tcp.cluster0.8rhhosm.mongodb.net.). Using mongomock for test isolation.
+2026-08-24 23:00:28 | INFO     | storage.faiss_store:_load_or_create:112 — [FAISS] New index created (dim=384)
+2026-08-24 23:00:28 | INFO     | __main__:cleanup_test_articles:159 — [TestCleanup] Removed test articles from MongoDB.
+2026-08-24 23:02:18 | WARNING  | __main__:setup_test_environment:102 — [TestSetup] Live MongoDB unreachable (The DNS query name does not exist: _mongodb._tcp.cluster0.8rhhosm.mongodb.net.). Using mongomock for test isolation.
+2026-08-24 23:02:18 | INFO     | storage.faiss_store:_load_or_create:112 — [FAISS] New index created (dim=384)
+2026-08-24 23:02:41 | INFO     | storage.faiss_store:_load_sentence_transformer:24 — [FAISS] Embedding model loaded: all-MiniLM-L6-v2
+2026-08-24 23:02:41 | INFO     | storage.faiss_store:add_articles:181 — [FAISS] Added 3 vectors. Total index size: 3
+2026-08-24 23:02:41 | INFO     | __main__:insert_test_articles:151 — [TestSetup] Inserted 3 test articles into MongoDB and FAISS.
+2026-08-24 23:02:41 | INFO     | agents.agent5_query:__init__:43 — [QueryAgent] Initialized with LLM: GroqQueryLLM
+2026-08-24 23:02:41 | INFO     | __main__:cleanup_test_articles:159 — [TestCleanup] Removed test articles from MongoDB.
+2026-08-24 23:04:36 | WARNING  | __main__:setup_test_environment:102 — [TestSetup] Live MongoDB unreachable (The DNS query name does not exist: _mongodb._tcp.cluster0.8rhhosm.mongodb.net.). Using mongomock for test isolation.
+2026-08-24 23:04:37 | INFO     | storage.faiss_store:_load_or_create:112 — [FAISS] New index created (dim=384)
+2026-08-24 23:04:53 | INFO     | storage.faiss_store:_load_sentence_transformer:24 — [FAISS] Embedding model loaded: all-MiniLM-L6-v2
+2026-08-24 23:04:53 | INFO     | storage.faiss_store:add_articles:181 — [FAISS] Added 3 vectors. Total index size: 3
+2026-08-24 23:04:53 | INFO     | __main__:insert_test_articles:151 — [TestSetup] Inserted 3 test articles into MongoDB and FAISS.
+2026-08-24 23:04:53 | INFO     | agents.agent5_query:__init__:43 — [QueryAgent] Initialized with LLM: GroqQueryLLM
+2026-08-24 23:04:53 | INFO     | agents.agent5_query:process:75 — [QueryAgent] Processing query: 'What is happening in global finance this week?'
+2026-08-24 23:04:53 | INFO     | agents.query_retriever:retrieve:48 — [QueryRetriever] Query: 'What is happening in global finance this week?' | Route Decision: 'semantic'
+2026-08-24 23:04:54 | INFO     | agents.agent5_query:process:84 — [QueryAgent] Retrieved 3 articles via route 'semantic' for query: 'What is happening in global finance this week?'
+2026-08-24 23:04:54 | WARNING  | utils.groq_client:get_groq_client:29 — [GroqClient] No GROQ_API_KEY provided in settings or environment.
+2026-08-24 23:04:54 | INFO     | agents.agent5_query:process:132 — [QueryAgent] Answer generated | Route: semantic | Sources: 3 | Confidence: 0.63 | Latency: 0.78s
+2026-08-24 23:04:54 | INFO     | agents.agent5_query:process:75 — [QueryAgent] Processing query: 'What did RBI do recently?'
+2026-08-24 23:04:54 | INFO     | agents.query_retriever:retrieve:48 — [QueryRetriever] Query: 'What did RBI do recently?' | Route Decision: 'keyword'
+2026-08-24 23:04:54 | DEBUG    | agents.query_retriever:keyword_search:160 — [QueryRetriever] Extracted search keywords: ['RBI', 'do']
+2026-08-24 23:04:54 | INFO     | agents.agent5_query:process:84 — [QueryAgent] Retrieved 2 articles via route 'keyword' for query: 'What did RBI do recently?'
+2026-08-24 23:04:54 | WARNING  | utils.groq_client:get_groq_client:29 — [GroqClient] No GROQ_API_KEY provided in settings or environment.
+2026-08-24 23:04:54 | INFO     | agents.agent5_query:process:132 — [QueryAgent] Answer generated | Route: keyword | Sources: 2 | Confidence: 0.51 | Latency: 0.00s
+2026-08-24 23:04:54 | INFO     | agents.agent5_query:process:75 — [QueryAgent] Processing query: 'What are the latest developments in quantum technology and AI?'
+2026-08-24 23:04:54 | INFO     | agents.query_retriever:retrieve:48 — [QueryRetriever] Query: 'What are the latest developments in quantum technology and AI?' | Route Decision: 'keyword'
+2026-08-24 23:04:54 | DEBUG    | agents.query_retriever:keyword_search:160 — [QueryRetriever] Extracted search keywords: ['latest', 'developments', 'in', 'quantum', 'technology', 'AI']
+2026-08-24 23:04:54 | INFO     | agents.agent5_query:process:84 — [QueryAgent] Retrieved 3 articles via route 'keyword' for query: 'What are the latest developments in quantum technology and AI?'
+2026-08-24 23:04:54 | WARNING  | utils.groq_client:get_groq_client:29 — [GroqClient] No GROQ_API_KEY provided in settings or environment.
+2026-08-24 23:04:54 | INFO     | agents.agent5_query:process:132 — [QueryAgent] Answer generated | Route: keyword | Sources: 3 | Confidence: 0.31 | Latency: 0.00s
+2026-08-24 23:04:54 | INFO     | __main__:cleanup_test_articles:159 — [TestCleanup] Removed test articles from MongoDB.
+2026-08-24 23:06:54 | WARNING  | __main__:setup_test_environment:102 — [TestSetup] Live MongoDB unreachable (The DNS query name does not exist: _mongodb._tcp.cluster0.8rhhosm.mongodb.net.). Using mongomock for test isolation.
+2026-08-24 23:06:54 | INFO     | storage.faiss_store:_load_or_create:112 — [FAISS] New index created (dim=384)
+2026-08-24 23:07:11 | INFO     | storage.faiss_store:_load_sentence_transformer:24 — [FAISS] Embedding model loaded: all-MiniLM-L6-v2
+2026-08-24 23:07:11 | INFO     | storage.faiss_store:add_articles:181 — [FAISS] Added 3 vectors. Total index size: 3
+2026-08-24 23:07:11 | INFO     | __main__:insert_test_articles:151 — [TestSetup] Inserted 3 test articles into MongoDB and FAISS.
+2026-08-24 23:07:11 | INFO     | agents.agent5_query:__init__:43 — [QueryAgent] Initialized with LLM: GroqQueryLLM
+2026-08-24 23:07:11 | INFO     | agents.agent5_query:process:75 — [QueryAgent] Processing query: 'What is happening in global finance this week?'
+2026-08-24 23:07:11 | INFO     | agents.query_retriever:retrieve:48 — [QueryRetriever] Query: 'What is happening in global finance this week?' | Route Decision: 'semantic'
+2026-08-24 23:07:11 | INFO     | agents.agent5_query:process:84 — [QueryAgent] Retrieved 3 articles via route 'semantic' for query: 'What is happening in global finance this week?'
+2026-08-24 23:07:12 | WARNING  | utils.groq_client:get_groq_client:29 — [GroqClient] No GROQ_API_KEY provided in settings or environment.
+2026-08-24 23:07:12 | INFO     | agents.agent5_query:process:132 — [QueryAgent] Answer generated | Route: semantic | Sources: 3 | Confidence: 0.63 | Latency: 0.68s
+2026-08-24 23:07:12 | INFO     | agents.agent5_query:process:75 — [QueryAgent] Processing query: 'What did RBI do recently?'
+2026-08-24 23:07:12 | INFO     | agents.query_retriever:retrieve:48 — [QueryRetriever] Query: 'What did RBI do recently?' | Route Decision: 'keyword'
+2026-08-24 23:07:12 | DEBUG    | agents.query_retriever:keyword_search:166 — [QueryRetriever] Extracted search keywords: ['RBI', 'do']
+2026-08-24 23:07:12 | INFO     | agents.agent5_query:process:84 — [QueryAgent] Retrieved 2 articles via route 'keyword' for query: 'What did RBI do recently?'
+2026-08-24 23:07:12 | WARNING  | utils.groq_client:get_groq_client:29 — [GroqClient] No GROQ_API_KEY provided in settings or environment.
+2026-08-24 23:07:12 | INFO     | agents.agent5_query:process:132 — [QueryAgent] Answer generated | Route: keyword | Sources: 2 | Confidence: 0.51 | Latency: 0.01s
+2026-08-24 23:07:12 | INFO     | agents.agent5_query:process:75 — [QueryAgent] Processing query: 'What are the latest developments in quantum technology and AI?'
+2026-08-24 23:07:12 | INFO     | agents.query_retriever:retrieve:48 — [QueryRetriever] Query: 'What are the latest developments in quantum technology and AI?' | Route Decision: 'semantic'
+2026-08-24 23:07:12 | INFO     | agents.agent5_query:process:84 — [QueryAgent] Retrieved 3 articles via route 'semantic' for query: 'What are the latest developments in quantum technology and AI?'
+2026-08-24 23:07:12 | WARNING  | utils.groq_client:get_groq_client:29 — [GroqClient] No GROQ_API_KEY provided in settings or environment.
+2026-08-24 23:07:12 | INFO     | agents.agent5_query:process:132 — [QueryAgent] Answer generated | Route: semantic | Sources: 3 | Confidence: 0.72 | Latency: 0.03s
+2026-08-24 23:07:12 | INFO     | agents.agent5_query:process:75 — [QueryAgent] Processing query: 'What happened in ancient volcanic eruptions on Mars in 2099?'
+2026-08-24 23:07:12 | INFO     | agents.query_retriever:retrieve:48 — [QueryRetriever] Query: 'What happened in ancient volcanic eruptions on Mars in 2099?' | Route Decision: 'keyword'
+2026-08-24 23:07:12 | DEBUG    | agents.query_retriever:keyword_search:166 — [QueryRetriever] Extracted search keywords: ['happened', 'in', 'ancient', 'volcanic', 'eruptions', 'on', 'Mars', 'in', '2099']
+2026-08-24 23:07:12 | INFO     | agents.agent5_query:process:84 — [QueryAgent] Retrieved 3 articles via route 'keyword' for query: 'What happened in ancient volcanic eruptions on Mars in 2099?'
+2026-08-24 23:07:12 | WARNING  | utils.groq_client:get_groq_client:29 — [GroqClient] No GROQ_API_KEY provided in settings or environment.
+2026-08-24 23:07:12 | INFO     | agents.agent5_query:process:132 — [QueryAgent] Answer generated | Route: keyword | Sources: 3 | Confidence: 0.25 | Latency: 0.01s
+2026-08-24 23:07:12 | INFO     | __main__:cleanup_test_articles:159 — [TestCleanup] Removed test articles from MongoDB.
+2026-08-24 23:09:37 | WARNING  | __main__:setup_test_environment:102 — [TestSetup] Live MongoDB unreachable (The DNS query name does not exist: _mongodb._tcp.cluster0.8rhhosm.mongodb.net.). Using mongomock for test isolation.
+2026-08-24 23:09:37 | INFO     | storage.faiss_store:_load_or_create:112 — [FAISS] New index created (dim=384)
+2026-08-24 23:09:52 | INFO     | storage.faiss_store:_load_sentence_transformer:24 — [FAISS] Embedding model loaded: all-MiniLM-L6-v2
+2026-08-24 23:09:52 | INFO     | storage.faiss_store:add_articles:181 — [FAISS] Added 3 vectors. Total index size: 3
+2026-08-24 23:09:52 | INFO     | __main__:insert_test_articles:151 — [TestSetup] Inserted 3 test articles into MongoDB and FAISS.
+2026-08-24 23:09:52 | INFO     | agents.agent5_query:__init__:43 — [QueryAgent] Initialized with LLM: GroqQueryLLM
+2026-08-24 23:09:52 | INFO     | agents.agent5_query:process:75 — [QueryAgent] Processing query: 'What is happening in global finance this week?'
+2026-08-24 23:09:52 | INFO     | agents.query_retriever:retrieve:48 — [QueryRetriever] Query: 'What is happening in global finance this week?' | Route Decision: 'semantic'
+2026-08-24 23:09:52 | INFO     | agents.agent5_query:process:84 — [QueryAgent] Retrieved 1 articles via route 'semantic' for query: 'What is happening in global finance this week?'
+2026-08-24 23:09:53 | WARNING  | utils.groq_client:get_groq_client:29 — [GroqClient] No GROQ_API_KEY provided in settings or environment.
+2026-08-24 23:09:53 | INFO     | agents.agent5_query:process:132 — [QueryAgent] Answer generated | Route: semantic | Sources: 1 | Confidence: 0.64 | Latency: 0.64s
+2026-08-24 23:09:53 | INFO     | agents.agent5_query:process:75 — [QueryAgent] Processing query: 'What did RBI do recently?'
+2026-08-24 23:09:53 | INFO     | agents.query_retriever:retrieve:48 — [QueryRetriever] Query: 'What did RBI do recently?' | Route Decision: 'keyword'
+2026-08-24 23:09:53 | DEBUG    | agents.query_retriever:keyword_search:166 — [QueryRetriever] Extracted search keywords: ['RBI', 'do']
+2026-08-24 23:09:53 | INFO     | agents.agent5_query:process:84 — [QueryAgent] Retrieved 2 articles via route 'keyword' for query: 'What did RBI do recently?'
+2026-08-24 23:09:53 | WARNING  | utils.groq_client:get_groq_client:29 — [GroqClient] No GROQ_API_KEY provided in settings or environment.
+2026-08-24 23:09:53 | INFO     | agents.agent5_query:process:132 — [QueryAgent] Answer generated | Route: keyword | Sources: 2 | Confidence: 0.51 | Latency: 0.00s
+2026-08-24 23:09:53 | INFO     | agents.agent5_query:process:75 — [QueryAgent] Processing query: 'What are the latest developments in quantum technology and AI?'
+2026-08-24 23:09:53 | INFO     | agents.query_retriever:retrieve:48 — [QueryRetriever] Query: 'What are the latest developments in quantum technology and AI?' | Route Decision: 'semantic'
+2026-08-24 23:09:53 | INFO     | agents.agent5_query:process:84 — [QueryAgent] Retrieved 1 articles via route 'semantic' for query: 'What are the latest developments in quantum technology and AI?'
+2026-08-24 23:09:53 | WARNING  | utils.groq_client:get_groq_client:29 — [GroqClient] No GROQ_API_KEY provided in settings or environment.
+2026-08-24 23:09:53 | INFO     | agents.agent5_query:process:132 — [QueryAgent] Answer generated | Route: semantic | Sources: 1 | Confidence: 0.77 | Latency: 0.02s
+2026-08-24 23:09:53 | INFO     | agents.agent5_query:process:75 — [QueryAgent] Processing query: 'What happened in ancient volcanic eruptions on Mars in 2099?'
+2026-08-24 23:09:53 | INFO     | agents.query_retriever:retrieve:48 — [QueryRetriever] Query: 'What happened in ancient volcanic eruptions on Mars in 2099?' | Route Decision: 'keyword'
+2026-08-24 23:09:53 | DEBUG    | agents.query_retriever:keyword_search:166 — [QueryRetriever] Extracted search keywords: ['happened', 'in', 'ancient', 'volcanic', 'eruptions', 'on', 'Mars', 'in', '2099']
+2026-08-24 23:09:53 | INFO     | agents.agent5_query:process:84 — [QueryAgent] Retrieved 3 articles via route 'keyword' for query: 'What happened in ancient volcanic eruptions on Mars in 2099?'
+2026-08-24 23:09:53 | WARNING  | utils.groq_client:get_groq_client:29 — [GroqClient] No GROQ_API_KEY provided in settings or environment.
+2026-08-24 23:09:53 | INFO     | agents.agent5_query:process:132 — [QueryAgent] Answer generated | Route: keyword | Sources: 3 | Confidence: 0.25 | Latency: 0.01s
+2026-08-24 23:09:53 | INFO     | __main__:cleanup_test_articles:159 — [TestCleanup] Removed test articles from MongoDB.
+2026-08-24 23:10:47 | WARNING  | __main__:setup_test_environment:102 — [TestSetup] Live MongoDB unreachable (The DNS query name does not exist: _mongodb._tcp.cluster0.8rhhosm.mongodb.net.). Using mongomock for test isolation.
+2026-08-24 23:10:47 | INFO     | storage.faiss_store:_load_or_create:112 — [FAISS] New index created (dim=384)
+2026-08-24 23:11:00 | INFO     | storage.faiss_store:_load_sentence_transformer:24 — [FAISS] Embedding model loaded: all-MiniLM-L6-v2
+2026-08-24 23:11:00 | INFO     | storage.faiss_store:add_articles:181 — [FAISS] Added 3 vectors. Total index size: 3
+2026-08-24 23:11:00 | INFO     | __main__:insert_test_articles:151 — [TestSetup] Inserted 3 test articles into MongoDB and FAISS.
+2026-08-24 23:11:00 | INFO     | agents.agent5_query:__init__:43 — [QueryAgent] Initialized with LLM: GroqQueryLLM
+2026-08-24 23:11:00 | INFO     | agents.agent5_query:process:75 — [QueryAgent] Processing query: 'What is happening in global finance this week?'
+2026-08-24 23:11:00 | INFO     | agents.query_retriever:retrieve:48 — [QueryRetriever] Query: 'What is happening in global finance this week?' | Route Decision: 'semantic'
+2026-08-24 23:11:00 | INFO     | agents.agent5_query:process:84 — [QueryAgent] Retrieved 1 articles via route 'semantic' for query: 'What is happening in global finance this week?'
+2026-08-24 23:11:01 | WARNING  | utils.groq_client:get_groq_client:29 — [GroqClient] No GROQ_API_KEY provided in settings or environment.
+2026-08-24 23:11:01 | INFO     | agents.agent5_query:process:132 — [QueryAgent] Answer generated | Route: semantic | Sources: 1 | Confidence: 0.64 | Latency: 0.54s
+2026-08-24 23:11:01 | INFO     | agents.agent5_query:process:75 — [QueryAgent] Processing query: 'What did RBI do recently?'
+2026-08-24 23:11:01 | INFO     | agents.query_retriever:retrieve:48 — [QueryRetriever] Query: 'What did RBI do recently?' | Route Decision: 'keyword'
+2026-08-24 23:11:01 | DEBUG    | agents.query_retriever:keyword_search:168 — [QueryRetriever] Extracted search keywords: ['RBI']
+2026-08-24 23:11:01 | INFO     | agents.agent5_query:process:84 — [QueryAgent] Retrieved 1 articles via route 'keyword' for query: 'What did RBI do recently?'
+2026-08-24 23:11:01 | WARNING  | utils.groq_client:get_groq_client:29 — [GroqClient] No GROQ_API_KEY provided in settings or environment.
+2026-08-24 23:11:01 | INFO     | agents.agent5_query:process:132 — [QueryAgent] Answer generated | Route: keyword | Sources: 1 | Confidence: 0.68 | Latency: 0.00s
+2026-08-24 23:11:01 | INFO     | agents.agent5_query:process:75 — [QueryAgent] Processing query: 'What are the latest developments in quantum technology and AI?'
+2026-08-24 23:11:01 | INFO     | agents.query_retriever:retrieve:48 — [QueryRetriever] Query: 'What are the latest developments in quantum technology and AI?' | Route Decision: 'semantic'
+2026-08-24 23:11:01 | INFO     | agents.agent5_query:process:84 — [QueryAgent] Retrieved 1 articles via route 'semantic' for query: 'What are the latest developments in quantum technology and AI?'
+2026-08-24 23:11:01 | WARNING  | utils.groq_client:get_groq_client:29 — [GroqClient] No GROQ_API_KEY provided in settings or environment.
+2026-08-24 23:11:01 | INFO     | agents.agent5_query:process:132 — [QueryAgent] Answer generated | Route: semantic | Sources: 1 | Confidence: 0.77 | Latency: 0.02s
+2026-08-24 23:11:01 | INFO     | agents.agent5_query:process:75 — [QueryAgent] Processing query: 'What happened in ancient volcanic eruptions on Mars in 2099?'
+2026-08-24 23:11:01 | INFO     | agents.query_retriever:retrieve:48 — [QueryRetriever] Query: 'What happened in ancient volcanic eruptions on Mars in 2099?' | Route Decision: 'keyword'
+2026-08-24 23:11:01 | DEBUG    | agents.query_retriever:keyword_search:168 — [QueryRetriever] Extracted search keywords: ['happened', 'ancient', 'volcanic', 'eruptions', 'Mars', '2099']
+2026-08-24 23:11:01 | INFO     | agents.query_retriever:retrieve:57 — [QueryRetriever] Keyword search yielded 0 results, falling back to semantic search.
+2026-08-24 23:11:01 | INFO     | agents.agent5_query:process:84 — [QueryAgent] Retrieved 0 articles via route 'keyword' for query: 'What happened in ancient volcanic eruptions on Mars in 2099?'
+2026-08-24 23:11:01 | INFO     | agents.query_llm:__init__:156 — [CustomModelQueryLLM] Configured placeholder with path: models/mapnai-query-model
+2026-08-24 23:11:01 | INFO     | agents.agent5_query:__init__:43 — [QueryAgent] Initialized with LLM: CustomModelQueryLLM
+2026-08-24 23:11:01 | INFO     | agents.agent5_query:process:75 — [QueryAgent] Processing query: 'What did RBI do recently?'
+2026-08-24 23:11:01 | INFO     | agents.query_retriever:retrieve:48 — [QueryRetriever] Query: 'What did RBI do recently?' | Route Decision: 'keyword'
+2026-08-24 23:11:01 | DEBUG    | agents.query_retriever:keyword_search:168 — [QueryRetriever] Extracted search keywords: ['RBI']
+2026-08-24 23:11:01 | INFO     | agents.agent5_query:process:84 — [QueryAgent] Retrieved 1 articles via route 'keyword' for query: 'What did RBI do recently?'
+2026-08-24 23:11:01 | WARNING  | agents.query_llm:load_model:161 — [CustomModelQueryLLM] Model directory not found at 'models/mapnai-query-model'. Running in simulated mode. Place custom model weights in models/ to enable.
+2026-08-24 23:11:01 | INFO     | agents.agent5_query:process:132 — [QueryAgent] Answer generated | Route: keyword | Sources: 1 | Confidence: 0.68 | Latency: 0.00s
+2026-08-24 23:11:01 | INFO     | __main__:cleanup_test_articles:159 — [TestCleanup] Removed test articles from MongoDB.
+2026-08-24 23:11:51 | INFO     | agents.rss_fetcher:fetch_rss_source:125 — [RSS] Fetched 2 articles from Test Source
+2026-08-24 23:11:51 | INFO     | agents.rss_fetcher:fetch_rss_source:125 — [RSS] Fetched 0 articles from Test
+2026-08-24 23:11:51 | WARNING  | agents.rss_fetcher:_fetch_feed:77 — RSS fetch error (https://test.com/feed): Network unreachable
+2026-08-24 23:11:53 | WARNING  | agents.rss_fetcher:_fetch_feed:77 — RSS fetch error (https://test.com/feed): Network unreachable
+2026-08-24 23:11:55 | WARNING  | agents.rss_fetcher:_fetch_feed:77 — RSS fetch error (https://test.com/feed): Network unreachable
+2026-08-24 23:11:55 | ERROR    | agents.rss_fetcher:fetch_rss_source:128 — [RSS] Failed to fetch Test (https://test.com/feed): RetryError[<Future at 0x2237bdd58d0 state=finished raised ConnectionError>]
+2026-08-24 23:11:55 | WARNING  | agents.rss_fetcher:_fetch_feed:74 — HTTP 503 for RSS: https://test.com/feed
+2026-08-24 23:11:57 | WARNING  | agents.rss_fetcher:_fetch_feed:74 — HTTP 503 for RSS: https://test.com/feed
+2026-08-24 23:11:59 | WARNING  | agents.rss_fetcher:_fetch_feed:74 — HTTP 503 for RSS: https://test.com/feed
+2026-08-24 23:11:59 | ERROR    | agents.rss_fetcher:fetch_rss_source:128 — [RSS] Failed to fetch Test (https://test.com/feed): RetryError[<Future at 0x2237bdeb210 state=finished raised HTTPError>]
+2026-08-24 23:11:59 | INFO     | agents.rss_fetcher:fetch_rss_source:125 — [RSS] Fetched 5 articles from Test
+2026-08-24 23:11:59 | INFO     | agents.api_fetcher:fetch:134 — [NewsAPI] Fetched 2 articles for query: 'central bank rates'
+2026-08-24 23:11:59 | INFO     | agents.api_fetcher:fetch:134 — [NewsAPI] Fetched 1 articles for query: 'query'
+2026-08-24 23:11:59 | WARNING  | agents.api_fetcher:fetch:90 — [NewsAPI] API key not configured — skipping.
+2026-08-24 23:11:59 | ERROR    | agents.api_fetcher:fetch:109 — [NewsAPI] Bad response: {'status': 'error', 'message': 'API key invalid'}
+2026-08-24 23:11:59 | WARNING  | agents.api_fetcher:_get_json:44 — Rate limit hit: https://api.example.com — backing off
+2026-08-24 23:12:01 | WARNING  | agents.api_fetcher:_get_json:44 — Rate limit hit: https://api.example.com — backing off
+2026-08-24 23:12:03 | WARNING  | agents.api_fetcher:_get_json:44 — Rate limit hit: https://api.example.com — backing off
+2026-08-24 23:12:04 | INFO     | agents.api_fetcher:fetch:204 — [GNews] Fetched 1 for 'tech layoffs'
+2026-08-24 23:12:04 | WARNING  | agents.api_fetcher:fetch:167 — [GNews] API key not configured — skipping.
+2026-08-24 23:12:04 | DEBUG    | utils.text_cleaner:normalize_timestamp:151 — Timestamp parse failed for 'not-a-date': Unknown string format: not-a-date
+2026-08-24 23:12:04 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: art-002
+2026-08-24 23:12:04 | INFO     | utils.deduplicator:load_existing_hashes:146 — Deduplicator seeded with 1 existing hashes from DB.
+2026-08-24 23:12:04 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: new-id
+2026-08-24 23:12:04 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [0310f6db]: Empty body
+2026-08-24 23:12:04 | DEBUG    | agents.preprocessing_agent:process:180 — Quality gate fail [aabe91ff]: Body too short (10 < 100 chars)
+2026-08-24 23:12:04 | DEBUG    | utils.deduplicator:is_duplicate:164 — SimHash duplicate: 180af4fc
+2026-08-24 23:12:04 | DEBUG    | utils.deduplicator:is_duplicate:105 — MinHash duplicate detected: b23e3076 matches f98c6934
+2026-08-24 23:12:04 | DEBUG    | utils.deduplicator:is_duplicate:105 — MinHash duplicate detected: 31564919 matches f98c6934
+2026-08-24 23:12:04 | DEBUG    | utils.deduplicator:is_duplicate:105 — MinHash duplicate detected: 7768bddd matches f98c6934
+2026-08-24 23:12:04 | DEBUG    | utils.deduplicator:is_duplicate:105 — MinHash duplicate detected: 2d54d55e matches f98c6934
+2026-08-24 23:12:04 | INFO     | agents.preprocessing_agent:process_batch:252 — [Preprocessing] Batch complete | Input=5 | Processed=1 | Dupes=4 | QualityFail=0
+2026-08-24 23:12:05 | DEBUG    | utils.deduplicator:is_duplicate:105 — MinHash duplicate detected: 7a59cdb8 matches e57a6611
+2026-08-24 23:12:05 | INFO     | agents.preprocessing_agent:process_batch:252 — [Preprocessing] Batch complete | Input=5 | Processed=4 | Dupes=1 | QualityFail=0
+2026-08-24 23:12:05 | INFO     | storage.mongo_store:upsert_articles:107 — [MongoDB] Upserted 2 new + 0 updated articles.
+2026-08-24 23:12:05 | INFO     | storage.mongo_store:get_existing_hashes:141 — [MongoDB] Loaded 3 existing hashes for deduplication.
+2026-08-24 23:12:05 | INFO     | storage.faiss_store:_load_or_create:112 — [FAISS] New index created (dim=384)
+2026-08-24 23:12:05 | INFO     | storage.faiss_store:add_articles:181 — [FAISS] Added 2 vectors. Total index size: 0
+2026-08-24 23:12:05 | INFO     | storage.faiss_store:_load_or_create:112 — [FAISS] New index created (dim=384)
+2026-08-24 23:12:05 | INFO     | storage.faiss_store:_load_or_create:112 — [FAISS] New index created (dim=384)
+2026-08-24 23:12:05 | INFO     | storage.faiss_store:_load_or_create:112 — [FAISS] New index created (dim=384)
+2026-08-24 23:12:05 | INFO     | storage.neo4j_store:upsert_articles:122 — [Neo4j] Upserted 2 article nodes.
+2026-08-24 23:12:43 | INFO     | storage.mongo_store:upsert_articles:107 — [MongoDB] Upserted 2 new + 0 updated articles.
+2026-08-24 23:12:43 | INFO     | storage.mongo_store:get_existing_hashes:141 — [MongoDB] Loaded 3 existing hashes for deduplication.
+2026-08-24 23:12:43 | INFO     | storage.faiss_store:_load_or_create:112 — [FAISS] New index created (dim=384)
+2026-08-24 23:12:43 | INFO     | storage.faiss_store:add_articles:181 — [FAISS] Added 2 vectors. Total index size: 0
+2026-08-24 23:12:43 | INFO     | storage.faiss_store:_load_or_create:112 — [FAISS] New index created (dim=384)
+2026-08-24 23:12:43 | INFO     | storage.faiss_store:_load_or_create:112 — [FAISS] New index created (dim=384)
+2026-08-24 23:12:43 | INFO     | storage.faiss_store:_load_or_create:112 — [FAISS] New index created (dim=384)
+2026-08-24 23:12:43 | INFO     | storage.neo4j_store:upsert_articles:122 — [Neo4j] Upserted 2 article nodes.
+2026-08-24 23:13:18 | WARNING  | __main__:setup_test_environment:102 — [TestSetup] Live MongoDB unreachable (The DNS query name does not exist: _mongodb._tcp.cluster0.8rhhosm.mongodb.net.). Using mongomock for test isolation.
+2026-08-24 23:13:18 | INFO     | storage.faiss_store:_load_or_create:112 — [FAISS] New index created (dim=384)
+2026-08-24 23:13:35 | INFO     | storage.faiss_store:_load_sentence_transformer:24 — [FAISS] Embedding model loaded: all-MiniLM-L6-v2
+2026-08-24 23:13:36 | INFO     | storage.faiss_store:add_articles:181 — [FAISS] Added 3 vectors. Total index size: 3
+2026-08-24 23:13:36 | INFO     | __main__:insert_test_articles:151 — [TestSetup] Inserted 3 test articles into MongoDB and FAISS.
+2026-08-24 23:13:36 | INFO     | agents.agent5_query:__init__:43 — [QueryAgent] Initialized with LLM: GroqQueryLLM
+2026-08-24 23:13:36 | INFO     | agents.agent5_query:process:75 — [QueryAgent] Processing query: 'What is happening in global finance this week?'
+2026-08-24 23:13:36 | INFO     | agents.query_retriever:retrieve:48 — [QueryRetriever] Query: 'What is happening in global finance this week?' | Route Decision: 'semantic'
+2026-08-24 23:13:36 | INFO     | agents.agent5_query:process:84 — [QueryAgent] Retrieved 1 articles via route 'semantic' for query: 'What is happening in global finance this week?'
+2026-08-24 23:13:36 | WARNING  | utils.groq_client:get_groq_client:29 — [GroqClient] No GROQ_API_KEY provided in settings or environment.
+2026-08-24 23:13:36 | INFO     | agents.agent5_query:process:132 — [QueryAgent] Answer generated | Route: semantic | Sources: 1 | Confidence: 0.64 | Latency: 0.68s
+2026-08-24 23:13:36 | INFO     | agents.agent5_query:process:75 — [QueryAgent] Processing query: 'What did RBI do recently?'
+2026-08-24 23:13:36 | INFO     | agents.query_retriever:retrieve:48 — [QueryRetriever] Query: 'What did RBI do recently?' | Route Decision: 'keyword'
+2026-08-24 23:13:36 | DEBUG    | agents.query_retriever:keyword_search:168 — [QueryRetriever] Extracted search keywords: ['RBI']
+2026-08-24 23:13:36 | INFO     | agents.agent5_query:process:84 — [QueryAgent] Retrieved 1 articles via route 'keyword' for query: 'What did RBI do recently?'
+2026-08-24 23:13:36 | WARNING  | utils.groq_client:get_groq_client:29 — [GroqClient] No GROQ_API_KEY provided in settings or environment.
+2026-08-24 23:13:36 | INFO     | agents.agent5_query:process:132 — [QueryAgent] Answer generated | Route: keyword | Sources: 1 | Confidence: 0.68 | Latency: 0.00s
+2026-08-24 23:13:36 | INFO     | agents.agent5_query:process:75 — [QueryAgent] Processing query: 'What are the latest developments in quantum technology and AI?'
+2026-08-24 23:13:36 | INFO     | agents.query_retriever:retrieve:48 — [QueryRetriever] Query: 'What are the latest developments in quantum technology and AI?' | Route Decision: 'semantic'
+2026-08-24 23:13:36 | INFO     | agents.agent5_query:process:84 — [QueryAgent] Retrieved 1 articles via route 'semantic' for query: 'What are the latest developments in quantum technology and AI?'
+2026-08-24 23:13:36 | WARNING  | utils.groq_client:get_groq_client:29 — [GroqClient] No GROQ_API_KEY provided in settings or environment.
+2026-08-24 23:13:36 | INFO     | agents.agent5_query:process:132 — [QueryAgent] Answer generated | Route: semantic | Sources: 1 | Confidence: 0.77 | Latency: 0.03s
+2026-08-24 23:13:36 | INFO     | agents.agent5_query:process:75 — [QueryAgent] Processing query: 'What happened in ancient volcanic eruptions on Mars in 2099?'
+2026-08-24 23:13:36 | INFO     | agents.query_retriever:retrieve:48 — [QueryRetriever] Query: 'What happened in ancient volcanic eruptions on Mars in 2099?' | Route Decision: 'keyword'
+2026-08-24 23:13:36 | DEBUG    | agents.query_retriever:keyword_search:168 — [QueryRetriever] Extracted search keywords: ['happened', 'ancient', 'volcanic', 'eruptions', 'Mars', '2099']
+2026-08-24 23:13:36 | INFO     | agents.query_retriever:retrieve:57 — [QueryRetriever] Keyword search yielded 0 results, falling back to semantic search.
+2026-08-24 23:13:36 | INFO     | agents.agent5_query:process:84 — [QueryAgent] Retrieved 0 articles via route 'keyword' for query: 'What happened in ancient volcanic eruptions on Mars in 2099?'
+2026-08-24 23:13:36 | INFO     | agents.query_llm:__init__:156 — [CustomModelQueryLLM] Configured placeholder with path: models/mapnai-query-model
+2026-08-24 23:13:36 | INFO     | agents.agent5_query:__init__:43 — [QueryAgent] Initialized with LLM: CustomModelQueryLLM
+2026-08-24 23:13:36 | INFO     | agents.agent5_query:process:75 — [QueryAgent] Processing query: 'What did RBI do recently?'
+2026-08-24 23:13:36 | INFO     | agents.query_retriever:retrieve:48 — [QueryRetriever] Query: 'What did RBI do recently?' | Route Decision: 'keyword'
+2026-08-24 23:13:36 | DEBUG    | agents.query_retriever:keyword_search:168 — [QueryRetriever] Extracted search keywords: ['RBI']
+2026-08-24 23:13:36 | INFO     | agents.agent5_query:process:84 — [QueryAgent] Retrieved 1 articles via route 'keyword' for query: 'What did RBI do recently?'
+2026-08-24 23:13:36 | WARNING  | agents.query_llm:load_model:161 — [CustomModelQueryLLM] Model directory not found at 'models/mapnai-query-model'. Running in simulated mode. Place custom model weights in models/ to enable.
+2026-08-24 23:13:36 | INFO     | agents.agent5_query:process:132 — [QueryAgent] Answer generated | Route: keyword | Sources: 1 | Confidence: 0.68 | Latency: 0.00s
+2026-08-24 23:13:36 | INFO     | __main__:cleanup_test_articles:159 — [TestCleanup] Removed test articles from MongoDB.
+2026-08-24 23:19:29 | WARNING  | __main__:setup_test_environment:102 — [TestSetup] Live MongoDB unreachable (The DNS query name does not exist: _mongodb._tcp.cluster0.8rhhosm.mongodb.net.). Using mongomock for test isolation.
+2026-08-24 23:19:29 | INFO     | storage.faiss_store:_load_or_create:112 — [FAISS] New index created (dim=384)
+2026-08-24 23:19:45 | INFO     | storage.faiss_store:_load_sentence_transformer:24 — [FAISS] Embedding model loaded: all-MiniLM-L6-v2
+2026-08-24 23:19:45 | INFO     | storage.faiss_store:add_articles:181 — [FAISS] Added 3 vectors. Total index size: 3
+2026-08-24 23:19:45 | INFO     | __main__:insert_test_articles:151 — [TestSetup] Inserted 3 test articles into MongoDB and FAISS.
+2026-08-24 23:19:45 | INFO     | agents.agent5_query:__init__:43 — [QueryAgent] Initialized with LLM: GroqQueryLLM
+2026-08-24 23:19:45 | INFO     | agents.agent5_query:process:75 — [QueryAgent] Processing query: 'What is happening in global finance this week?'
+2026-08-24 23:19:45 | INFO     | agents.query_retriever:retrieve:48 — [QueryRetriever] Query: 'What is happening in global finance this week?' | Route Decision: 'semantic'
+2026-08-24 23:19:45 | INFO     | agents.agent5_query:process:84 — [QueryAgent] Retrieved 1 articles via route 'semantic' for query: 'What is happening in global finance this week?'
+2026-08-24 23:19:46 | WARNING  | utils.groq_client:get_groq_client:29 — [GroqClient] No GROQ_API_KEY provided in settings or environment.
+2026-08-24 23:19:46 | INFO     | agents.agent5_query:process:132 — [QueryAgent] Answer generated | Route: semantic | Sources: 1 | Confidence: 0.64 | Latency: 0.56s
+2026-08-24 23:19:46 | INFO     | agents.agent5_query:process:75 — [QueryAgent] Processing query: 'What did RBI do recently?'
+2026-08-24 23:19:46 | INFO     | agents.query_retriever:retrieve:48 — [QueryRetriever] Query: 'What did RBI do recently?' | Route Decision: 'keyword'
+2026-08-24 23:19:46 | DEBUG    | agents.query_retriever:keyword_search:168 — [QueryRetriever] Extracted search keywords: ['RBI']
+2026-08-24 23:19:46 | INFO     | agents.agent5_query:process:84 — [QueryAgent] Retrieved 1 articles via route 'keyword' for query: 'What did RBI do recently?'
+2026-08-24 23:19:46 | WARNING  | utils.groq_client:get_groq_client:29 — [GroqClient] No GROQ_API_KEY provided in settings or environment.
+2026-08-24 23:19:46 | INFO     | agents.agent5_query:process:132 — [QueryAgent] Answer generated | Route: keyword | Sources: 1 | Confidence: 0.68 | Latency: 0.00s
+2026-08-24 23:19:46 | INFO     | agents.agent5_query:process:75 — [QueryAgent] Processing query: 'What are the latest developments in quantum technology and AI?'
+2026-08-24 23:19:46 | INFO     | agents.query_retriever:retrieve:48 — [QueryRetriever] Query: 'What are the latest developments in quantum technology and AI?' | Route Decision: 'semantic'
+2026-08-24 23:19:46 | INFO     | agents.agent5_query:process:84 — [QueryAgent] Retrieved 1 articles via route 'semantic' for query: 'What are the latest developments in quantum technology and AI?'
+2026-08-24 23:19:46 | WARNING  | utils.groq_client:get_groq_client:29 — [GroqClient] No GROQ_API_KEY provided in settings or environment.
+2026-08-24 23:19:46 | INFO     | agents.agent5_query:process:132 — [QueryAgent] Answer generated | Route: semantic | Sources: 1 | Confidence: 0.77 | Latency: 0.03s
+2026-08-24 23:19:46 | INFO     | agents.agent5_query:process:75 — [QueryAgent] Processing query: 'What happened in ancient volcanic eruptions on Mars in 2099?'
+2026-08-24 23:19:46 | INFO     | agents.query_retriever:retrieve:48 — [QueryRetriever] Query: 'What happened in ancient volcanic eruptions on Mars in 2099?' | Route Decision: 'keyword'
+2026-08-24 23:19:46 | DEBUG    | agents.query_retriever:keyword_search:168 — [QueryRetriever] Extracted search keywords: ['happened', 'ancient', 'volcanic', 'eruptions', 'Mars', '2099']
+2026-08-24 23:19:46 | INFO     | agents.query_retriever:retrieve:57 — [QueryRetriever] Keyword search yielded 0 results, falling back to semantic search.
+2026-08-24 23:19:46 | INFO     | agents.agent5_query:process:84 — [QueryAgent] Retrieved 0 articles via route 'keyword' for query: 'What happened in ancient volcanic eruptions on Mars in 2099?'
+2026-08-24 23:19:46 | INFO     | agents.query_llm:__init__:156 — [CustomModelQueryLLM] Configured placeholder with path: models/mapnai-query-model
+2026-08-24 23:19:46 | INFO     | agents.agent5_query:__init__:43 — [QueryAgent] Initialized with LLM: CustomModelQueryLLM
+2026-08-24 23:19:46 | INFO     | agents.agent5_query:process:75 — [QueryAgent] Processing query: 'What did RBI do recently?'
+2026-08-24 23:19:46 | INFO     | agents.query_retriever:retrieve:48 — [QueryRetriever] Query: 'What did RBI do recently?' | Route Decision: 'keyword'
+2026-08-24 23:19:46 | DEBUG    | agents.query_retriever:keyword_search:168 — [QueryRetriever] Extracted search keywords: ['RBI']
+2026-08-24 23:19:46 | INFO     | agents.agent5_query:process:84 — [QueryAgent] Retrieved 1 articles via route 'keyword' for query: 'What did RBI do recently?'
+2026-08-24 23:19:46 | WARNING  | agents.query_llm:load_model:161 — [CustomModelQueryLLM] Model directory not found at 'models/mapnai-query-model'. Running in simulated mode. Place custom model weights in models/ to enable.
+2026-08-24 23:19:46 | INFO     | agents.agent5_query:process:132 — [QueryAgent] Answer generated | Route: keyword | Sources: 1 | Confidence: 0.68 | Latency: 0.00s
+2026-08-24 23:19:46 | INFO     | __main__:cleanup_test_articles:159 — [TestCleanup] Removed test articles from MongoDB.
+2026-08-24 23:30:30 | WARNING  | __main__:setup_database:115 — [Setup] Live MongoDB unreachable (The DNS query name does not exist: _mongodb._tcp.cluster0.8rhhosm.mongodb.net.). Using mongomock for test isolation.
+2026-08-24 23:30:31 | INFO     | storage.faiss_store:_load_or_create:112 — [FAISS] New index created (dim=384)
+2026-08-24 23:30:51 | INFO     | storage.faiss_store:_load_sentence_transformer:24 — [FAISS] Embedding model loaded: all-MiniLM-L6-v2
+2026-08-24 23:30:51 | INFO     | storage.faiss_store:add_articles:181 — [FAISS] Added 3 vectors. Total index size: 3
+2026-08-24 23:30:51 | INFO     | __main__:setup_database:157 — [Setup] Database loaded with 3 test articles.
+2026-08-24 23:30:51 | INFO     | agents.agent5_query:__init__:43 — [QueryAgent] Initialized with LLM: GroqQueryLLM
+2026-08-24 23:30:51 | INFO     | agents.agent5_query:process:75 — [QueryAgent] Processing query: 'What is Christopher Nolan's new film?'
+2026-08-24 23:30:51 | INFO     | agents.query_retriever:retrieve:48 — [QueryRetriever] Query: 'What is Christopher Nolan's new film?' | Route Decision: 'keyword'
+2026-08-24 23:30:51 | DEBUG    | agents.query_retriever:keyword_search:168 — [QueryRetriever] Extracted search keywords: ['Christopher', 'Nolan', 'new', 'film']
+2026-08-24 23:30:51 | INFO     | agents.agent5_query:process:84 — [QueryAgent] Retrieved 2 articles via route 'keyword' for query: 'What is Christopher Nolan's new film?'
+2026-08-24 23:30:52 | WARNING  | utils.groq_client:get_groq_client:29 — [GroqClient] No GROQ_API_KEY provided in settings or environment.
+2026-08-24 23:30:52 | INFO     | agents.agent5_query:process:132 — [QueryAgent] Answer generated | Route: keyword | Sources: 2 | Confidence: 0.55 | Latency: 0.99s
+2026-08-24 23:30:52 | INFO     | __main__:cleanup_database:167 — [Cleanup] Cleaned up test articles from MongoDB.
+2026-08-24 23:31:43 | WARNING  | __main__:setup_database:115 — [Setup] Live MongoDB unreachable (The DNS query name does not exist: _mongodb._tcp.cluster0.8rhhosm.mongodb.net.). Using mongomock for test isolation.
+2026-08-24 23:31:43 | INFO     | storage.faiss_store:_load_or_create:112 — [FAISS] New index created (dim=384)
+2026-08-24 23:32:04 | INFO     | storage.faiss_store:_load_sentence_transformer:24 — [FAISS] Embedding model loaded: all-MiniLM-L6-v2
+2026-08-24 23:32:05 | INFO     | storage.faiss_store:add_articles:181 — [FAISS] Added 3 vectors. Total index size: 3
+2026-08-24 23:32:05 | INFO     | __main__:setup_database:157 — [Setup] Database loaded with 3 test articles.
+2026-08-24 23:32:05 | INFO     | agents.agent5_query:__init__:43 — [QueryAgent] Initialized with LLM: GroqQueryLLM
+2026-08-24 23:32:05 | INFO     | agents.agent5_query:process:75 — [QueryAgent] Processing query: 'Who won the match at Old Trafford?'
+2026-08-24 23:32:05 | INFO     | agents.query_retriever:retrieve:48 — [QueryRetriever] Query: 'Who won the match at Old Trafford?' | Route Decision: 'keyword'
+2026-08-24 23:32:05 | DEBUG    | agents.query_retriever:keyword_search:168 — [QueryRetriever] Extracted search keywords: ['won', 'match', 'Old', 'Trafford']
+2026-08-24 23:32:05 | INFO     | agents.agent5_query:process:84 — [QueryAgent] Retrieved 1 articles via route 'keyword' for query: 'Who won the match at Old Trafford?'
+2026-08-24 23:32:06 | WARNING  | utils.groq_client:get_groq_client:29 — [GroqClient] No GROQ_API_KEY provided in settings or environment.
+2026-08-24 23:32:06 | INFO     | agents.agent5_query:process:132 — [QueryAgent] Answer generated | Route: keyword | Sources: 1 | Confidence: 0.47 | Latency: 0.94s
+2026-08-24 23:32:06 | INFO     | __main__:cleanup_database:167 — [Cleanup] Cleaned up test articles from MongoDB.
+2026-08-24 23:32:25 | WARNING  | __main__:setup_database:115 — [Setup] Live MongoDB unreachable (The DNS query name does not exist: _mongodb._tcp.cluster0.8rhhosm.mongodb.net.). Using mongomock for test isolation.
+2026-08-24 23:32:25 | INFO     | storage.faiss_store:_load_or_create:112 — [FAISS] New index created (dim=384)
+2026-08-24 23:32:41 | INFO     | storage.faiss_store:_load_sentence_transformer:24 — [FAISS] Embedding model loaded: all-MiniLM-L6-v2
+2026-08-24 23:32:41 | INFO     | storage.faiss_store:add_articles:181 — [FAISS] Added 3 vectors. Total index size: 3
+2026-08-24 23:32:41 | INFO     | __main__:setup_database:157 — [Setup] Database loaded with 3 test articles.
+2026-08-24 23:32:41 | INFO     | agents.agent5_query:__init__:43 — [QueryAgent] Initialized with LLM: GroqQueryLLM
+2026-08-24 23:32:41 | INFO     | agents.agent5_query:process:75 — [QueryAgent] Processing query: 'What did the Federal Reserve do regarding interest rates?'
+2026-08-24 23:32:41 | INFO     | agents.query_retriever:retrieve:48 — [QueryRetriever] Query: 'What did the Federal Reserve do regarding interest rates?' | Route Decision: 'keyword'
+2026-08-24 23:32:41 | DEBUG    | agents.query_retriever:keyword_search:168 — [QueryRetriever] Extracted search keywords: ['Federal', 'Reserve', 'regarding', 'interest', 'rates']
+2026-08-24 23:32:41 | INFO     | agents.agent5_query:process:84 — [QueryAgent] Retrieved 1 articles via route 'keyword' for query: 'What did the Federal Reserve do regarding interest rates?'
+2026-08-24 23:32:42 | WARNING  | utils.groq_client:get_groq_client:29 — [GroqClient] No GROQ_API_KEY provided in settings or environment.
+2026-08-24 23:32:42 | INFO     | agents.agent5_query:process:132 — [QueryAgent] Answer generated | Route: keyword | Sources: 1 | Confidence: 0.42 | Latency: 0.56s
+2026-08-24 23:32:42 | INFO     | __main__:cleanup_database:167 — [Cleanup] Cleaned up test articles from MongoDB.
+2026-08-24 23:36:03 | WARNING  | __main__:setup_database:115 — [Setup] Live MongoDB unreachable (The DNS query name does not exist: _mongodb._tcp.cluster0.8rhhosm.mongodb.net.). Using mongomock for test isolation.
+2026-08-24 23:36:03 | INFO     | storage.faiss_store:_load_or_create:112 — [FAISS] New index created (dim=384)
+2026-08-24 23:36:18 | INFO     | storage.faiss_store:_load_sentence_transformer:24 — [FAISS] Embedding model loaded: all-MiniLM-L6-v2
+2026-08-24 23:36:18 | INFO     | storage.faiss_store:add_articles:181 — [FAISS] Added 3 vectors. Total index size: 3
+2026-08-24 23:36:18 | INFO     | __main__:setup_database:157 — [Setup] Database loaded with 3 test articles.
+2026-08-24 23:36:18 | INFO     | agents.agent5_query:__init__:43 — [QueryAgent] Initialized with LLM: GroqQueryLLM
+2026-08-24 23:36:37 | INFO     | agents.agent5_query:process:75 — [QueryAgent] Processing query: 'what is the most recent news in movie'
+2026-08-24 23:36:37 | INFO     | agents.query_retriever:retrieve:48 — [QueryRetriever] Query: 'what is the most recent news in movie' | Route Decision: 'semantic'
+2026-08-24 23:36:37 | INFO     | agents.agent5_query:process:84 — [QueryAgent] Retrieved 1 articles via route 'semantic' for query: 'what is the most recent news in movie'
+2026-08-24 23:36:37 | WARNING  | utils.groq_client:get_groq_client:29 — [GroqClient] No GROQ_API_KEY provided in settings or environment.
+2026-08-24 23:36:37 | INFO     | agents.agent5_query:process:132 — [QueryAgent] Answer generated | Route: semantic | Sources: 1 | Confidence: 0.72 | Latency: 0.53s

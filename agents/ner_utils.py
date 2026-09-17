@@ -17,7 +17,8 @@ ENTITY_TYPES = {
     "Policy/Regulation",
     "Event",
     "Economic Indicator",
-    "Product/Technology"
+    "Product/Technology",
+    "Product"
 }
 
 # Mapping spaCy default NER labels to our custom types

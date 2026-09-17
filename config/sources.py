@@ -1,8 +1,14 @@
 """
 MAPNAI — config/sources.py
-Defines all ingestion sources: RSS feeds, API endpoints, subreddits,
+Defines all ingestion sources: RSS feeds, API endpoints, Bluesky Firehose,
 government feeds, and scraper targets.
 Add / remove sources here without touching any agent code.
+
+Note: Reddit has been fully replaced by the Bluesky public Firehose.
+      The Firehose is a single always-on WebSocket stream — no per-source
+      list is needed here. Configure it via settings.py / .env:
+          BLUESKY_FIREHOSE_URL  (default: wss://bsky.network/...)
+          BLUESKY_MAX_POSTS     (default: 200)
 """
 
 from dataclasses import dataclass, field
@@ -18,12 +24,8 @@ class RSSSource:
     active: bool = True
 
 
-@dataclass
-class RedditSource:
-    subreddit: str
-    domain: str
-    post_limit: int = 25
-    active: bool = True
+# RedditSource removed — replaced by Bluesky Firehose (zero-auth WebSocket).
+# See agents/bluesky_fetcher.py and config/settings.py.
 
 
 @dataclass
@@ -105,21 +107,10 @@ GOVERNMENT_RSS: List[RSSSource] = [
     RSSSource("PIB India",            "https://pib.gov.in/RssMain.aspx",                       "geopolitics"),
 ]
 
-# ── Reddit Sources ───────────────────────────────────────────
-REDDIT_SOURCES: List[RedditSource] = [
-    RedditSource("worldnews",         "geopolitics",    post_limit=30),
-    RedditSource("economics",         "finance",        post_limit=25),
-    RedditSource("finance",           "finance",        post_limit=25),
-    RedditSource("technology",        "technology",     post_limit=25),
-    RedditSource("artificial",        "technology",     post_limit=20),
-    RedditSource("MachineLearning",   "technology",     post_limit=20),
-    RedditSource("geopolitics",       "geopolitics",    post_limit=25),
-    RedditSource("India",             "geopolitics",    post_limit=20),
-    RedditSource("investing",         "finance",        post_limit=25),
-    RedditSource("supplychain",       "supply_chain",   post_limit=15),
-    RedditSource("coronavirus",       "health",         post_limit=15),
-    RedditSource("health",            "health",         post_limit=15),
-]
+# ── Bluesky Firehose ─────────────────────────────────────────
+# No source list required — the Firehose is a single public WebSocket stream
+# that delivers ALL network posts in real-time.
+# Configuration: BLUESKY_FIREHOSE_URL + BLUESKY_MAX_POSTS in .env / settings.py
 
 # ── Aggregated source list (all RSS) ─────────────────────────
 ALL_RSS_SOURCES: List[RSSSource] = (

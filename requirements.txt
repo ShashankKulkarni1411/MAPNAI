@@ -18,6 +18,12 @@ html2text==2024.2.26
 chardet==5.2.0
 ftfy==6.2.0                  # fixes mojibake / encoding issues
 
+# ── spaCy (NER Agent primary model) ─────────────────────────
+spacy>=3.7.0,<4.0.0
+# After installing, download a model:
+#   python -m spacy download en_core_web_sm   (fast, CPU)
+#   python -m spacy download en_core_web_trf  (accurate, GPU-optional)
+
 # ── Deduplication ────────────────────────────────────────────
 datasketch==1.6.4             # MinHash / LSH
 simhash==2.1.2                # SimHash fingerprinting
@@ -31,8 +37,9 @@ faiss-cpu==1.8.0
 
 # ── Database ─────────────────────────────────────────────────
 pymongo==4.7.2
+dnspython==2.6.1              # required for mongodb+srv:// (Atlas) URIs
 motor==3.4.0                  # async MongoDB driver
-psycopg2-binary==2.9.9        # PostgreSQL (optional fallback)
+psycopg2-binary==2.9.9        # PostgreSQL (optional — not used by NER Agent)
 
 # ── Knowledge Graph ──────────────────────────────────────────
 neo4j==5.20.0
@@ -45,8 +52,9 @@ APScheduler==3.10.4
 aiohttp==3.9.5
 asyncio-throttle==1.0.2
 
-# ── Reddit API ───────────────────────────────────────────────
-praw==7.7.1
+# ── Bluesky Firehose (zero-auth public WebSocket) ─────────────────
+websocket-client>=1.6.0           # WebSocket connection to bsky.network
+cbor2>=5.4.0                      # decode ATProto DAG-CBOR frames
 
 # ── Config & Environment ────────────────────────────────────
 python-dotenv==1.0.1
