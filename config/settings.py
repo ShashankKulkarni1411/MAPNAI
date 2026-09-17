@@ -32,6 +32,9 @@ class Settings(BaseSettings):
     )
     bluesky_max_posts: int = Field(default=200, env="BLUESKY_MAX_POSTS")
 
+    # ── LLM / Groq Settings ──────────────────────────────────
+    groq_model: str = Field(default="llama-3.3-70b-versatile", env="GROQ_MODEL")
+
     # ── MongoDB ──────────────────────────────────────────────
     mongo_uri: str = Field(default="mongodb://localhost:27017", env="MONGO_URI")
     mongo_db_name: str = Field(default="mapnai", env="MONGO_DB_NAME")

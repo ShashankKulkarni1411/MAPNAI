@@ -2,6 +2,8 @@
 venv/
 .venv/
 env/
+models.zip
+models/
 
 # Python cache
 __pycache__/
@@ -13,4 +15,4 @@ __pycache__/
 .env.*
 !.env.example
 
-.env.example 
+.env.example
