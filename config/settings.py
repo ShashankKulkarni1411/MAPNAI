@@ -34,6 +34,12 @@ class Settings(BaseSettings):
 
     # ── LLM / Groq Settings ──────────────────────────────────
     groq_model: str = Field(default="llama-3.3-70b-versatile", env="GROQ_MODEL")
+    openai_api_key: str = Field(default="", env="OPENAI_API_KEY")
+
+    # ── Reddit ───────────────────────────────────────────────
+    reddit_client_id: str = Field(default="", env="REDDIT_CLIENT_ID")
+    reddit_client_secret: str = Field(default="", env="REDDIT_CLIENT_SECRET")
+    reddit_user_agent: str = Field(default="MAPNAI/1.0", env="REDDIT_USER_AGENT")
 
     # ── MongoDB ──────────────────────────────────────────────
     mongo_uri: str = Field(default="mongodb://localhost:27017", env="MONGO_URI")
