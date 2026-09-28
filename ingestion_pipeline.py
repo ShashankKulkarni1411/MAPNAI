@@ -7,11 +7,9 @@ This is the single entry point for one complete ingestion run.
 Pipeline flow:
   1. Fetch from RSS + APIs + Bluesky Firehose + Scrapers (parallel)
   2. Preprocess batch (clean, dedupe, classify, normalize)
-  3. Store to MongoDB + FAISS + Neo4j (simultaneous)
-  4. Log run statistics
-
-Agents 1–4 run separately after ingestion:
-  python pipeline.py             # NER → Classifier → Summarizer → Risk Scorer
+  3. Enrich with entities (spaCy NER)
+  4. Store to MongoDB + FAISS + Neo4j (simultaneous)
+  5. Log run statistics
 
 Usage:
   python ingestion_pipeline.py              # single run
@@ -29,6 +27,7 @@ from agents.api_fetcher        import fetch_all_apis
 from agents.bluesky_fetcher    import fetch_all_bluesky
 from agents.web_scraper        import scrape_all_targets
 from agents.preprocessing_agent import PreprocessingAgent
+from agents.enrichment_agent   import EnrichmentAgent
 
 from storage.mongo_store  import MongoStore
 from storage.faiss_store  import FAISSStore
@@ -126,7 +125,15 @@ def _preprocess_phase(
     return processed
 
 
-# ── Phase 3: Store (3-way simultaneous) ──────────────────────
+# ── Phase 3: Enrich ──────────────────────────────────────────
+
+def _enrich_phase(articles: List[ProcessedArticle]) -> List[ProcessedArticle]:
+    """Run NER enrichment on all processed articles."""
+    agent = EnrichmentAgent()
+    return agent.enrich_batch(articles)
+
+
+# ── Phase 4: Store (3-way simultaneous) ──────────────────────
 
 def _store_phase(articles: List[ProcessedArticle]) -> dict:
     """
@@ -156,10 +163,11 @@ def _store_phase(articles: List[ProcessedArticle]) -> dict:
     except Exception as e:
         logger.error(f"[Pipeline] FAISS store failed: {e}")
 
-    # ── Neo4j (article graph only; entities added by Agent 1 / pipeline.py) ──
+    # ── Neo4j ─────────────────────────────────────────────────
     try:
         neo4j = _get_neo4j()
         neo4j.upsert_articles(articles)
+        neo4j.upsert_entities(articles)   # also builds co-occurrence graph
         store_results["neo4j"] = len(articles)
     except Exception as e:
         logger.error(f"[Pipeline] Neo4j store failed: {e}")
@@ -224,7 +232,14 @@ def run_ingestion_pipeline() -> IngestionRunStats:
         run_stats.errors.append(f"preprocess:{e}")
         processed = []
 
-    # ── Phase 3: Store (NER runs later via pipeline.py / Agent 1) ─
+    # ── Phase 3: Enrich ──────────────────────────────────────
+    try:
+        processed = _enrich_phase(processed)
+    except Exception as e:
+        logger.warning(f"[Pipeline] Enrichment phase warning (non-fatal): {e}")
+        # Continue with unenriched articles
+
+    # ── Phase 4: Store ────────────────────────────────────────
     try:
         store_results = _store_phase(processed)
         run_stats.total_stored = store_results.get("mongo", 0)

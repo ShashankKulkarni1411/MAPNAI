@@ -19,7 +19,7 @@ from typing import List, Optional
 class RSSSource:
     name: str
     url: str
-    domain: str          # finance | geopolitics | technology | health | supply_chain | general
+    domain: str          # finance | geopolitics | technology | health | supply_chain | sports | entertainment_movies | general
     language: str = "en"
     active: bool = True
 
@@ -95,6 +95,36 @@ SUPPLY_CHAIN_RSS: List[RSSSource] = [
     RSSSource("Freightos",            "https://www.freightos.com/feed/",                       "supply_chain"),
 ]
 
+# ── RSS Feeds — Sports ───────────────────────────────────────
+SPORTS_RSS: List[RSSSource] = [
+    RSSSource("ESPN Top News",        "https://www.espn.com/espn/rss/news",                    "sports"),
+    RSSSource("ESPN NBA",             "https://www.espn.com/espn/rss/nba/news",                "sports"),
+    RSSSource("ESPNcricinfo",         "https://www.espncricinfo.com/rss/content/story/feeds/0.xml", "sports"),
+    RSSSource("BBC Sport",            "https://feeds.bbci.co.uk/sport/rss.xml",                "sports"),
+    RSSSource("BBC Sport Football",   "https://feeds.bbci.co.uk/sport/football/rss.xml",       "sports"),
+    RSSSource("BBC Sport Cricket",    "https://feeds.bbci.co.uk/sport/cricket/rss.xml",        "sports"),
+    RSSSource("BBC Sport Tennis",     "https://feeds.bbci.co.uk/sport/tennis/rss.xml",         "sports"),
+    RSSSource("Sky Sports",           "https://www.skysports.com/rss/12040",                   "sports"),
+    RSSSource("Guardian Sport",       "https://www.theguardian.com/sport/rss",                 "sports"),
+    RSSSource("Autosport",            "https://www.autosport.com/rss/feed/all",                "sports"),
+    RSSSource("Times of India Sports","https://timesofindia.indiatimes.com/rssfeeds/4719148.cms", "sports"),
+]
+
+# ── RSS Feeds — Entertainment (Movies) ───────────────────────
+ENTERTAINMENT_MOVIES_RSS: List[RSSSource] = [
+    RSSSource("Variety",              "https://variety.com/feed/",                             "entertainment_movies"),
+    RSSSource("Hollywood Reporter",   "https://www.hollywoodreporter.com/feed/",               "entertainment_movies"),
+    RSSSource("Deadline",             "https://deadline.com/feed/",                            "entertainment_movies"),
+    RSSSource("IndieWire",            "https://www.indiewire.com/feed/",                       "entertainment_movies"),
+    RSSSource("Screen Rant",          "https://screenrant.com/feed/",                          "entertainment_movies"),
+    RSSSource("Collider",             "https://collider.com/feed/",                            "entertainment_movies"),
+    RSSSource("Guardian Film",        "https://www.theguardian.com/film/rss",                  "entertainment_movies"),
+    RSSSource("BBC Entertainment",    "https://feeds.bbci.co.uk/news/entertainment_and_arts/rss.xml", "entertainment_movies"),
+    RSSSource("Bollywood Hungama",    "https://www.bollywoodhungama.com/feed/",                "entertainment_movies"),
+    RSSSource("Pinkvilla",            "https://www.pinkvilla.com/rss.xml",                     "entertainment_movies"),
+    RSSSource("Times of India Entertainment", "https://timesofindia.indiatimes.com/rssfeeds/1081479906.cms", "entertainment_movies"),
+]
+
 # ── Government & Policy Sources ──────────────────────────────
 GOVERNMENT_RSS: List[RSSSource] = [
     RSSSource("RBI Press Releases",   "https://www.rbi.org.in/Scripts/rss.aspx",               "finance"),
@@ -120,6 +150,8 @@ ALL_RSS_SOURCES: List[RSSSource] = (
     + HEALTH_RSS
     + SUPPLY_CHAIN_RSS
     + GOVERNMENT_RSS
+    + SPORTS_RSS
+    + ENTERTAINMENT_MOVIES_RSS
 )
 
 # ── Domain keyword hints for auto-classification ─────────────
@@ -148,5 +180,15 @@ DOMAIN_KEYWORDS: dict = {
         "supply chain", "logistics", "shipping", "port", "freight",
         "inventory", "manufacturing", "trade route", "tariff", "import",
         "export", "container", "warehouse", "procurement",
+    ],
+    "sports": [
+        "match", "tournament", "cricket", "football", "tennis", "basketball",
+        "nba", "ipl", "premier league", "world cup", "olympic", "formula 1",
+        "grand prix", "goal", "wicket", "coach", "championship", "league",
+    ],
+    "entertainment_movies": [
+        "film", "movie", "box office", "trailer", "director", "actor",
+        "actress", "bollywood", "hollywood", "oscar", "cannes", "sequel",
+        "streaming", "netflix", "casting", "premiere", "screenplay", "cinema",
     ],
 }

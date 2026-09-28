@@ -18,7 +18,10 @@ class Domain(str, Enum):
     TECHNOLOGY    = "technology"
     HEALTH        = "health"
     SUPPLY_CHAIN  = "supply_chain"
+    SPORTS        = "sports"
+    ENTERTAINMENT_MOVIES = "entertainment_movies"
     GENERAL       = "general"
+    OTHER         = "other"          # Agent 2 classifier's catch-all domain
 
 
 class SourceType(str, Enum):

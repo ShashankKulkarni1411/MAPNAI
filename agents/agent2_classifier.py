@@ -3,119 +3,81 @@ MAPNAI — agents/agent2_classifier.py
 Agent 2: Event Classifier (Layer 2)
 
 Receives the structured JSON output from Agent 1 (NER & Entity Extraction).
-Classifies the article into domain, category, sentiment, and urgency_flag.
-Uses a configured LLM prompt and Taxonomy. Updates the 'processed_articles' table.
-Outputs the merged JSON payload downstream for Agent 3.
+Classifies the article into domain, category, sentiment, and urgency_flag using
+MAPNAI's own fine-tuned model (agents/classifier_model.py, weights in models/classifier/).
+Runs fully offline — no LLM API. Label space: config/classifier_taxonomy.py.
+Updates the 'processed_articles' table and outputs the merged payload for Agent 3.
+
+Train / re-train the model with scripts/classifier/train_colab.ipynb.
 """
 
 import json
-from termcolor import colored
+from pathlib import Path
 from typing import Optional
 
+from termcolor import colored
+
+from config.classifier_taxonomy import TAXONOMY_VERSION
 from storage.mongo_store import MongoStore
-from utils.groq_client import init_groq_llm
 from agents.pipeline_bridge import mongo_doc_to_agent1_payload
 from utils.logger import logger
 
-# ── Dynamic Taxonomy Configuration ──────────────────────────────
+MODEL_DIR = Path(__file__).resolve().parent.parent / "models" / "classifier"
 
-TAXONOMY_VERSION = "1.0.0"
+# Loaded once per process and shared by every agent instance
+_PREDICTOR = None
 
-TAXONOMY = {
-    "finance": ["Markets", "Corporate", "Economy", "Banking", "Cryptocurrency"],
-    "geopolitics": ["Elections", "Conflict", "Diplomacy", "Policy", "Trade"],
-    "technology": ["AI", "Cybersecurity", "Startups", "Hardware", "Regulation"],
-    "supply_chain": ["Logistics", "Manufacturing", "Shipping", "Shortages", "Trade Deals"],
-    "health": ["Public Health", "Pharma", "Research", "Hospitals", "Policy"],
-    "general": ["Other"]
-}
 
-# ── Agent 2 Implementation ──────────────────────────────────────
+def _get_predictor():
+    global _PREDICTOR
+    if _PREDICTOR is None:
+        if not (MODEL_DIR / "label_config.json").exists():
+            logger.warning(
+                f"[Agent 2] No trained classifier at {MODEL_DIR}. "
+                "Train it with scripts/classifier/train_colab.ipynb. Classification will fallback."
+            )
+            return None
+        from agents.classifier_model import NewsClassifierPredictor
+        _PREDICTOR = NewsClassifierPredictor(str(MODEL_DIR))
+        logger.info(
+            f"[Agent 2] Loaded MAPNAI classifier (taxonomy {_PREDICTOR.labels['taxonomy_version']}) "
+            f"on {_PREDICTOR.device}."
+        )
+    return _PREDICTOR
+
 
 class EventClassifierAgent:
     """
     Agent 2 pipeline agent.
-    Applies LLM classification and merges the result to the pipeline record.
+    Applies the local classifier and merges the result to the pipeline record.
     """
 
     def __init__(self, mongo_store: Optional[MongoStore] = None):
-        self.client, self.model_name = init_groq_llm("[Agent 2]", "Classification")
+        self.predictor = _get_predictor()
         self.mongo = mongo_store or MongoStore()
 
-    def _build_system_prompt(self) -> str:
-        """Constructs the system prompt dynamically from the TAXONOMY."""
-        tax_str = json.dumps(TAXONOMY, indent=2)
-        system_prompt = f"""You are the Event Classifier (Agent 2) in the MAPNAI pipeline.
-Your job is to analyze a news article (its Title, Body) and its pre-extracted Entities, and classify it.
-
-Here is the TAXONOMY of domains and categories:
-{tax_str}
-
-Output a strictly formatted JSON object with exactly these fields:
-{{
-  "domain": "<One of the top-level keys from the TAXONOMY>",
-  "category": "<One of the categories in the chosen domain's list>",
-  "sentiment": <A float between -1.0 (very negative) and 1.0 (very positive)>,
-  "urgency_flag": <true or false. Set true ONLY if the event signals an immediate risk, crisis, or breaking major event>,
-  "classification_confidence": <A float between 0.0 and 1.0 representing your confidence in this classification>
-}}
-
-RULES:
-1. ONLY use domains and categories provided in the TAXONOMY. If unsure, use "general" and "Other".
-2. You MUST return valid JSON. Do not return markdown, do not include explanations. Only the JSON object.
-3. The sentiment must be a numerical float.
-"""
-        return system_prompt
-
-    def _call_llm_classification(
-        self,
-        title: str,
-        body: str,
-        entities: list,
-        similar_articles: Optional[list] = None,
-    ) -> dict:
-        """Performs the OpenAI API call and parses the JSON."""
-        if not self.client:
+    def classify(self, title: str, body: str) -> dict:
+        """Classify one article. Returns the Agent 2 fields (never raises)."""
+        if not self.predictor:
             return self._fallback_classification()
-
-        truncated_body = body[:4000]
-
-        user_payload = {
-            "title": title,
-            "body": truncated_body,
-            "entities": entities,
-        }
-        if similar_articles:
-            user_payload["similar_articles"] = similar_articles
-
-        user_content = json.dumps(user_payload, indent=2)
-
         try:
-            response = self.client.chat.completions.create(
-                model=self.model_name,
-                messages=[
-                    {"role": "system", "content": self._build_system_prompt()},
-                    {"role": "user", "content": user_content}
-                ],
-                response_format={ "type": "json_object" },
-                temperature=0.1
-            )
-            
-            raw_json = response.choices[0].message.content
-            return json.loads(raw_json)
-            
+            text = self.predictor.format_text(title, body)
+            result = self.predictor.predict([text])[0]
+            result["taxonomy_version"] = self.predictor.labels["taxonomy_version"]
+            return result
         except Exception as e:
-            logger.error(f"[Agent 2] LLM API or JSON parse failed: {e}")
+            logger.error(f"[Agent 2] Classifier inference failed: {e}")
             return self._fallback_classification()
 
     def _fallback_classification(self) -> dict:
-        """Returns safe default classification if LLM routing fails."""
+        """Returns safe default classification if the model is unavailable."""
         return {
-            "domain": "general",
+            "domain": "other",
             "category": "Other",
             "sentiment": 0.0,
             "urgency_flag": False,
-            "classification_confidence": 0.0
+            "classification_confidence": 0.0,
+            "taxonomy_version": TAXONOMY_VERSION,
         }
 
     def _resolve_article_fields(self, payload: dict) -> dict:
@@ -148,44 +110,35 @@ RULES:
         """
         Main entry pipeline function:
         1. Takes Agent 1 JSON payload
-        2. Classifies via LLM
+        2. Classifies via the local model
         3. Updates the processed_article in MongoDB
         4. Merges and returns the payload to pass to Agent 3
         """
         agent1_output = self._resolve_article_fields(agent1_output)
         article_id = agent1_output.get("article_id")
-        title = agent1_output.get("title", "")
-        body = agent1_output.get("body", "")
-        entities = agent1_output.get("entities", [])
-        similar_articles = agent1_output.get("similar_articles")
 
         if not article_id:
             logger.warning("[Agent 2] Received payload without article_id.")
             return agent1_output
 
         logger.info(f"[Agent 2] Classifying article: {article_id}")
+        classification_result = self.classify(agent1_output.get("title", ""), agent1_output.get("body", ""))
 
-        classification_result = self._call_llm_classification(
-            title, body, entities, similar_articles=similar_articles
-        )
-        
-        # 2. Add Taxonomy version wrapper
-        classification_result["taxonomy_version"] = TAXONOMY_VERSION
+        # Write purely the agent 2 fields to MongoDB processed_articles
+        db_success = self.mongo.update_article_classification(article_id, classification_result)
+        if not db_success:
+            logger.warning(f"[Agent 2] Could not update MongoDB for {article_id}. It may not exist in Layer 1.")
 
-        # 3. Write purely the agent 2 fields to MongoDB processed_articles
-        # Note: the article_id is required to find the document.
-        if article_id:
-            db_success = self.mongo.update_article_classification(article_id, classification_result)
-            if not db_success:
-                logger.warning(f"[Agent 2] Could not update MongoDB for {article_id}. It may not exist in Layer 1.")
-        else:
-            logger.warning("[Agent 2] Received payload without article_id.")
-            
-        # 4. Merge results for downstream Agent 3 payload
+        # Merge results for downstream Agent 3 payload
         merged_payload = agent1_output.copy()
         merged_payload.update(classification_result)
 
-        logger.info(f"[Agent 2] Classification complete for {article_id} -> Domain: {classification_result.get('domain')} | Urgency: {classification_result.get('urgency_flag')}")
+        logger.info(
+            f"[Agent 2] Classification complete for {article_id} -> "
+            f"{classification_result['domain']}/{classification_result['category']} | "
+            f"Urgency: {classification_result['urgency_flag']} | "
+            f"Confidence: {classification_result['classification_confidence']}"
+        )
         return merged_payload
 
     def close(self):
@@ -197,10 +150,18 @@ RULES:
 if __name__ == "__main__":
     import argparse
 
-    parser = argparse.ArgumentParser(description="Agent 2 — classify from MongoDB")
+    parser = argparse.ArgumentParser(description="Agent 2 — classify articles")
+    parser.add_argument("--text", type=str, help="Classify a piece of text directly (no MongoDB)")
     parser.add_argument("--article-id", type=str, help="Classify one article by ID")
     parser.add_argument("--limit", type=int, default=1, help="Max pending articles")
     args = parser.parse_args()
+
+    if args.text:
+        predictor = _get_predictor()
+        if not predictor:
+            raise SystemExit(1)
+        print(json.dumps(predictor.predict([args.text])[0], indent=2))
+        raise SystemExit(0)
 
     mongo = MongoStore()
     agent = EventClassifierAgent(mongo_store=mongo)
