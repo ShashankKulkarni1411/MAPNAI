@@ -137,7 +137,9 @@ def test_agent2_falls_back_without_model(tmp_path, monkeypatch):
     assert out["domain"] == "other" and out["category"] == "other"
     assert out["classification_confidence"] == 0.0
     assert out["title"] == "Kohli injured"
-    mongo.update_article_classification.assert_called_once()
+    assert out["in_scope"] is False and out["out_of_scope_reason"] == "classifier_unavailable"
+    # Nothing is written, so the article is classified for real once the model is available
+    mongo.update_article_classification.assert_not_called()
 
 
 def test_agent2_downloads_missing_model(tmp_path, monkeypatch):

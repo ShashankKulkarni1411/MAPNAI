@@ -9,6 +9,7 @@ Provides:
   - Query interface for downstream agents
 """
 
+import re
 from datetime import datetime, timezone
 from typing import List, Optional, Dict, Any
 from pymongo import MongoClient, UpdateOne, ASCENDING, DESCENDING
@@ -17,6 +18,12 @@ from pymongo.errors import BulkWriteError, ConnectionFailure, ServerSelectionTim
 from config.settings import settings
 from utils.models import ProcessedArticle
 from utils.logger import logger
+
+
+def mask_uri(uri: str) -> str:
+    """Hide the password in a MongoDB URI before it's printed or logged
+    (Atlas URIs embed credentials: mongodb+srv://user:pass@host)."""
+    return re.sub(r"(://[^:/@]+):[^@]*@", r"\1:****@", uri or "")
 
 
 class MongoStore:
@@ -46,7 +53,7 @@ class MongoStore:
                 self._db = self._client[self.db_name]
                 # Verify connection
                 self._client.admin.command("ping")
-                logger.info(f"[MongoDB] Connected to {self.uri} / {self.db_name}")
+                logger.info(f"[MongoDB] Connected to {mask_uri(self.uri)} / {self.db_name}")
                 self._ensure_indexes()
             except (ConnectionFailure, ServerSelectionTimeoutError) as e:
                 logger.error(f"[MongoDB] Connection failed: {e}")
@@ -75,6 +82,20 @@ class MongoStore:
     def db(self):
         self._connect()
         return self._db
+
+    def is_available(self) -> bool:
+        """True if MongoDB answers a ping. Call once before a run so a missing
+        database stops it with one clear error instead of a timeout per call."""
+        try:
+            self._connect()
+            return True
+        except Exception:
+            logger.error(
+                f"[MongoDB] Not reachable at {mask_uri(self.uri)}. Check MONGO_URI in .env "
+                "and, for Atlas, that your IP is in Network Access. "
+                "`python run_mapnai.py --check` shows the exact error."
+            )
+            return False
 
     # ── Write Operations ─────────────────────────────────────
 
@@ -139,6 +160,8 @@ class MongoStore:
             "urgency_flag",
             "classification_confidence",
             "taxonomy_version",
+            "in_scope",
+            "out_of_scope_reason",
         }
         update_fields = {
             k: v for k, v in classification_data.items() if k in allowed_keys
@@ -215,13 +238,14 @@ class MongoStore:
         Agent 4 (Risk Scoring) updates specific risk assessment fields
         to the processed_articles table via $set.
         Only writes: risk_score, risk_confidence, action_recommendation,
-        and risk_reasoning. Never touches fields written by Agents 1, 2, or 3.
+        risk_reasoning and risk_level. Never touches fields written by Agents 1, 2, or 3.
         """
         allowed_keys = {
             "risk_score",
             "risk_confidence",
             "action_recommendation",
             "risk_reasoning",
+            "risk_level",
         }
         filtered_data = {k: v for k, v in risk_data.items() if k in allowed_keys}
         if not filtered_data:
@@ -468,6 +492,7 @@ class MongoStore:
         """Articles classified by Agent 2 but not yet summarized by Agent 3."""
         query = {
             "classification_processed": True,
+            "in_scope": {"$ne": False},   # Agent 2 marks off-topic articles out of scope
             "$or": [
                 {"summarization_processed": {"$exists": False}},
                 {"summarization_processed": False},
@@ -495,6 +520,7 @@ class MongoStore:
     def count_articles_pending_summarization(self) -> int:
         query = {
             "classification_processed": True,
+            "in_scope": {"$ne": False},   # Agent 2 marks off-topic articles out of scope
             "$or": [
                 {"summarization_processed": {"$exists": False}},
                 {"summarization_processed": False},

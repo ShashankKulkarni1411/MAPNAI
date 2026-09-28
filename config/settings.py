@@ -34,6 +34,9 @@ class Settings(BaseSettings):
 
     # ── LLM / Groq Settings ──────────────────────────────────
     groq_model: str = Field(default="llama-3.3-70b-versatile", env="GROQ_MODEL")
+    # Agent 3: "auto" = Groq LLM when GROQ_API_KEY is set, else extractive TF-IDF;
+    # "extractive" = always offline TF-IDF; "llm" = Groq only
+    summarizer_backend: str = Field(default="auto", env="SUMMARIZER_BACKEND")
     openai_api_key: str = Field(default="", env="OPENAI_API_KEY")
 
     # ── Reddit ───────────────────────────────────────────────

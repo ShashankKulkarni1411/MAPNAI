@@ -13,13 +13,11 @@ import os
 import time
 from typing import Dict, Any, List
 
-from pymongo import MongoClient
-from pymongo.errors import PyMongoError
-from transformers import pipeline
+from transformers import AutoTokenizer, pipeline
 
 from agents.ner_utils import deduplicate_and_merge_entities
 from agents.neo4j_writer import Neo4jWriter
-from config.settings import settings
+from storage.mongo_store import MongoStore
 
 
 logger = logging.getLogger(__name__)
@@ -44,17 +42,9 @@ class NERAgent:
         domain      (str)  — e.g. "finance", "geopolitics"
     """
 
-    def __init__(self, model_path: str = "models/mapnai-ner-bert"):
-        # ── MongoDB ──────────────────────────────────────────
-        try:
-            self._mongo_client = MongoClient(settings.mongo_uri, serverSelectionTimeoutMS=2000)
-            self._db = self._mongo_client[settings.mongo_db_name]
-            self._articles_col = self._db["processed_articles"]
-        except Exception as e:
-            logger.warning(f"[NER Agent] MongoDB client init failed: {e}")
-            self._mongo_client = None
-            self._db = None
-            self._articles_col = None
+    def __init__(self, model_path: str = "models/mapnai-ner-bert", mongo_store=None):
+        self.mongo_store = mongo_store or MongoStore()
+        self._owns_mongo_store = mongo_store is None
 
         # ── Neo4j ────────────────────────────────────────────
         self.neo4j_writer = Neo4jWriter()
@@ -68,13 +58,26 @@ class NERAgent:
                 resolved_path = alt_path
 
         logger.info(f"[NER Agent] Loading fine-tuned BERT model from: {resolved_path}")
-        self.ner_pipeline = pipeline(
-            "token-classification",
-            model=resolved_path,
-            tokenizer=resolved_path,
-            aggregation_strategy="first"
-        )
-        logger.info(f"[NER Agent] Loaded BERT model: {resolved_path}")
+        self.ner_pipeline = None
+        try:
+            tokenizer = AutoTokenizer.from_pretrained(resolved_path)
+            # Some saved tokenizers report a huge default max length, which disables chunking
+            if tokenizer.model_max_length > 512:
+                tokenizer.model_max_length = 512
+            self.ner_pipeline = pipeline(
+                "token-classification",
+                model=resolved_path,
+                tokenizer=tokenizer,
+                aggregation_strategy="first",
+                stride=128,   # chunk long articles instead of truncating at 512 tokens
+            )
+            logger.info(f"[NER Agent] Loaded BERT model: {resolved_path}")
+        except Exception as e:
+            logger.warning(
+                f"[NER Agent] Fine-tuned BERT not loaded from '{resolved_path}' ({e}). "
+                "Falling back to spaCy entities from ingestion — place the model in "
+                "models/mapnai-ner-bert to use it."
+            )
 
     # ── Public API ───────────────────────────────────────────
 
@@ -106,17 +109,23 @@ class NERAgent:
             return self._build_output(article_id, [], "none", time.time() - start_time)
 
         # ── Entity extraction ────────────────────────────────
-        raw_entities, model_used = self._extract(text)
-
-        # ── Deduplication, salience scoring, domain stamp ────
-        processed_entities = deduplicate_and_merge_entities(
-            raw_entities, len(text), domain_str
-        )
+        if self.ner_pipeline is None:
+            processed_entities = article.get("entities", [])
+            model_used = "ingestion-enrichment-fallback"
+        else:
+            raw_entities, model_used = self._extract(text)
+            if raw_entities:
+                processed_entities = deduplicate_and_merge_entities(
+                    raw_entities, len(text), domain_str
+                )
+            else:
+                processed_entities = article.get("entities", [])
+                model_used = "ingestion-enrichment-fallback"
 
         latency = time.time() - start_time
 
         # ── Persist ──────────────────────────────────────────
-        self._write_to_mongo(article_id, processed_entities)
+        self._write_to_mongo(article_id, processed_entities, model_used)
         upserted = self.neo4j_writer.upsert_entities(article_id, processed_entities)
 
         logger.info(
@@ -158,21 +167,14 @@ class NERAgent:
             logger.error(f"[NER Agent] BERT inference error: {e}")
             return [], model_used
 
-    def _write_to_mongo(self, article_id: str, entities: List[Dict]) -> None:
+    def _write_to_mongo(self, article_id: str, entities: List[Dict], model_used: str) -> None:
         """
-        Upserts the entities field on the processed_articles document.
-        Creates the document if it doesn't exist yet.
+        Sets the entities field on the processed_articles document, recording which
+        model produced them (BERT vs the spaCy ingestion fallback).
         """
-        if self._articles_col is None:
-            return
-        try:
-            self._articles_col.update_one(
-                {"article_id": article_id},
-                {"$set": {"entities": entities}},
-                upsert=True,
-            )
-        except PyMongoError as e:
-            logger.error(f"[NER Agent] MongoDB write failed for {article_id}: {e}")
+        self.mongo_store.update_ner_results(
+            article_id, entities, metadata={"model_used": model_used}
+        )
 
     @staticmethod
     def _build_output(
@@ -197,12 +199,8 @@ class NERAgent:
     def close(self):
         """Release all external connections."""
         self.neo4j_writer.close()
-        if self._mongo_client:
-            try:
-                self._mongo_client.close()
-            except Exception:
-                pass
-            logger.debug("[NER Agent] MongoDB connection closed.")
+        if self._owns_mongo_store:
+            self.mongo_store.close()
 
     def __del__(self):
         # Best-effort cleanup — avoid raising inside __del__

@@ -125,10 +125,21 @@ def _process_one_article(
                     for k in (
                         "domain", "category", "urgency_flag",
                         "classification_confidence", "taxonomy_version",
+                        "in_scope", "out_of_scope_reason",
                     )
                     if k in doc
                 }}
                 payload["sentiment"] = float(doc.get("sentiment_score", 0.0))
+
+        # Off-topic / low-confidence articles stop here (no LLM calls wasted on them)
+        if payload.get("in_scope", doc.get("in_scope")) is False:
+            stats["out_of_scope"] += 1
+            stats["articles_ok"] += 1
+            logger.debug(
+                f"[Pipeline] {article_id[:8]} out of scope "
+                f"({payload.get('out_of_scope_reason', doc.get('out_of_scope_reason'))}) — skipping Agents 3-4"
+            )
+            return
 
         # ── Agent 3: Summarization ────────────────────────────
         if 3 in agents:
@@ -180,6 +191,10 @@ def run_agent_pipeline(
     """
     agents = agents or {1, 2, 3, 4}
     mongo = MongoStore()
+    if not mongo.is_available():
+        # Agents 1-4 read their work queue from MongoDB; nothing to do without it
+        return {"agents_run": sorted(agents), "pending_found": 0, "articles_ok": 0,
+                "errors": [{"error": "MongoDB unavailable"}]}
     faiss_store: Optional[FAISSStore] = None
     if 2 in agents or 3 in agents:
         try:
@@ -208,6 +223,7 @@ def run_agent_pipeline(
         "classified": 0,
         "summarized": 0,
         "risk_scored": 0,
+        "out_of_scope": 0,
         "total_entities": 0,
         "errors": [],
     }
@@ -270,7 +286,8 @@ def run_agent_pipeline(
     logger.info(
         f"[Pipeline] Done — ok={stats['articles_ok']} | failed={stats['failed']} | "
         f"ner={stats['ner_processed']} | classified={stats['classified']} | "
-        f"summarized={stats['summarized']} | risk_scored={stats['risk_scored']}"
+        f"summarized={stats['summarized']} | risk_scored={stats['risk_scored']} | "
+        f"out_of_scope={stats['out_of_scope']}"
     )
 
     _close_all(ner_agent, classifier, summarizer, risk_scorer, mongo)
@@ -283,15 +300,17 @@ def _collect_pending_docs(
     limit: int,
     skip: int,
 ) -> List[dict]:
-    """Pick the right pending queue based on which agents will run."""
-    if 1 in agents:
-        return mongo.get_articles_pending_ner(limit=limit, skip=skip)
-    if 2 in agents:
-        return mongo.get_articles_pending_classification(limit=limit, skip=skip)
-    if 3 in agents:
-        return mongo.get_articles_pending_summarization(limit=limit, skip=skip)
-    if 4 in agents:
-        return mongo.get_articles_pending_risk_scoring(limit=limit, skip=skip)
+    """Choose the earliest non-empty queue among the selected agents."""
+    pending_getters = {
+        1: mongo.get_articles_pending_ner,
+        2: mongo.get_articles_pending_classification,
+        3: mongo.get_articles_pending_summarization,
+        4: mongo.get_articles_pending_risk_scoring,
+    }
+    for agent_number in sorted(agents):
+        docs = pending_getters[agent_number](limit=limit, skip=skip)
+        if docs:
+            return docs
     return []
 
 

@@ -7,7 +7,7 @@ This is the single entry point for one complete ingestion run.
 Pipeline flow:
   1. Fetch from RSS + APIs + Bluesky Firehose + Scrapers (parallel)
   2. Preprocess batch (clean, dedupe, classify, normalize)
-  3. Enrich with entities (spaCy NER)
+  3. Enrich with entities (spaCy NER; Agent 1 re-runs NER with fine-tuned BERT)
   4. Store to MongoDB + FAISS + Neo4j (simultaneous)
   5. Log run statistics
 
@@ -195,12 +195,19 @@ def run_ingestion_pipeline() -> IngestionRunStats:
     logger.info(f"[Pipeline] INGESTION RUN STARTED — {run_stats.run_id[:8]}")
     logger.info("=" * 60)
 
-    # ── Phase 0: Seed deduplicator from DB ───────────────────
+    # ── Phase 0: MongoDB is the primary store — without it nothing reaches the agents
+    mongo = _get_mongo()
+    if not mongo.is_available():
+        run_stats.errors.append("mongo:unavailable")
+        run_stats.completed_at = datetime.now(timezone.utc)
+        logger.error("[Pipeline] Aborting ingestion run: MongoDB is unavailable.")
+        return run_stats
+
+    # ── Seed deduplicator from DB ─────────────────────────────
     try:
-        mongo = _get_mongo()
         existing_hashes = mongo.get_existing_hashes()
     except Exception as e:
-        logger.warning(f"[Pipeline] Could not seed deduplicator (DB unavailable): {e}")
+        logger.warning(f"[Pipeline] Could not seed deduplicator: {e}")
         existing_hashes = []
 
     # ── Phase 1: Fetch ────────────────────────────────────────

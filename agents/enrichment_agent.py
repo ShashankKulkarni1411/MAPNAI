@@ -6,10 +6,12 @@ NOTE: The full GLiNER / BERT-based NER (Agent 1 in AI pipeline) runs
       downstream. This agent handles fast, rule-based enrichment at
       ingestion time to populate entity fields before DB storage.
 
-Entity types extracted: ORG, GPE (geopolitical), PERSON, PRODUCT, EVENT
+Entity types extracted: ORG, GPE (geopolitical), PERSON, PRODUCT, EVENT —
+stored under Agent 1's type names (Organization, Location, Person, ...).
 """
 
 from typing import List, Dict, Optional
+from agents.ner_utils import SPACY_TO_CUSTOM_MAP
 from utils.models import ProcessedArticle
 from utils.logger import logger
 
@@ -43,7 +45,7 @@ def _get_nlp():
 
 # ── Entity extraction ────────────────────────────────────────
 
-ENTITY_TYPES_TO_KEEP = {"ORG", "GPE", "PERSON", "PRODUCT", "EVENT", "NORP", "FAC", "LOC"}
+ENTITY_TYPES_TO_KEEP = {"ORG", "GPE", "PERSON", "PRODUCT", "EVENT", "FAC", "LOC"}
 
 
 def extract_entities(text: str, max_chars: int = 1000) -> List[Dict[str, str]]:
@@ -76,7 +78,9 @@ def extract_entities(text: str, max_chars: int = 1000) -> List[Dict[str, str]]:
         # Normalize: "U.S." → "US", remove trailing punctuation
         name = name.rstrip(".,;:")
         entity_freq[name] = entity_freq.get(name, 0) + 1
-        entity_types[name] = ent.label_
+        # Same type names as Agent 1 (Organization, Location...), so Neo4j doesn't
+        # create separate nodes for "RBI/ORG" and "RBI/Organization"
+        entity_types[name] = SPACY_TO_CUSTOM_MAP[ent.label_]
 
     if not entity_freq:
         return []

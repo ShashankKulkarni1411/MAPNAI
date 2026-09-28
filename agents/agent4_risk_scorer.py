@@ -21,6 +21,42 @@ from agents.pipeline_bridge import mongo_doc_to_agent4_payload
 from utils.logger import logger
 
 
+RISK_FACTORS = ("event_severity", "entity_salience", "temporal_urgency", "domain_criticality")
+
+
+def risk_level(score: int) -> str:
+    """Action signal bands: MONITOR (0-39), ALERT (40-69), ESCALATE (70-100)."""
+    if score >= 70:
+        return "ESCALATE"
+    if score >= 40:
+        return "ALERT"
+    return "MONITOR"
+
+
+def normalize_risk(raw: dict) -> dict:
+    """Clamp LLM output to the contract: sub-scores 0-25, risk_score = their sum,
+    confidence 0-1, plus the derived risk_level."""
+    reasoning = raw.get("risk_reasoning") or {}
+    sub_scores = {}
+    for factor in RISK_FACTORS:
+        try:
+            sub_scores[factor] = max(0, min(25, int(round(float(reasoning.get(factor, 0))))))
+        except (TypeError, ValueError):
+            sub_scores[factor] = 0
+    score = sum(sub_scores.values())
+    try:
+        confidence = max(0.0, min(1.0, float(raw.get("risk_confidence", 0.0))))
+    except (TypeError, ValueError):
+        confidence = 0.0
+    return {
+        "risk_reasoning": sub_scores,
+        "risk_score": score,
+        "risk_confidence": round(confidence, 3),
+        "risk_level": risk_level(score),
+        "action_recommendation": str(raw.get("action_recommendation") or "").strip(),
+    }
+
+
 # ── Agent 4 Implementation ──────────────────────────────────────
 
 class RiskScoringAgent:
@@ -95,7 +131,9 @@ Thought: Assess the inherent risk weight of the article's domain.
 - Geopolitics and health emergencies are weighted HIGH by default.
 - Finance and supply chain are MEDIUM.
 - Technology is MEDIUM-LOW unless cybersecurity.
-- General is LOW.
+- Sports is LOW-MEDIUM: higher for match-fixing, doping, serious injuries, or cancelled events.
+- Entertainment / movies is LOW: higher for bans, legal action, or pulled releases.
+- General / other is LOW.
 Use the DOMAIN above to support your reasoning.
 Provide your Domain Criticality sub-score.
 
@@ -166,7 +204,7 @@ RULES:
             )
 
             raw_json = response.choices[0].message.content
-            return json.loads(raw_json)
+            return normalize_risk(json.loads(raw_json))
 
         except Exception as e:
             logger.error(f"[Agent 4] LLM API or JSON parse failed: {e}")
@@ -175,17 +213,15 @@ RULES:
     # ── Fallback ────────────────────────────────────────────────
 
     def _fallback_risk(self) -> dict:
-        """Returns safe zero-state risk dict if LLM errors out — pipeline never halts."""
+        """Returns safe zero-state risk dict if LLM errors out — pipeline never halts.
+        Never written to MongoDB, so the article is re-scored once the LLM is back."""
         return {
             "risk_score": 0,
             "risk_confidence": 0.0,
+            "risk_level": risk_level(0),
             "action_recommendation": "Unable to assess risk.",
-            "risk_reasoning": {
-                "event_severity": 0,
-                "entity_salience": 0,
-                "temporal_urgency": 0,
-                "domain_criticality": 0,
-            }
+            "risk_reasoning": {factor: 0 for factor in RISK_FACTORS},
+            "_fallback": True,
         }
 
     # ── Main Pipeline Entry ─────────────────────────────────────
@@ -216,7 +252,9 @@ RULES:
         )
 
         # 2. Write only Agent 4 fields to MongoDB via $set
-        if article_id:
+        if risk_result.pop("_fallback", False):
+            logger.warning(f"[Agent 4] Risk scoring unavailable — {article_id} left pending in MongoDB.")
+        elif article_id:
             db_success = self.mongo.update_article_risk(article_id, risk_result)
             if not db_success:
                 logger.warning(
@@ -232,7 +270,7 @@ RULES:
 
         logger.info(
             f"[Agent 4] Risk scoring complete for {article_id} → "
-            f"Score: {risk_result.get('risk_score')} | "
+            f"Score: {risk_result.get('risk_score')} ({risk_result.get('risk_level')}) | "
             f"Confidence: {risk_result.get('risk_confidence')}"
         )
         return merged_payload

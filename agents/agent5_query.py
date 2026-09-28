@@ -218,3 +218,31 @@ class QueryAgent:
                 "latency_seconds": round(latency, 2),
             },
         }
+
+
+def main() -> None:
+    import argparse
+    import json
+
+    parser = argparse.ArgumentParser(description="Ask the MAPNAI news store a question.")
+    parser.add_argument("query", nargs="+", help="Question to ask about stored news.")
+    parser.add_argument("--domain", help="Optional domain filter, e.g. finance.")
+    parser.add_argument("--top-k", type=int, default=5, help="Maximum source articles.")
+    args = parser.parse_args()
+
+    mongo = MongoStore()
+    if not mongo.is_available():
+        raise SystemExit(1)
+    faiss = FAISSStore()
+    agent = QueryAgent(mongo_store=mongo, faiss_store=faiss)
+    try:
+        response = agent.process(
+            " ".join(args.query), domain_filter=args.domain, top_k=args.top_k
+        )
+        print(json.dumps(response, indent=2, default=str))
+    finally:
+        mongo.close()
+
+
+if __name__ == "__main__":
+    main()

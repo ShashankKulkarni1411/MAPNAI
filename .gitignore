@@ -20,3 +20,6 @@ __pycache__/
 # Classifier training bundle (regenerate with scripts/classifier/make_colab_bundle.py)
 data/classifier/colab_bundle.zip
 data/classifier/colab_bundle/
+
+# Runtime logs (may contain hostnames / connection details)
+logs/

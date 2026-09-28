@@ -111,10 +111,50 @@ cd mapnai_ingestion
 pip install -r requirements.txt
 ```
 
-Install spaCy model for NER enrichment:
+Download the models into `models/` (git-ignored):
 ```bash
-python -m spacy download en_core_web_sm
+python -m spacy download en_core_web_sm                                   # ingestion entities
+hf download satvik4577/mapnai-classifier --local-dir models/classifier   # Agent 2 (auto-downloads if missing)
+# Agent 1: unzip the fine-tuned BERT NER into models/mapnai-ner-bert/
 ```
+
+### Start the databases
+
+MongoDB is required: it stores every article and is the work queue for Agents 1-4. Neo4j is
+optional (graph writes are skipped without it). With Docker Desktop running and `NEO4J_PASSWORD`
+set in `.env` (at least 8 characters):
+
+```bash
+docker compose up -d        # MongoDB on :27017, Neo4j on :7687 (browser UI on :7474)
+docker compose ps           # both should be "running"
+```
+
+The default `.env` values (`MONGO_URI=mongodb://localhost:27017`, `NEO4J_URI=bolt://localhost:7687`,
+`NEO4J_USER=neo4j`) already point at these containers. To use MongoDB Atlas instead, put its
+`mongodb+srv://...` connection string in `MONGO_URI` and skip the `mongo` service. Data persists in
+Docker volumes across restarts; `docker compose down -v` deletes it.
+
+### Run the complete pipeline
+
+After configuring `.env` (step 2) and starting MongoDB and Neo4j, check the setup, then run
+ingestion and Agents 1-4 in order:
+
+```bash
+python run_mapnai.py --check       # lists missing services, models and keys
+python run_mapnai.py --limit 100
+```
+
+The command prints JSON with ingestion counts/errors and Agent 1-4 processing counts. Articles
+that Agent 2 labels `other` (or classifies below 0.5 confidence) are marked `in_scope: false` and
+skip Agents 3-4. To process only articles already stored in MongoDB, use
+`python pipeline.py --limit 100`. Query the processed news store with Agent 5:
+
+```bash
+python -m agents.agent5_query "What happened in the India vs Australia Test?" --domain sports
+```
+
+The query response includes an answer, source article IDs/titles, retrieval route, and confidence.
+Agent 5 needs stored article summaries; semantic retrieval also uses the FAISS index.
 
 ### 2. Configure environment
 
@@ -130,6 +170,11 @@ MONGO_URI=mongodb://localhost:27017
 NEO4J_URI=bolt://localhost:7687
 NEO4J_PASSWORD=your_password
 ```
+
+Set `GROQ_API_KEY` to enable risk scores and LLM query answers. Agent 3 uses Groq when the key is
+set and the offline extractive TF-IDF summarizer otherwise (`SUMMARIZER_BACKEND=extractive` forces
+it). Without the key, Agent 4 leaves articles pending (re-run once the key is set) and Agent 5 uses
+its offline answer fallback. News API keys are optional when using RSS sources; Bluesky needs no credentials.
 
 ### 3. Run a single ingestion cycle
 

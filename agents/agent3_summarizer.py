@@ -4,7 +4,9 @@ Agent 3: Summarization Agent (Layer 2)
 
 Receives the combined JSON dictionary from Agent 1 (Entities) and Agent 2 (Classification).
 Generates persona-aware summaries based on the article's domain, urgency, and sentiment.
-Uses a configured LLM prompt. Updates only `summary_short` and `summary_long` in DB.
+Backend (SUMMARIZER_BACKEND): Groq LLM prompt, or the offline extractive TF-IDF
+summarizer (agents/extractive_summarizer.py), which is also the fallback when the
+LLM is unavailable. Updates only `summary_short` and `summary_long` in DB.
 Outputs the fully merged JSON payload downstream for Agent 4.
 """
 
@@ -12,8 +14,10 @@ import json
 from termcolor import colored
 from typing import Optional
 
+from config.settings import settings
 from storage.mongo_store import MongoStore
 from utils.groq_client import init_groq_llm
+from agents.extractive_summarizer import extractive_summarize
 from agents.pipeline_bridge import mongo_doc_to_agent1_payload
 from utils.logger import logger
 
@@ -25,7 +29,14 @@ class SummarizationAgent:
     """
 
     def __init__(self, mongo_store: Optional[MongoStore] = None):
-        self.client, self.model_name = init_groq_llm("[Agent 3]", "Summarization")
+        backend = settings.summarizer_backend.strip().lower()
+        if backend == "extractive":
+            self.client, self.model_name = None, None
+            logger.info("[Agent 3] Using extractive TF-IDF summarizer (SUMMARIZER_BACKEND=extractive).")
+        else:
+            self.client, self.model_name = init_groq_llm("[Agent 3]", "Summarization")
+            if not self.client:
+                logger.info("[Agent 3] No LLM available — using extractive TF-IDF summarizer.")
         self.mongo = mongo_store or MongoStore()
 
     def _build_system_prompt(self, domain: str, sentiment: float, urgency_flag: bool) -> str:
@@ -47,6 +58,10 @@ class SummarizationAgent:
             persona_instructions = "Adopt a forward-looking, tech-literate tone. Focus on innovation impacts, cybersecurity risks, or regulatory shifts."
         elif domain == "supply_chain":
             persona_instructions = "Adopt an operational and logistical tone. Focus on disruptions, capacity, trade flow, and cascading downstream effects."
+        elif domain == "sports":
+            persona_instructions = "Adopt an energetic but factual sports-desk tone. Keep scores, player and team names, fixtures, and records exact."
+        elif domain == "entertainment_movies":
+            persona_instructions = "Adopt an engaging entertainment-desk tone. Keep film titles, cast, release dates, platforms, and box-office figures exact."
             
         if urgency_flag and domain not in ["geopolitics"]:
             persona_instructions += " The report is flagged as URGENT: make the summary exceptionally direct concerning immediate risks or breaking disruptions."
@@ -86,9 +101,9 @@ RULES:
         urgency_flag: bool,
         similar_articles: Optional[list] = None,
     ) -> dict:
-        """Performs the OpenAI API call enforcing JSON returns."""
+        """Performs the Groq (OpenAI-compatible) call enforcing JSON returns."""
         if not self.client:
-            return self._fallback_summarization()
+            return extractive_summarize(title, body, entities, domain, urgency_flag)
 
         truncated_body = body[:5000]
 
@@ -114,18 +129,15 @@ RULES:
             )
             
             raw_json = response.choices[0].message.content
-            return json.loads(raw_json)
-            
-        except Exception as e:
-            logger.error(f"[Agent 3] LLM API or JSON parse failed: {e}")
-            return self._fallback_summarization()
+            result = json.loads(raw_json)
+            if result.get("summary_short") and result.get("summary_long"):
+                return result
+            logger.warning("[Agent 3] LLM returned empty summaries — using extractive fallback.")
 
-    def _fallback_summarization(self) -> dict:
-        """Returns safe default empty summaries if LLM routing fails."""
-        return {
-            "summary_short": "",
-            "summary_long": ""
-        }
+        except Exception as e:
+            logger.error(f"[Agent 3] LLM API or JSON parse failed: {e} — using extractive fallback.")
+
+        return extractive_summarize(title, body, entities, domain, urgency_flag)
 
     def _resolve_article_fields(self, payload: dict) -> dict:
         """Load title/body/entities/classification from MongoDB when missing."""

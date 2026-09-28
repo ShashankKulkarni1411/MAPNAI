@@ -18,7 +18,7 @@ html2text==2024.2.26
 chardet==5.2.0
 ftfy==6.2.0                  # fixes mojibake / encoding issues
 
-# ── spaCy (NER Agent primary model) ─────────────────────────
+# ── spaCy (ingestion-time entities; Agent 1 fallback) ────────
 spacy>=3.7.0,<4.0.0
 # After installing, download a model:
 #   python -m spacy download en_core_web_sm   (fast, CPU)

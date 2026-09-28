@@ -27,6 +27,9 @@ from agents.pipeline_bridge import mongo_doc_to_agent1_payload
 from utils.logger import logger
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
+# Articles labelled "other", or classified below this confidence, are out of scope
+# and are not sent to Agents 3-4.
+IN_SCOPE_MIN_CONFIDENCE = 0.5
 MODEL_DIR = PROJECT_ROOT / "models" / "classifier"
 DEFAULT_MODEL_REPO = "satvik4577/mapnai-classifier"
 
@@ -91,18 +94,28 @@ class EventClassifierAgent:
     def classify(self, title: str, body: str) -> dict:
         """Classify one article. Returns the Agent 2 fields (never raises)."""
         if not self.predictor:
-            return self._fallback_classification()
+            return self._fallback_classification("classifier_unavailable")
         try:
             text = self.predictor.format_text(title, body)
             result = self.predictor.predict([text])[0]
             result["taxonomy_version"] = self.predictor.labels["taxonomy_version"]
-            return result
+            return {**result, **self._scope(result)}
         except Exception as e:
             logger.error(f"[Agent 2] Classifier inference failed: {e}")
-            return self._fallback_classification()
+            return self._fallback_classification("classifier_error")
 
-    def _fallback_classification(self) -> dict:
-        """Returns safe default classification if the model is unavailable."""
+    @staticmethod
+    def _scope(result: dict) -> dict:
+        """Decide whether Agents 3-4 should process this article."""
+        if result["domain"] == "other":
+            return {"in_scope": False, "out_of_scope_reason": "off_topic"}
+        if result["classification_confidence"] < IN_SCOPE_MIN_CONFIDENCE:
+            return {"in_scope": False, "out_of_scope_reason": "low_confidence"}
+        return {"in_scope": True, "out_of_scope_reason": None}
+
+    def _fallback_classification(self, reason: str) -> dict:
+        """Safe default when the model can't run. Never written to MongoDB, so the
+        article stays in the classification queue until the model is available."""
         return {
             "domain": "other",
             "category": "other",
@@ -110,6 +123,9 @@ class EventClassifierAgent:
             "urgency_flag": False,
             "classification_confidence": 0.0,
             "taxonomy_version": TAXONOMY_VERSION,
+            "in_scope": False,
+            "out_of_scope_reason": reason,
+            "_fallback": True,
         }
 
     def _resolve_article_fields(self, payload: dict) -> dict:
@@ -155,10 +171,12 @@ class EventClassifierAgent:
 
         logger.info(f"[Agent 2] Classifying article: {article_id}")
         classification_result = self.classify(agent1_output.get("title", ""), agent1_output.get("body", ""))
+        is_fallback = classification_result.pop("_fallback", False)
 
         # Write purely the agent 2 fields to MongoDB processed_articles
-        db_success = self.mongo.update_article_classification(article_id, classification_result)
-        if not db_success:
+        if is_fallback:
+            logger.warning(f"[Agent 2] Classifier unavailable — {article_id} left pending in MongoDB.")
+        elif not self.mongo.update_article_classification(article_id, classification_result):
             logger.warning(f"[Agent 2] Could not update MongoDB for {article_id}. It may not exist in Layer 1.")
 
         # Merge results for downstream Agent 3 payload
@@ -169,7 +187,8 @@ class EventClassifierAgent:
             f"[Agent 2] Classification complete for {article_id} -> "
             f"{classification_result['domain']} | "
             f"Urgency: {classification_result['urgency_flag']} | "
-            f"Confidence: {classification_result['classification_confidence']}"
+            f"Confidence: {classification_result['classification_confidence']} | "
+            f"In scope: {classification_result['in_scope']}"
         )
         return merged_payload
 
