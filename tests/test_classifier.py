@@ -124,6 +124,7 @@ def test_format_text():
 def test_agent2_falls_back_without_model(tmp_path, monkeypatch):
     monkeypatch.setattr(agent2, "MODEL_DIR", tmp_path / "missing")
     monkeypatch.setattr(agent2, "_PREDICTOR", None)
+    monkeypatch.setattr(agent2, "_download_model", lambda: False)  # e.g. offline
     mongo = MagicMock()
     mongo.update_article_classification.return_value = True
 
@@ -134,6 +135,35 @@ def test_agent2_falls_back_without_model(tmp_path, monkeypatch):
     assert out["classification_confidence"] == 0.0
     assert out["title"] == "Kohli injured"
     mongo.update_article_classification.assert_called_once()
+
+
+def test_agent2_downloads_missing_model(tmp_path, monkeypatch):
+    """With no local model, Agent 2 pulls it from the Hub once and then uses it."""
+    model_dir = tmp_path / "classifier"
+    monkeypatch.setattr(agent2, "MODEL_DIR", model_dir)
+    monkeypatch.setattr(agent2, "_PREDICTOR", None)
+    monkeypatch.setenv("MAPNAI_CLASSIFIER_REPO", "someone/some-model")
+    calls = []
+
+    def fake_snapshot_download(repo_id, local_dir):
+        calls.append(repo_id)
+        model, tokenizer = _tiny_model_and_tokenizer()
+        save_model(model, tokenizer, tax.label_config(max_length=32), local_dir)
+
+    monkeypatch.setattr("huggingface_hub.snapshot_download", fake_snapshot_download)
+
+    assert agent2._get_predictor() is not None
+    assert agent2._get_predictor() is not None  # cached — no second download
+    assert calls == ["someone/some-model"]
+
+
+def test_agent2_download_can_be_disabled(tmp_path, monkeypatch):
+    monkeypatch.setattr(agent2, "MODEL_DIR", tmp_path / "missing")
+    monkeypatch.setattr(agent2, "_PREDICTOR", None)
+    monkeypatch.setenv("MAPNAI_CLASSIFIER_REPO", "")
+    monkeypatch.setattr("huggingface_hub.snapshot_download",
+                        lambda **_: pytest.fail("should not download when disabled"))
+    assert agent2._get_predictor() is None
 
 
 def test_agent2_uses_trained_model(tmp_path, monkeypatch):

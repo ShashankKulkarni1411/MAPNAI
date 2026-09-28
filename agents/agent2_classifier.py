@@ -9,12 +9,15 @@ Runs fully offline — no LLM API. Label space: config/classifier_taxonomy.py.
 Updates the 'processed_articles' table and outputs the merged payload for Agent 3.
 
 Train / re-train the model with scripts/classifier/train_colab.ipynb.
+If models/classifier/ is missing, the weights are downloaded once from Hugging Face.
 """
 
 import json
+import os
 from pathlib import Path
 from typing import Optional
 
+from dotenv import dotenv_values
 from termcolor import colored
 
 from config.classifier_taxonomy import TAXONOMY_VERSION
@@ -22,19 +25,47 @@ from storage.mongo_store import MongoStore
 from agents.pipeline_bridge import mongo_doc_to_agent1_payload
 from utils.logger import logger
 
-MODEL_DIR = Path(__file__).resolve().parent.parent / "models" / "classifier"
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+MODEL_DIR = PROJECT_ROOT / "models" / "classifier"
+DEFAULT_MODEL_REPO = "satvik4577/mapnai-classifier"
 
 # Loaded once per process and shared by every agent instance
 _PREDICTOR = None
 
 
+def _model_repo() -> str:
+    """Hugging Face repo to download from: env var > .env > default. Empty string disables."""
+    if "MAPNAI_CLASSIFIER_REPO" in os.environ:
+        return os.environ["MAPNAI_CLASSIFIER_REPO"].strip()
+    env_file = dotenv_values(PROJECT_ROOT / ".env")
+    if "MAPNAI_CLASSIFIER_REPO" in env_file:
+        return (env_file["MAPNAI_CLASSIFIER_REPO"] or "").strip()
+    return DEFAULT_MODEL_REPO
+
+
+def _download_model() -> bool:
+    """Fetch the trained weights from Hugging Face into MODEL_DIR. Returns True on success."""
+    repo = _model_repo()
+    if not repo:
+        return False
+    try:
+        from huggingface_hub import snapshot_download
+        logger.info(f"[Agent 2] Classifier not found locally — downloading {repo} (~300 MB, one time)...")
+        snapshot_download(repo_id=repo, local_dir=str(MODEL_DIR))
+        return (MODEL_DIR / "label_config.json").exists()
+    except Exception as e:
+        logger.error(f"[Agent 2] Could not download classifier from {repo}: {e}")
+        return False
+
+
 def _get_predictor():
     global _PREDICTOR
     if _PREDICTOR is None:
-        if not (MODEL_DIR / "label_config.json").exists():
+        if not (MODEL_DIR / "label_config.json").exists() and not _download_model():
             logger.warning(
-                f"[Agent 2] No trained classifier at {MODEL_DIR}. "
-                "Train it with scripts/classifier/train_colab.ipynb. Classification will fallback."
+                f"[Agent 2] No trained classifier at {MODEL_DIR}. Download it with "
+                f"`hf download {DEFAULT_MODEL_REPO} --local-dir models/classifier` or train it with "
+                "scripts/classifier/train_colab.ipynb. Classification will fallback."
             )
             return None
         from agents.classifier_model import NewsClassifierPredictor

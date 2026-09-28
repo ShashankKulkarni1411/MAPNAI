@@ -164,6 +164,28 @@ Custom interval:
 python ingestion_pipeline.py --schedule --interval 60
 ```
 
+### 5. Get the Agent 2 classifier model
+
+Agent 2 classifies articles with MAPNAI's own fine-tuned model (domain, category, urgency,
+sentiment for sports and movie news). The weights (~300 MB) are not in git; they are hosted at
+[huggingface.co/satvik4577/mapnai-classifier](https://huggingface.co/satvik4577/mapnai-classifier).
+
+Agent 2 downloads them automatically into `models/classifier/` the first time it runs. To download
+them yourself (e.g. before going offline):
+
+```bash
+hf download satvik4577/mapnai-classifier --local-dir models/classifier
+```
+
+Test it:
+```bash
+python -m agents.agent2_classifier --text "Kohli ruled out of the World Cup final with a hamstring injury"
+```
+
+To use a different model repo set `MAPNAI_CLASSIFIER_REPO=<user>/<repo>` in `.env`; set it to
+an empty value to turn automatic download off. To retrain the model, see
+`scripts/classifier/train_colab.ipynb`.
+
 ---
 
 ## Running Tests
