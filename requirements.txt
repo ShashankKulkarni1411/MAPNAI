@@ -11,6 +11,10 @@ beautifulsoup4==4.12.3
 lxml==5.2.2
 Scrapy==2.11.1
 
+# ── API (personalization, api/app.py) ────────────────────────
+fastapi==0.115.0
+uvicorn==0.30.6
+
 # ── Text Cleaning & NLP ──────────────────────────────────────
 nltk==3.8.1
 langdetect==1.0.9

@@ -344,6 +344,30 @@ class MongoStore:
             logger.error(f"[MongoDB] get_recent_articles error: {e}")
             return []
 
+    def get_articles_published_since(
+        self,
+        cutoff: datetime,
+        limit: int = 5000,
+        projection: Dict = None,
+    ) -> List[Dict]:
+        """
+        Articles whose published_at (ISO string) falls on or after the cutoff's date.
+        The date-prefix comparison is coarse on purpose (published_at mixes offsets);
+        callers filter the exact cutoff after parsing.
+        """
+        query = {"published_at": {"$gte": cutoff.date().isoformat()}}
+        try:
+            cursor = (
+                self.db["processed_articles"]
+                .find(query, projection or {"_id": 0, "body": 0})
+                .sort("published_at", DESCENDING)
+                .limit(limit)
+            )
+            return list(cursor)
+        except Exception as e:
+            logger.error(f"[MongoDB] get_articles_published_since error: {e}")
+            return []
+
     def count_articles(self, domain: str = None) -> int:
         """Count total articles, optionally filtered by domain."""
         query = {"domain": domain} if domain else {}

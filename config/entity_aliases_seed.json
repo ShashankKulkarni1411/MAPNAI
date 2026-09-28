@@ -1,0 +1,24 @@
+{
+  "_comment": "alias -> canonical entity key (name_lower). Loaded by scripts/seed_entity_aliases.py; targets that don't exist in Neo4j are skipped.",
+  "aliases": {
+    "u.s": "us",
+    "u.s.": "us",
+    "usa": "us",
+    "america": "us",
+    "united states": "us",
+    "the united states": "us",
+    "man city": "manchester city",
+    "manchester city's": "manchester city",
+    "man utd": "manchester united",
+    "man united": "manchester united",
+    "britain": "uk",
+    "great britain": "uk",
+    "united kingdom": "uk",
+    "u.k.": "uk",
+    "world health organization": "who",
+    "united nations": "un",
+    "donald trump": "trump",
+    "artificial intelligence": "ai",
+    "european union": "eu"
+  }
+}

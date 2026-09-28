@@ -243,6 +243,10 @@ class FAISSStore:
         except Exception as e:
             logger.error(f"[FAISS] Save error: {e}")
 
+    def indexed_article_ids(self) -> set:
+        """article_ids present in the index (row i ↔ metadata[i]["article_id"])."""
+        return {m.get("article_id") for m in self._metadata if m.get("article_id")}
+
     @property
     def total_vectors(self) -> int:
         return self._index.ntotal if self._index else 0
