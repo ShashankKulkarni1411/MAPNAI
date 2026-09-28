@@ -1,0 +1,29 @@
+# Keep the build context small and secrets out of the image.
+.git
+.gitignore
+.vscode
+.claude
+**/__pycache__
+**/*.pyc
+.pytest_cache
+venv/
+.venv/
+env/
+
+# Secrets — passed at runtime via env_file, never baked in
+.env
+.env.*
+!.env.example
+
+# Mounted as volumes at runtime / large or local-only
+models/
+models.zip
+data/
+logs/
+graphify-out/
+
+# Documents and training material not needed to run the pipeline
+*.docx
+*.pdf
+*.pptx
+scripts/classifier/train_colab.ipynb

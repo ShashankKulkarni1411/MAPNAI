@@ -234,6 +234,43 @@ an empty value to turn automatic download off. To retrain the model, see
 
 ---
 
+## Docker (recommended — same versions on every machine)
+
+The whole project runs in a container built from pinned versions: Python 3.11, and every
+package (NumPy 1.26.4, PyTorch 2.3.0 CPU, FAISS 1.8.0, spaCy 3.8.14 + `en_core_web_sm`,
+transformers 4.57.6, …) fixed by `requirements.lock`. This avoids the NumPy / PyTorch / FAISS
+mismatches that happen when packages are installed into a shared Python.
+
+**Prerequisite:** [Docker Desktop](https://www.docker.com/products/docker-desktop/) and a filled-in `.env`
+(copy `.env.example`). Secrets stay in `.env`; they are never copied into the image.
+
+```bash
+docker compose build                                         # build the image (first time, or after code changes)
+docker compose run --rm mapnai python run_mapnai.py --check  # check MongoDB, models and keys
+docker compose run --rm mapnai                               # run ingestion + Agents 1-4 once
+docker compose run --rm mapnai python -m pytest              # run the tests
+docker compose down                                          # stop the containers
+```
+
+| Service | What it is |
+|---|---|
+| `mapnai` | The application. Uses `MONGO_URI` from `.env` (e.g. the Atlas cluster). |
+| `mongo` | Local MongoDB 7 — use it by setting `MONGO_URI_DOCKER=mongodb://mongo:27017` in `.env`. |
+| `neo4j` | Local Neo4j 5 for the entity graph (browser UI on http://localhost:7474). Password: `NEO4J_PASSWORD` in `.env`. |
+
+`models/`, `data/` (FAISS index) and `logs/` are mounted from the project folder, so the Agent 2
+classifier is downloaded only once and the FAISS index survives between runs. The embedding
+model (`all-MiniLM-L6-v2`) is built into the image. Agent 1's BERT NER model is optional: put
+it in `models/mapnai-ner-bert`; without it Agent 1 uses spaCy entities from ingestion.
+
+**Without Docker**, install the same versions into a fresh Python 3.11 virtual environment:
+
+```bash
+pip install -r requirements.txt -c requirements.lock --extra-index-url https://download.pytorch.org/whl/cpu
+```
+
+---
+
 ## Running Tests
 
 ```bash
