@@ -308,7 +308,8 @@ class TestSourceConfig:
             assert source.name, f"Source missing name"
             assert source.url.startswith("http"), f"{source.name}: invalid URL"
             assert source.domain in (
-                "finance", "geopolitics", "technology", "health", "supply_chain", "general"
+                "finance", "geopolitics", "technology", "health", "supply_chain",
+                "sports", "entertainment_movies", "general"
             ), f"{source.name}: invalid domain '{source.domain}'"
 
     def test_reddit_sources_have_required_fields(self):

@@ -122,6 +122,10 @@ class NERAgent:
                 processed_entities = article.get("entities", [])
                 model_used = "ingestion-enrichment-fallback"
 
+        # Ingestion (spaCy) entities carry only name/type/salience; the NER contract and
+        # the Neo4j writer also need each entity's domain.
+        processed_entities = [{**e, "domain": e.get("domain", domain_str)} for e in processed_entities]
+
         latency = time.time() - start_time
 
         # ── Persist ──────────────────────────────────────────
