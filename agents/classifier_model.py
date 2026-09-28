@@ -2,18 +2,21 @@
 MAPNAI — agents/classifier_model.py
 MAPNAI's own multi-task news classifier (Agent 2's model).
 
-One shared transformer encoder (DistilRoBERTa by default) with four heads:
-  - domain        : softmax over DOMAINS
-  - category      : softmax over CATEGORIES, restricted at inference to the predicted domain
+One shared transformer encoder (DistilRoBERTa by default) with three heads:
+  - domain        : softmax over DOMAINS (entertainment_movies, sports, other)
   - urgency_flag  : single logit (sigmoid)
   - sentiment     : single value in [-1, 1] (tanh)
+The reported category is the domain.
+
+Models trained with the older sub-category taxonomy (v2, `categories` in label_config.json)
+still load: their extra category head is kept only so the weights match, and is ignored.
 
 This file is self-contained (torch + transformers + safetensors only) because the
 same file is uploaded to Google Colab for training — do not import project modules here.
 Saved model folder layout (models/classifier/):
     config.json, tokenizer files   — encoder config + tokenizer (no internet needed to load)
     model.safetensors              — full weights (encoder + heads)
-    label_config.json              — label lists, category->domain map, max_length, version
+    label_config.json              — domain list, max_length, urgency threshold, version
 """
 
 import json
@@ -31,15 +34,18 @@ WEIGHTS_FILE = "model.safetensors"
 
 
 class MultiTaskNewsClassifier(nn.Module):
-    def __init__(self, encoder: nn.Module, n_domains: int, n_categories: int, dropout: float = 0.1):
+    def __init__(self, encoder: nn.Module, n_domains: int, n_legacy_categories: int = 0,
+                 dropout: float = 0.1):
         super().__init__()
         self.encoder = encoder
         hidden = encoder.config.hidden_size
         self.dropout = nn.Dropout(dropout)
         self.domain_head = nn.Linear(hidden, n_domains)
-        self.category_head = nn.Linear(hidden, n_categories)
         self.urgency_head = nn.Linear(hidden, 1)
         self.sentiment_head = nn.Linear(hidden, 1)
+        # Only present when loading a v2 (sub-category) model; never used for predictions.
+        if n_legacy_categories:
+            self.category_head = nn.Linear(hidden, n_legacy_categories)
 
     def forward(self, input_ids, attention_mask) -> Dict[str, torch.Tensor]:
         hidden = self.encoder(input_ids=input_ids, attention_mask=attention_mask).last_hidden_state
@@ -48,7 +54,6 @@ class MultiTaskNewsClassifier(nn.Module):
         pooled = self.dropout((hidden * mask).sum(1) / mask.sum(1).clamp(min=1e-6))
         return {
             "domain": self.domain_head(pooled),
-            "category": self.category_head(pooled),
             "urgency": self.urgency_head(pooled).squeeze(-1),
             "sentiment": torch.tanh(self.sentiment_head(pooled)).squeeze(-1),
         }
@@ -56,13 +61,12 @@ class MultiTaskNewsClassifier(nn.Module):
 
 def compute_loss(out: Dict[str, torch.Tensor], batch: Dict[str, torch.Tensor],
                  urgency_pos_weight: float = 1.0,
-                 category_weight: torch.Tensor = None) -> torch.Tensor:
-    """Sum of the four task losses (used in training).
-    category_weight: optional per-class weights so rare categories aren't drowned out."""
+                 domain_weight: torch.Tensor = None) -> torch.Tensor:
+    """Sum of the three task losses (used in training).
+    domain_weight: optional per-class weights if the domains are imbalanced."""
     pos_weight = torch.tensor(urgency_pos_weight, device=out["urgency"].device)
     return (
-        F.cross_entropy(out["domain"], batch["domain"])
-        + F.cross_entropy(out["category"], batch["category"], weight=category_weight)
+        F.cross_entropy(out["domain"], batch["domain"], weight=domain_weight)
         + F.binary_cross_entropy_with_logits(out["urgency"], batch["urgency"].float(), pos_weight=pos_weight)
         + F.mse_loss(out["sentiment"], batch["sentiment"].float())
     )
@@ -71,7 +75,7 @@ def compute_loss(out: Dict[str, torch.Tensor], batch: Dict[str, torch.Tensor],
 def build_new(base_model: str, label_config: dict) -> MultiTaskNewsClassifier:
     """Create an untrained classifier on top of a pretrained Hugging Face encoder."""
     encoder = AutoModel.from_pretrained(base_model)
-    return MultiTaskNewsClassifier(encoder, len(label_config["domains"]), len(label_config["categories"]))
+    return MultiTaskNewsClassifier(encoder, len(label_config["domains"]))
 
 
 def save_model(model: MultiTaskNewsClassifier, tokenizer, label_config: dict, out_dir: str):
@@ -94,58 +98,43 @@ class NewsClassifierPredictor:
         self.tokenizer = AutoTokenizer.from_pretrained(model_dir)
         encoder = AutoModel.from_config(AutoConfig.from_pretrained(model_dir))
         self.model = MultiTaskNewsClassifier(
-            encoder, len(self.labels["domains"]), len(self.labels["categories"])
+            encoder, len(self.labels["domains"]), len(self.labels.get("categories", []))
         )
         self.model.load_state_dict(load_file(str(model_dir / WEIGHTS_FILE)))
         self.model.to(self.device).eval()
-
-        domains, categories = self.labels["domains"], self.labels["categories"]
-        cat_to_dom = self.labels["category_to_domain"]
-        # For each domain, a boolean mask over categories that belong to it
-        self._domain_cat_mask = torch.tensor(
-            [[cat_to_dom[c] == d for c in categories] for d in domains], device=self.device
-        )
 
     @staticmethod
     def format_text(title: str, body: str) -> str:
         return f"{(title or '').strip()}. {(body or '').strip()}".strip(". ")
 
+    def _batches(self, texts: List[str], batch_size: int):
+        for start in range(0, len(texts), batch_size):
+            enc = self.tokenizer(
+                texts[start:start + batch_size], truncation=True, padding=True,
+                max_length=self.labels["max_length"], return_tensors="pt",
+            ).to(self.device)
+            yield self.model(enc["input_ids"], enc["attention_mask"])
+
     @torch.no_grad()
     def urgency_probabilities(self, texts: List[str], batch_size: int = 16) -> List[float]:
         """Raw P(urgent) per text — used to tune urgency_threshold on validation data."""
-        probs = []
-        for start in range(0, len(texts), batch_size):
-            enc = self.tokenizer(
-                texts[start:start + batch_size], truncation=True, padding=True,
-                max_length=self.labels["max_length"], return_tensors="pt",
-            ).to(self.device)
-            probs += torch.sigmoid(self.model(enc["input_ids"], enc["attention_mask"])["urgency"]).tolist()
-        return probs
+        return [p for out in self._batches(texts, batch_size) for p in torch.sigmoid(out["urgency"]).tolist()]
 
     @torch.no_grad()
     def predict(self, texts: List[str], batch_size: int = 16) -> List[dict]:
+        threshold = self.labels.get("urgency_threshold", 0.5)
         results = []
-        for start in range(0, len(texts), batch_size):
-            enc = self.tokenizer(
-                texts[start:start + batch_size], truncation=True, padding=True,
-                max_length=self.labels["max_length"], return_tensors="pt",
-            ).to(self.device)
-            out = self.model(enc["input_ids"], enc["attention_mask"])
+        for out in self._batches(texts, batch_size):
             p_domain = out["domain"].softmax(-1)
-            dom_idx = p_domain.argmax(-1)
-            # Category must belong to the predicted domain
-            cat_logits = out["category"].masked_fill(~self._domain_cat_mask[dom_idx], float("-inf"))
-            p_cat = cat_logits.softmax(-1)
-            cat_idx = p_cat.argmax(-1)
+            conf, dom_idx = p_domain.max(-1)
             p_urgent = torch.sigmoid(out["urgency"])
-
             for i in range(len(dom_idx)):
-                d, c = dom_idx[i].item(), cat_idx[i].item()
+                domain = self.labels["domains"][dom_idx[i].item()]
                 results.append({
-                    "domain": self.labels["domains"][d],
-                    "category": self.labels["categories"][c],
+                    "domain": domain,
+                    "category": domain,
                     "sentiment": round(out["sentiment"][i].item(), 3),
-                    "urgency_flag": bool(p_urgent[i].item() >= self.labels.get("urgency_threshold", 0.5)),
-                    "classification_confidence": round(p_domain[i, d].item() * p_cat[i, c].item(), 3),
+                    "urgency_flag": bool(p_urgent[i].item() >= threshold),
+                    "classification_confidence": round(conf[i].item(), 3),
                 })
         return results

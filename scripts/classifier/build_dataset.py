@@ -88,18 +88,11 @@ def load_huffpost(n_sports: int, n_ent: int, n_other: int, seed: int) -> list:
     return out
 
 
-# Keyword-targeted extra candidates for categories / urgency cases the random samples under-cover.
+# Keyword-targeted extra candidates for urgency cases the random samples under-cover
+# (urgent events are rare, and routine results are the easiest to mistake for them).
 # These only choose WHICH articles get labelled — the LLM still assigns the actual label.
 TARGETED = [
     # (name, hint_domain, regex, n)
-    ("awards",    "entertainment_movies", r"\b(oscars?|academy awards?|golden globes?|baftas?|sag awards?|cannes|sundance|venice film|film festival|nominat)", 250),
-    ("releases",  "entertainment_movies", r"\b(trailer|teaser|first look|release date|poster|premieres?)\b", 250),
-    ("casting",   "entertainment_movies", r"\b(cast as|to star|casting|joins the cast|to direct|sequel|reboot|remake|filming|biopic)\b", 200),
-    ("reviews",   "entertainment_movies", r"\b(review|critics?|rotten tomatoes)\b", 200),
-    ("streaming", "entertainment_movies", r"\b(netflix|hulu|prime video|amazon prime|disney\+|hbo max|streaming)\b", 200),
-    ("tennis",    "sports", r"\b(tennis|wimbledon|us open|french open|roland garros|australian open|djokovic|nadal|federer|serena)", 150),
-    ("basketball","sports", r"\b(nba|wnba|basketball|lebron|lakers|warriors|celtics)", 150),
-    ("motorsport","sports", r"\b(formula one|formula 1|f1|grand prix|nascar|indycar|motogp|hamilton|verstappen)\b", 150),
     ("urgent",    "sports", r"\b(injur\w*|ruled out|died|dies|death|arrested|banned|doping|suspended|postponed|cancell?ed|scandal|match.fixing)\b", 250),
     ("not_urgent","sports", r"\b(wins?|won|beat|beats|victory|squad|announce[sd]?|preview|record)\b", 200),
     ("urgent",    "entertainment_movies", r"\b(died|dies|death|arrested|banned|postponed|pulled|hospitali[sz]ed|lawsuit|scandal)\b", 200),

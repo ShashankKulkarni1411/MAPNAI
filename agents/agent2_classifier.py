@@ -3,7 +3,8 @@ MAPNAI — agents/agent2_classifier.py
 Agent 2: Event Classifier (Layer 2)
 
 Receives the structured JSON output from Agent 1 (NER & Entity Extraction).
-Classifies the article into domain, category, sentiment, and urgency_flag using
+Classifies the article as entertainment_movies, sports or other (category = domain),
+plus sentiment and urgency_flag, using
 MAPNAI's own fine-tuned model (agents/classifier_model.py, weights in models/classifier/).
 Runs fully offline — no LLM API. Label space: config/classifier_taxonomy.py.
 Updates the 'processed_articles' table and outputs the merged payload for Agent 3.
@@ -104,7 +105,7 @@ class EventClassifierAgent:
         """Returns safe default classification if the model is unavailable."""
         return {
             "domain": "other",
-            "category": "Other",
+            "category": "other",
             "sentiment": 0.0,
             "urgency_flag": False,
             "classification_confidence": 0.0,
@@ -166,7 +167,7 @@ class EventClassifierAgent:
 
         logger.info(
             f"[Agent 2] Classification complete for {article_id} -> "
-            f"{classification_result['domain']}/{classification_result['category']} | "
+            f"{classification_result['domain']} | "
             f"Urgency: {classification_result['urgency_flag']} | "
             f"Confidence: {classification_result['classification_confidence']}"
         )

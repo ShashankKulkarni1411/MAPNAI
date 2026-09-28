@@ -166,8 +166,9 @@ python ingestion_pipeline.py --schedule --interval 60
 
 ### 5. Get the Agent 2 classifier model
 
-Agent 2 classifies articles with MAPNAI's own fine-tuned model (domain, category, urgency,
-sentiment for sports and movie news). The weights (~300 MB) are not in git; they are hosted at
+Agent 2 classifies articles with MAPNAI's own fine-tuned model into two categories —
+`entertainment_movies` and `sports` — or `other` for off-topic news, and also predicts urgency
+and sentiment. The weights (~300 MB) are not in git; they are hosted at
 [huggingface.co/satvik4577/mapnai-classifier](https://huggingface.co/satvik4577/mapnai-classifier).
 
 Agent 2 downloads them automatically into `models/classifier/` the first time it runs. To download
