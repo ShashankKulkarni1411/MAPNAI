@@ -5,7 +5,7 @@ Agent 3: Summarization Agent (Layer 2)
 Receives the combined JSON dictionary from Agent 1 (Entities) and Agent 2 (Classification).
 Generates persona-aware summaries based on the article's domain, urgency, and sentiment.
 Backend (SUMMARIZER_BACKEND): Groq LLM prompt, or the offline extractive TF-IDF
-summarizer (agents/extractive_summarizer.py), which is also the fallback when the
+summarizer (utils/extractive_summarizer.py), which is also the fallback when the
 LLM is unavailable. Updates only `summary_short` and `summary_long` in DB.
 Outputs the fully merged JSON payload downstream for Agent 4.
 """
@@ -17,7 +17,7 @@ from typing import Optional
 from config.settings import settings
 from storage.mongo_store import MongoStore
 from utils.groq_client import init_groq_llm
-from agents.extractive_summarizer import extractive_summarize
+from utils.extractive_summarizer import extractive_summarize
 from agents.pipeline_bridge import mongo_doc_to_agent1_payload
 from utils.logger import logger
 
