@@ -1,0 +1,39 @@
+{
+  "expo": {
+    "name": "MAPNAI",
+    "slug": "mapnai",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "automatic",
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#0F1B2D",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
+      "predictiveBackGestureEnabled": false
+    },
+    "web": {
+      "favicon": "./assets/favicon.png",
+      "bundler": "metro"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-status-bar",
+      "expo-font",
+      "expo-secure-store",
+      "expo-web-browser",
+      "expo-localization"
+    ],
+    "scheme": "mapnai",
+    "backgroundColor": "#0F1B2D",
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
+}
