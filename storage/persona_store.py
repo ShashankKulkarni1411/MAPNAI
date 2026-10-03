@@ -154,10 +154,22 @@ class PersonaStore:
                 {"$push": {"history": {"$each": items, "$slice": -self.cfg.history_keep}}},
             )
 
+    def set_pi_topk(self, user_id: str, pi: List[Dict]) -> None:
+        """pi_topk is derived from the exposures, so it doesn't bump persona_version."""
+        self.personas.update_one(
+            {"user_id": user_id}, {"$set": {"pi_topk": pi[: self.cfg.pi_topk_max], "pi_computed_at": _now()}}
+        )
+
     # ── Admin ────────────────────────────────────────────────
 
     def all_ids(self) -> List[str]:
         return [d["user_id"] for d in self.personas.find({}, {"_id": 0, "user_id": 1})]
+
+    def pi_rows(self) -> List[Dict]:
+        """{user_id, pi_topk, alert_prefs, persona_version} of every persona with a pi_topk (the alerts index)."""
+        return list(self.personas.find(
+            {"pi_topk.0": {"$exists": True}},
+            {"_id": 0, "user_id": 1, "pi_topk": 1, "alert_prefs": 1, "persona_version": 1}))
 
     def count(self) -> int:
         return self.personas.estimated_document_count()

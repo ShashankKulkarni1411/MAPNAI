@@ -86,6 +86,12 @@ class FakeExposureStore:
                 out[e["key"]] = {**e, "name": self.resolve_key(e["key"])[0]["name"]}
         return sorted(out.values(), key=lambda e: (-e["weight"], e["key"]))
 
+    def get_seeds(self, user_id):
+        return [{"key": e["key"], "role": e["role"], "weight": e["weight"]} for e in self.get_exposures(user_id)]
+
+    def neighbours(self, keys, top):
+        return {}
+
     def is_available(self):
         return {"ok": True}
 
@@ -127,6 +133,7 @@ class TestCreateAndProfile:
         assert prof["persona_version"] == 1
         assert prof["style"] == CFG.style_defaults
         assert prof["exposures"][0]["key"] == "manchester city"
+        assert prof["pi_topk"][0]["entity"] == "manchester city" and prof["pi_topk"][0]["score"] == 1.0
 
     def test_beta_priors_written(self, svc):
         uid = make_user(svc)["user_id"]

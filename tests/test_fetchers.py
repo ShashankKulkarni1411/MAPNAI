@@ -312,15 +312,6 @@ class TestSourceConfig:
                 "sports", "entertainment_movies", "general"
             ), f"{source.name}: invalid domain '{source.domain}'"
 
-    def test_reddit_sources_have_required_fields(self):
-        from config.sources import REDDIT_SOURCES
-        for source in REDDIT_SOURCES:
-            assert source.subreddit
-            assert source.post_limit > 0
-            assert source.domain in (
-                "finance", "geopolitics", "technology", "health", "supply_chain"
-            )
-
     def test_domain_keywords_coverage(self):
         from config.sources import DOMAIN_KEYWORDS
         required_domains = ["finance", "geopolitics", "technology", "health", "supply_chain"]
@@ -331,14 +322,13 @@ class TestSourceConfig:
     def test_source_counts_are_meaningful(self):
         from config.sources import (
             FINANCE_RSS, GEOPOLITICS_RSS, TECHNOLOGY_RSS,
-            HEALTH_RSS, GOVERNMENT_RSS, REDDIT_SOURCES, ALL_RSS_SOURCES,
+            HEALTH_RSS, GOVERNMENT_RSS, ALL_RSS_SOURCES,
         )
         assert len(FINANCE_RSS)     >= 5
         assert len(GEOPOLITICS_RSS) >= 5
         assert len(TECHNOLOGY_RSS)  >= 5
         assert len(HEALTH_RSS)      >= 4
         assert len(GOVERNMENT_RSS)  >= 5
-        assert len(REDDIT_SOURCES)  >= 8
         assert len(ALL_RSS_SOURCES) >= 25
 
 
@@ -366,7 +356,8 @@ class TestSettings:
 
     def test_neo4j_default_uri(self):
         from config.settings import settings
-        assert "bolt://" in settings.neo4j_uri or "neo4j://" in settings.neo4j_uri
+        scheme = settings.neo4j_uri.split("://")[0]
+        assert scheme in ("bolt", "bolt+s", "bolt+ssc", "neo4j", "neo4j+s", "neo4j+ssc")
 
 
 if __name__ == "__main__":

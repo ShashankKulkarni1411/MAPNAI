@@ -202,14 +202,19 @@ class TestSimHash:
         assert distance > 6   # should be very different
 
     def test_near_duplicate_texts(self):
-        # Same story, slight rewording
-        h1 = compute_simhash(
-            "Fed raises interest rates",
-            "The Federal Reserve raised interest rates by 25 basis points Wednesday."
+        # Same story, slight rewording (article-length body: on a one-line body every
+        # reworded word shifts a large share of the unigram+bigram tokens)
+        body = (
+            "The Federal Reserve raised interest rates by 25 basis points on Wednesday, its third increase "
+            "this year, as policymakers continued their effort to bring inflation back toward the central "
+            "bank's two percent target. Chair Jerome Powell said the committee would watch incoming data "
+            "closely before deciding on further moves, and markets reacted calmly with the S&P 500 closing "
+            "slightly higher while Treasury yields edged down."
         )
+        h1 = compute_simhash("Fed raises interest rates", body)
         h2 = compute_simhash(
             "Fed hikes interest rates",
-            "The Federal Reserve hiked interest rates by 25 basis points on Wednesday."
+            body.replace("raised", "hiked").replace("reacted calmly", "responded calmly"),
         )
         distance = simhash_distance(h1, h2)
         assert distance <= 10   # near-duplicate
@@ -363,15 +368,25 @@ class TestPreprocessingAgent:
 
     def test_batch_processing(self):
         agent = PreprocessingAgent()
-        articles = [
-            self._make_raw(
-                f"Article {i}: Market update",
-                f"This is article number {i} about the financial markets. "
-                f"The stock market showed mixed signals today with technology stocks "
-                f"leading gains while energy sector lagged behind. Investors remain cautious."
-            )
-            for i in range(5)
+        # Five distinct stories: near-identical texts would (correctly) be dropped as duplicates
+        stories = [
+            ("Stock market mixed as tech leads",
+             "The stock market showed mixed signals today with technology stocks leading gains "
+             "while the energy sector lagged behind. Investors remain cautious ahead of earnings."),
+            ("WHO reports new measles outbreak",
+             "The World Health Organization confirmed a measles outbreak in three provinces and "
+             "urged parents to vaccinate children as hospitals reported a rise in admissions."),
+            ("Port strike delays container shipping",
+             "A strike at the country's largest port has left hundreds of containers stranded, "
+             "forcing logistics firms to reroute freight and warn retailers of inventory shortages."),
+            ("Chipmaker unveils faster AI processor",
+             "A leading semiconductor company unveiled a new processor for artificial intelligence "
+             "workloads, claiming double the performance of its previous generation of chips."),
+            ("Leaders meet for border talks",
+             "Foreign ministers from both nations met in Geneva for a second round of diplomatic "
+             "talks aimed at easing tensions along the disputed border after months of clashes."),
         ]
+        articles = [self._make_raw(title, body) for title, body in stories]
         results = agent.process_batch(articles)
         assert len(results) == 5
         stats = agent.get_stats()

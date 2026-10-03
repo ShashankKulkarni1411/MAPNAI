@@ -4,12 +4,14 @@ MAPNAI — api/personalization_router.py
 this module only shapes requests and maps errors to HTTP status codes.
 """
 
+from datetime import datetime
 from typing import Dict, List, Optional, Union
 
-from fastapi import APIRouter, Depends, Query, status
+from fastapi import APIRouter, Depends, Query, Request, status
 from pydantic import BaseModel, Field
 
 from config.personalization import pers_settings
+from personalization import jobs
 from personalization.service import PersonalizationService
 
 router = APIRouter(prefix="/v1", tags=["personalization"])
@@ -58,6 +60,19 @@ class ExposuresPatch(BaseModel):
 
 class TopicsPatch(BaseModel):
     topics: Dict[str, Optional[float]]
+
+
+class FeedbackIn(BaseModel):
+    user_id: str = Field(min_length=1)
+    article_id: str = Field(min_length=1)
+    type: str = Field(description="open|more|less|dwell|save|needed|not_needed|missed")
+    value: Optional[float] = Field(default=None, description="dwell seconds")
+    section: Optional[str] = Field(default=None, description="default: the section the article was last served in")
+
+
+class ProposalAccept(BaseModel):
+    role: Optional[str] = Field(default=None, description="override the suggested role")
+    weight: Optional[Union[int, str]] = Field(default=None, description="override the suggested weight")
 
 
 class AlertPrefsPatch(BaseModel):
@@ -124,11 +139,138 @@ def patch_alert_prefs(user_id: str, body: AlertPrefsPatch, svc: PersonalizationS
     return svc.patch_alert_prefs(user_id, body.model_dump(exclude_none=True))
 
 
+# ── G. Digest ────────────────────────────────────────────────
+
+@router.get("/users/{user_id}/digest")
+def get_digest(
+    user_id: str,
+    refresh: bool = Query(default=False, description="recompute instead of serving today's cached digest"),
+    svc: PersonalizationService = Depends(get_service),
+):
+    return svc.get_digest(user_id, refresh)
+
+
+# ── E. Feedback ──────────────────────────────────────────────
+
+@router.post("/feedback")
+def feedback(body: FeedbackIn, svc: PersonalizationService = Depends(get_service)):
+    return svc.record_feedback(body.user_id, body.article_id, body.type, body.value, body.section)
+
+
+# ── I. Proposals ─────────────────────────────────────────────
+
+@router.get("/users/{user_id}/proposals")
+def list_proposals(
+    user_id: str,
+    status: Optional[str] = Query(default=None, description="pending|accepted|rejected; default all"),
+    svc: PersonalizationService = Depends(get_service),
+):
+    return svc.list_proposals(user_id, status)
+
+
+@router.post("/users/{user_id}/proposals/{proposal_id}/accept")
+def accept_proposal(user_id: str, proposal_id: str, body: Optional[ProposalAccept] = None,
+                    svc: PersonalizationService = Depends(get_service)):
+    body = body or ProposalAccept()
+    return svc.accept_proposal(user_id, proposal_id, body.role, body.weight)
+
+
+@router.post("/users/{user_id}/proposals/{proposal_id}/reject")
+def reject_proposal(user_id: str, proposal_id: str, svc: PersonalizationService = Depends(get_service)):
+    return svc.reject_proposal(user_id, proposal_id)
+
+
+# ── J. Alerts ────────────────────────────────────────────────
+
+@router.get("/users/{user_id}/alerts")
+def list_alerts(
+    user_id: str,
+    since: Optional[datetime] = Query(default=None, description="delivered after this time (ISO; naive = UTC)"),
+    include_pending: bool = Query(default=False, description="also alerts still held by quiet hours"),
+    limit: int = Query(default=50, ge=1, le=200),
+    svc: PersonalizationService = Depends(get_service),
+):
+    return svc.alerts(user_id, since, include_pending, limit)
+
+
+# ── M. App views ─────────────────────────────────────────────
+
+class AskIn(BaseModel):
+    query: str = Field(min_length=1, max_length=500)
+    domain: Optional[str] = None
+    context_article_id: Optional[str] = None
+
+
+@router.get("/users/{user_id}/feed")
+def feed(
+    user_id: str,
+    cursor: Optional[str] = Query(default=None, description="next_cursor of the previous page"),
+    limit: int = Query(default=10, ge=1, le=pers_settings.feed_page_max),
+    exclude: str = Query(default="", description="comma-separated article ids to leave out (e.g. today's brief)"),
+    svc: PersonalizationService = Depends(get_service),
+):
+    return svc.feed(user_id, cursor, limit, [a for a in exclude.split(",") if a])
+
+
+@router.get("/users/{user_id}/saved")
+def saved(user_id: str, svc: PersonalizationService = Depends(get_service)):
+    return svc.saved(user_id)
+
+
+@router.get("/articles/top")
+def top_articles(
+    hours: int = Query(default=24, ge=1, le=24 * 7),
+    limit: int = Query(default=8, ge=1, le=50),
+    svc: PersonalizationService = Depends(get_service),
+):
+    return svc.top(hours, limit)
+
+
+@router.get("/articles/{article_id}")
+def story(article_id: str, user_id: Optional[str] = Query(default=None),
+          svc: PersonalizationService = Depends(get_service)):
+    return svc.story(article_id, user_id)
+
+
+@router.get("/clusters/by-article/{article_id}")
+def cluster_sources(article_id: str, svc: PersonalizationService = Depends(get_service)):
+    return svc.cluster_sources(article_id)
+
+
+@router.get("/search")
+def search(
+    q: str = Query(min_length=1, max_length=200),
+    topic: Optional[str] = Query(default=None),
+    svc: PersonalizationService = Depends(get_service),
+):
+    return svc.search(q, topic)
+
+
+@router.post("/ask")
+def ask(body: AskIn, svc: PersonalizationService = Depends(get_service)):
+    return svc.ask(body.query, body.domain, body.context_article_id)
+
+
+# ── K. Render ────────────────────────────────────────────────
+
+@router.get("/articles/{article_id}/render")
+def render_article(
+    article_id: str,
+    user_id: str = Query(min_length=1),
+    refresh: bool = Query(default=False, description="rewrite again instead of serving the cached rewrite"),
+    svc: PersonalizationService = Depends(get_service),
+):
+    return svc.render(article_id, user_id, refresh)
+
+
 # ── Health ───────────────────────────────────────────────────
 
 @router.get("/personalization/health")
 def health(
+    request: Request,
     hours: int = Query(default=pers_settings.cand_window_h, ge=1, le=24 * 365),
     svc: PersonalizationService = Depends(get_service),
 ):
-    return svc.health(hours)
+    out = svc.health(hours)
+    out["scheduler"] = jobs.scheduler_status(getattr(request.app.state, "scheduler", None))
+    return out

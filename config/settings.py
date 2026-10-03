@@ -50,7 +50,8 @@ class Settings(BaseSettings):
 
     # ── Neo4j ────────────────────────────────────────────────
     neo4j_uri: str = Field(default="bolt://localhost:7687", env="NEO4J_URI")
-    neo4j_user: str = Field(default="neo4j", env="NEO4J_USER")
+    # Aura's credentials file names it NEO4J_USERNAME (newer instances use the instance id, not "neo4j")
+    neo4j_user: str = Field(default="neo4j", validation_alias=AliasChoices("NEO4J_USER", "NEO4J_USERNAME"))
     neo4j_password: str = Field(default="password", env="NEO4J_PASSWORD")
 
     # ── FAISS ────────────────────────────────────────────────
@@ -73,6 +74,20 @@ class Settings(BaseSettings):
     # ── Logging ──────────────────────────────────────────────
     log_level: str = Field(default="INFO", env="LOG_LEVEL")
     log_file: str = Field(default="./logs/ingestion.log", env="LOG_FILE")
+
+    # ── App accounts (api/auth_router.py) ────────────────────
+    # Signs access/refresh tokens. Unset → a random key per API process (every token dies on restart).
+    auth_secret: str = Field(default="", env="AUTH_SECRET")
+    auth_access_ttl_min: int = Field(default=60, env="AUTH_ACCESS_TTL_MIN")
+    auth_refresh_ttl_days: int = Field(default=30, env="AUTH_REFRESH_TTL_DAYS")
+    auth_code_ttl_min: int = Field(default=10, env="AUTH_CODE_TTL_MIN")
+    auth_code_max_attempts: int = Field(default=5, env="AUTH_CODE_MAX_ATTEMPTS")
+    # Email codes go out over SMTP; with no SMTP_HOST they are written to the API log instead (development).
+    smtp_host: str = Field(default="", env="SMTP_HOST")
+    smtp_port: int = Field(default=587, env="SMTP_PORT")
+    smtp_user: str = Field(default="", env="SMTP_USER")
+    smtp_password: str = Field(default="", env="SMTP_PASSWORD")
+    smtp_from: str = Field(default="", env="SMTP_FROM")
 
     model_config = SettingsConfigDict(
         env_file=str(_ENV_FILE),

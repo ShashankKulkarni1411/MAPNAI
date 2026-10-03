@@ -491,7 +491,7 @@ export const mock = {
     };
   },
 
-  // ── Auth (Proposed) ────────────────────────────────────
+  // ── Auth (real in live mode: api/auth_router.py) ───────
   async register(email: string, password: string, birthYear: number) {
     await delay(400);
     const d = await load();
@@ -517,6 +517,23 @@ export const mock = {
     if (!acc || acc.password !== password) throw new ApiError(401, 'Email or password is incorrect');
     if (!acc.verified) throw new ApiError(403, 'unverified');
     return { access_token: `mock.${uuid()}`, refresh_token: `mock.${uuid()}`, user_id: acc.user_id ?? null };
+  },
+  async resend(_email: string) {
+    await delay(300);
+    return { ok: true };
+  },
+  async requestReset(_email: string) {
+    await delay(300);
+    return { ok: true };
+  },
+  async confirmReset(email: string, code: string, password: string) {
+    await delay(300);
+    const d = await load();
+    const acc = d.accounts[email.toLowerCase()];
+    if (!acc || code !== '123456') throw new ApiError(422, "That code didn't work.");
+    acc.password = password;
+    await save();
+    return { ok: true };
   },
   async linkUser(email: string, user_id: string) {
     const d = await load();

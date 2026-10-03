@@ -1,4 +1,5 @@
-// One function per capability. `built` calls hit the API in hybrid/live; `proposed` calls hit it only in live.
+// One function per capability. Engine calls hit the API in hybrid and live; account (auth) calls hit it only in
+// live, so hybrid runs the real engine with the demo sign-in (code 123456).
 // Mock mode serves everything from mockServer. Screens import from here, never from client/mockServer directly.
 import { API_MODE, http } from './client';
 import { mock } from './mockServer';
@@ -8,12 +9,23 @@ import type {
 } from './types';
 
 const built = API_MODE !== 'mock';
-const proposed = API_MODE === 'live';
+const liveAuth = API_MODE === 'live';
+
+// The engine's proposal row → the app's Proposal
+const toProposal = (p: any): Proposal => ({
+  proposal_id: p.proposal_id,
+  entity_key: p.entity_key,
+  entity_name: p.name ?? p.entity_key,
+  reason: p.why ?? '',
+  evidence: p.evidence_articles ?? [],
+  role: p.suggested_role,
+  weight: p.suggested_weight,
+});
 
 const enc = encodeURIComponent;
 
 export const api = {
-  // ── Built ──────────────────────────────────────────────
+  // ── Engine: hybrid + live ──────────────────────────────
   health: (): Promise<Health> => (built ? http('/v1/personalization/health') : mock.health()),
 
   searchEntities: (q: string): Promise<EntityHit[]> =>
@@ -58,61 +70,70 @@ export const api = {
       ? http(`/v1/users/${enc(id)}/alert_prefs`, { method: 'PATCH', body: prefs })
       : mock.patchAlertPrefs(id, prefs),
 
-  // ── Built in the full engine, not yet in this repo (Phase 2+): live only ──
   digest: (id: string, refresh = false): Promise<Digest> =>
-    proposed ? http(`/v1/users/${enc(id)}/digest`, { query: { refresh } }) : mock.digest(id),
+    built ? http(`/v1/users/${enc(id)}/digest`, { query: { refresh } }) : mock.digest(id),
 
   feedback: (id: string, article_id: string, type: FeedbackType, value?: number, extra?: Record<string, string>) =>
-    proposed
+    built
       ? http('/v1/feedback', { method: 'POST', body: { user_id: id, article_id, type, value, ...extra } })
       : mock.feedback(id, article_id, type, value),
 
   alerts: (id: string, since?: string): Promise<Alert[]> =>
-    proposed ? http(`/v1/users/${enc(id)}/alerts`, { query: { since } }) : mock.alerts(id),
+    built ? http(`/v1/users/${enc(id)}/alerts`, { query: { since } }) : mock.alerts(id),
 
   proposals: (id: string): Promise<Proposal[]> =>
-    proposed ? http(`/v1/users/${enc(id)}/proposals`) : mock.proposals(id),
+    built
+      ? http<any[]>(`/v1/users/${enc(id)}/proposals`, { query: { status: 'pending' } }).then((rows) => rows.map(toProposal))
+      : mock.proposals(id),
 
   decideProposal: (id: string, pid: string, accept: boolean) =>
-    proposed
+    built
       ? http(`/v1/users/${enc(id)}/proposals/${enc(pid)}/${accept ? 'accept' : 'reject'}`, { method: 'POST' })
       : mock.decideProposal(id, pid, accept),
 
-  // ── Proposed (spec §28) ────────────────────────────────
   feed: (id: string, cursor: string | null, exclude: string[]): Promise<FeedPage> =>
-    proposed
+    built
       ? http(`/v1/users/${enc(id)}/feed`, { query: { cursor: cursor ?? undefined, limit: 10, exclude: exclude.join(',') } })
       : mock.feed(id, cursor, exclude),
 
   top: (hours = 24, limit = 8): Promise<StoryItem[]> =>
-    proposed ? http('/v1/articles/top', { query: { hours, limit } }) : mock.top(hours, limit),
+    built ? http('/v1/articles/top', { query: { hours, limit } }) : mock.top(hours, limit),
 
   story: (article_id: string, userId?: string | null): Promise<StoryDetail> =>
-    proposed
+    built
       ? http(`/v1/articles/${enc(article_id)}`, { query: { user_id: userId ?? undefined } })
       : mock.story(article_id, userId),
 
   cluster: (article_id: string) =>
-    proposed ? http<any[]>(`/v1/clusters/by-article/${enc(article_id)}`) : mock.cluster(article_id),
+    built ? http<any[]>(`/v1/clusters/by-article/${enc(article_id)}`) : mock.cluster(article_id),
 
-  saved: (id: string): Promise<StoryItem[]> => (proposed ? http(`/v1/users/${enc(id)}/saved`) : mock.saved(id)),
+  saved: (id: string): Promise<StoryItem[]> => (built ? http(`/v1/users/${enc(id)}/saved`) : mock.saved(id)),
 
   search: (q: string, topic?: string): Promise<SearchPage> =>
-    proposed ? http('/v1/search', { query: { q, topic } }) : mock.search(q, topic),
+    built ? http('/v1/search', { query: { q, topic } }) : mock.search(q, topic),
 
   ask: (query: string, domain?: string, context_article_id?: string): Promise<AskAnswer> =>
-    proposed
+    built
       ? http('/v1/ask', { method: 'POST', body: { query, domain, context_article_id }, timeoutMs: 20000 })
       : mock.ask(query, domain),
 
-  // Auth: Proposed. Mock accepts code 123456.
+  // ── Accounts: live only. Mock accepts code 123456. ──
   register: (email: string, password: string, birthYear: number) =>
-    proposed
+    liveAuth
       ? http('/v1/auth/register', { method: 'POST', body: { email, password, birth_year: birthYear } })
       : mock.register(email, password, birthYear),
   verify: (email: string, code: string): Promise<{ access_token: string; refresh_token: string; user_id: string | null }> =>
-    proposed ? http('/v1/auth/verify', { method: 'POST', body: { email, code } }) : mock.verify(email, code),
+    liveAuth ? http('/v1/auth/verify', { method: 'POST', body: { email, code } }) : mock.verify(email, code),
   login: (email: string, password: string): Promise<{ access_token: string; refresh_token: string; user_id: string | null }> =>
-    proposed ? http('/v1/auth/login', { method: 'POST', body: { email, password } }) : mock.login(email, password),
-  linkUser: (email: string, user_id: string) => (proposed ? Promise.resolve() : mock.linkUser(email, user_id)),
+    liveAuth ? http('/v1/auth/login', { method: 'POST', body: { email, password } }) : mock.login(email, password),
+  resend: (email: string) => (liveAuth ? http('/v1/auth/resend', { method: 'POST', body: { email } }) : mock.resend(email)),
+  requestReset: (email: string) =>
+    liveAuth ? http('/v1/auth/reset/request', { method: 'POST', body: { email } }) : mock.requestReset(email),
+  confirmReset: (email: string, code: string, password: string) =>
+    liveAuth
+      ? http('/v1/auth/reset/confirm', { method: 'POST', body: { email, code, password } })
+      : mock.confirmReset(email, code, password),
+  // live: the account comes from the Bearer token (the session's access token)
+  linkUser: (email: string, user_id: string) =>
+    liveAuth ? http('/v1/auth/link', { method: 'POST', body: { user_id } }).then(() => {}) : mock.linkUser(email, user_id),
 };

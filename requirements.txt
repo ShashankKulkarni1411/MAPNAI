@@ -14,6 +14,7 @@ Scrapy==2.11.1
 # ── API (personalization, api/app.py) ────────────────────────
 fastapi==0.115.0
 uvicorn==0.30.6
+rapidfuzz==3.14.6              # fuzzy entity match in personalization/clustering.py
 
 # ── Text Cleaning & NLP ──────────────────────────────────────
 nltk==3.8.1

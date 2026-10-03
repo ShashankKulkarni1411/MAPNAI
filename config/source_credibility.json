@@ -1,0 +1,30 @@
+{
+  "_doc": "Source credibility for materiality (source_cred). Keys are tiers, values are exact source_name strings. Move a name between lists to re-tier it; sources not listed get source_cred_default (0.5). Seeded 2026-09-29 from every source_name published in the last 30 days of Mongo (78 sources). PERS_SOURCE_CRED (JSON {name: value}) replaces this table entirely.",
+  "tiers": {
+    "0.8": [
+      "Reuters", "ANI (Asian News International)", "Bloomberg Markets", "Financial Times",
+      "BBC World", "BBC Sport", "BBC Sport Tennis", "BBC Sport Cricket", "BBC Sport Football", "BBC Entertainment",
+      "Guardian Sport", "Guardian Film", "Al Jazeera", "The Hindu", "The Telegraph",
+      "UN News", "US Fed Reserve"
+    ],
+    "0.6": [
+      "Mint", "Livemint", "The Economic Times", "Economic Times", "The Financial Express", "Business Today",
+      "Moneycontrol", "CNBC Finance", "CNBC TV18", "MarketWatch",
+      "NDTV World", "NDTV.com", "Times of India", "Times of India Sports", "The New Indian Express", "The Tribune",
+      "THE WEEK", "News18", "Times Now", "The New Zealand Herald", "The Manila Times", "The i Paper",
+      "Spokane Spokesman-Review",
+      "Wired", "Ars Technica", "The Verge", "TechCrunch", "MIT Tech Review", "STAT News",
+      "The Diplomat", "Foreign Policy", "Supply Chain Dive", "Freightos",
+      "Autosport", "Sky Sports", "ESPN Top News", "ESPN NBA", "ESPNcricinfo",
+      "Variety", "Hollywood Reporter", "Deadline", "IndieWire"
+    ],
+    "0.5": [
+      "iefimerida", "Le News", "The Morning Star", "InvenGlobal"
+    ],
+    "0.4": [
+      "Pinkvilla", "Bollywood Hungama", "Collider", "Screen Rant", "Times of India Entertainment",
+      "Hacker News", "Yahoo Finance", "Devdiscourse", "NewsBytes", "EUROPE SAYS", "Seeking Alpha",
+      "ZeroHedge", "Breitbart News Network", "Daily Express", "Paddy Power News"
+    ]
+  }
+}

@@ -18,10 +18,10 @@ Demo sign-up: any email and an 8+ character password; the verification code is `
 | Mode | What it does |
 |---|---|
 | `mock` (default) | Everything comes from on-device fixtures in `src/api/mockServer.ts`. No backend needed. |
-| `hybrid` | Endpoints the backend has today go to `EXPO_PUBLIC_API_URL`: users, profile, entity search, onboarding headlines and swipes, the four PATCH edits, health. The rest use fixtures. |
-| `live` | Every call goes to the API, using the contract in spec §28. |
+| `hybrid` | The engine is real (`EXPO_PUBLIC_API_URL`): profile, onboarding, digest, feed, Big today, story page, sources, saved, search, Ask, alerts, suggestions, feedback. Sign-up / sign-in stay on the device (code `123456`). |
+| `live` | Everything goes to the API, including accounts (`/v1/auth/*`): codes are emailed over SMTP, or printed in the API log when `SMTP_HOST` is not set. |
 
-For `hybrid`, run the backend with `python run_api.py --host 0.0.0.0` and set `EXPO_PUBLIC_API_URL` to your PC's LAN IP.
+For `hybrid` and `live`, run the backend with `python run_api.py --host 0.0.0.0` and set `EXPO_PUBLIC_API_URL` to your PC's LAN IP.
 
 The mock follows the engine's rules closely enough to exercise the UI: need = materiality × follow strength, τ = 0.2, at most 5 must-knows (the rest go to "More you may need"), at most 3 For you stories per topic, one explore slot, alerts at need ≥ 0.5 and materiality ≥ 0.6. It is not the ranking engine.
 

@@ -271,6 +271,133 @@ pip install -r requirements.txt -c requirements.lock --extra-index-url https://d
 
 ---
 
+## Personalization
+
+A per-user news layer on top of the processed articles (design: `PERSONALIZATION_PLAN.md`). Each user declares
+**exposures**, meaning graph entities they `owns` / `depends_on` / `operates_in` / `regulated_by` / `covers` /
+`follows`, plus topics and a reading style. The engine spreads the exposures over the Neo4j co-mention graph
+(`pi_topk`), clusters articles into events, and scores each article's **materiality** `m` (A4 risk, cluster size,
+first report, source credibility). It then builds a daily digest with these sections:
+
+| Section | What goes in it |
+|---|---|
+| `must_know` | Up to 5 articles whose **need** = `m` × exposure ≥ τ. τ adapts from `needed` / `missed` feedback. |
+| `more_you_need` | Must-know articles beyond the first 5. |
+| `for_you` | Ranked by interest (late fusion over reading history, plus Beta preferences per topic and entity), then diversified with MMR under topic caps. |
+| `explore` | One Thompson-sampled slot from a topic the slate doesn't cover yet. |
+
+Every item carries a `why` line, for example *"You own McLaren. Need 0.47 = materiality 0.71 × exposure 0.67"*.
+Other parts of the layer:
+- **Feedback** updates the Beta preferences and the reading history.
+- **Weekly proposals** suggest new exposures from what the user engages with.
+- **Alerts** fire on high-need, high-materiality events, with a daily cap and quiet hours.
+- **`/render`** rewrites an article in the reader's style through Groq and fact-checks the rewrite. If the check
+  fails, the source text is served instead.
+
+### Run it
+
+Prerequisites: MongoDB and Neo4j are filled by the pipeline, and `.env` has `GROQ_API_KEY` for rendering.
+```bash
+python run_mapnai.py --limit 100                 # 1. ingestion + Agents 1-4 → processed_articles + the graph
+python scripts/rebuild_pers_faiss.py             # 2. first time only: personalization vector index from Mongo
+python scripts/seed_entity_aliases.py            # 3. first time only: "man city" → "manchester city", …
+python -m personalization.jobs cluster           # 4. entity keys, index sync, event clusters, materiality
+python scripts/seed_demo_personas.py             # 5. three demo users (below), checked against the live graph
+python run_api.py                                # 6. API on http://127.0.0.1:8000 (docs at /docs) + scheduler
+python scripts/smoke_test.py                     # 7. every endpoint per persona; prints the digests
+```
+The smoke test runs in-process by default and doesn't need step 6. To hit the running server instead, use
+`python scripts/smoke_test.py --base-url http://127.0.0.1:8000`. The script:
+- does the mutating calls (create, onboarding, PATCH, feedback, accepting proposals) on scratch clones of the
+  personas;
+- deletes the clones afterwards and drops the τ row it wrote, so repeated runs leave the demo users and τ unchanged;
+- prints each digest as `section | title | why`;
+- flags any two personas whose `must_know` stories (compared by cluster) overlap by more than 30%;
+- exits non-zero if any status code or response shape is wrong.
+
+Demo personas (`scripts/seed_demo_personas.py`; a re-run replaces them):
+
+| Persona | Exposures | Analogue |
+|---|---|---|
+| Club & Team Investor | owns Manchester City, Chelsea (high); McLaren, Red Bull (medium); Alpine (low) | equity investor holding 4–5 listed names |
+| Film Release Supply-Chain Manager | depends_on Netflix, Disney (high); Ramayana, Hollywood, OTT (medium); follows Drishyam | supply-chain manager and their suppliers |
+| Sports Governance & Media Analyst | covers UEFA, FIFA, ESPN (high); FIA, NFL (medium); NBA (low) | tech-policy analyst covering regulators and platforms |
+
+### Endpoints (`/v1`)
+
+| Method | Path | Purpose |
+|---|---|---|
+| GET | `/entities/search?q=` | Find canonical entity keys to use as exposures |
+| POST | `/users` | Create a user `{name, topics, style, exposures: [{key, role, weight}]}` |
+| GET | `/onboarding/headlines` | 10 headlines across topics |
+| POST | `/users/{id}/onboarding` | `{likes, dislikes}` → preferences + long-window history |
+| GET | `/users/{id}/profile` | Profile sentences, exposures, topics, style, Beta, `pi_topk` |
+| PATCH | `/users/{id}/exposures` · `/topics` · `/style` · `/alert_prefs` | Edit the profile (bumps `persona_version`, invalidates the digest) |
+| GET | `/users/{id}/digest?refresh=` | Today's digest (cached per user and day) |
+| POST | `/feedback` | `{user_id, article_id, type}`, type ∈ open, more, less, dwell (`value` = seconds), save, needed, not_needed, missed |
+| GET | `/users/{id}/proposals` | Suggested exposures; `POST …/proposals/{pid}/accept` or `/reject` |
+| GET | `/users/{id}/alerts?since=&include_pending=` | Alerts, newest first |
+| GET | `/articles/{aid}/render?user_id=` | Style rewrite plus the reader's brief (`text, why, brief, fallback`) |
+| GET | `/personalization/health` | Mongo, Neo4j, the vector index, the last run of each job, the scheduler |
+| GET | `/admin/metrics?days=7` | Serving, read rate per section, must_know precision and miss rate, τ history, proposals, alerts, render fallbacks, the article window, jobs |
+| GET | `/admin/jobs` | Every job, its cron, the scheduler's next run times, the last run |
+| POST | `/admin/jobs/{name}/run?user=&rescan=` | Run a job now. 404 unknown job, 409 while a run holds the lease |
+
+There is no auth, so keep the API bound to 127.0.0.1 (the `run_api.py` default).
+
+### Jobs
+
+`python run_api.py` starts an in-process APScheduler with six cron jobs in `PERS_TZ` (default Asia/Kolkata). Each
+run is recorded in `job_runs` under a lease, so a manual run and a scheduled run never overlap. Run uvicorn with
+**one worker**, or set `PERS_SCHEDULER_ENABLED=false` on the extra workers.
+
+| Job | Default cron | What it does |
+|---|---|---|
+| `cluster` | `5 * * * *` | Entity keys, sync of the personalization index, event clustering, materiality (new and rescored articles) |
+| `alerts` | `*/5 * * * *` | Alerts for articles with need ≥ 0.5 and m ≥ 0.6 on users' exposures |
+| `pi_topk` | `0 1 * * *` | Recompute exposure spread for every user |
+| `tau` | `30 2 * * *` | One adaptive step of τ from last week's needed/missed feedback |
+| `digests` | `30 5 * * *` | Precompute today's digests |
+| `proposals` | `0 3 * * mon` | Engagement-based exposure proposals |
+
+Run any job once without the API: `python -m personalization.jobs <name> [--user ID] [--rescan]`. `recluster` is
+a manual-only job, for use after changing a clustering threshold.
+
+### Configuration (`PERS_*` environment variables)
+
+Every knob in `config/personalization.py` can be overridden as `PERS_<FIELD>`, for example `PERS_CAND_WINDOW_H=72`.
+Lists and dicts take JSON.
+
+| Toggle (default `true`) | Effect when `false` |
+|---|---|
+| `PERS_SCHEDULER_ENABLED` | The API doesn't start the scheduler |
+| `PERS_ENABLE_ALERTS` | The alerts job does nothing |
+| `PERS_ENABLE_RENDER` | `/render` returns the source text (no LLM call) |
+| `PERS_ENABLE_PROPOSALS` | The proposals job does nothing |
+| `PERS_ENABLE_EXPLORE` | No explore slot |
+| `PERS_ENABLE_MMR` · `PERS_ENABLE_CALIBRATION` | `for_you` is plain interest order · no per-topic caps from declared topics |
+| `PERS_ENABLE_HOP2` | Exposure spread stops after one hop |
+
+| Knob | Default | Meaning |
+|---|---|---|
+| `PERS_JOB_<NAME>` | see Jobs | Cron for a job. Empty (`PERS_JOB_ALERTS=`) unschedules it |
+| `PERS_TZ` | `Asia/Kolkata` | Scheduler time zone and the default user time zone |
+| `PERS_CAND_WINDOW_H` · `PERS_CLUSTER_WINDOW_H` | `48` | Candidate and clustering windows. Widen them for demos on old data |
+| `PERS_TAU_INIT` · `PERS_TAU_MIN` · `PERS_TAU_MAX` · `PERS_MISS_TARGET` | `.2` · `.05` · `.6` · `.1` | Must-know threshold and its adaptation |
+| `PERS_SLATE_K` · `PERS_MUST_KNOW_MAX` · `PERS_PER_TOPIC_CAP` | `10` · `5` · `3` | Digest shape |
+| `PERS_ALERT_MIN_NEED` · `PERS_ALERT_MIN_M` | `.5` · `.6` | Alert thresholds |
+| `PERS_W_RISK` · `PERS_W_SIZE` · `PERS_W_FIRST` · `PERS_W_CRED` | `.5` · `.2` · `.15` · `.15` | Materiality weights |
+| `PERS_RENDER_MODEL` | `openai/gpt-oss-120b` | Groq model for `/render` |
+| `PERS_POLICY_VERSION` | `v2.0` | Stamped on impressions. Changing it invalidates cached digests |
+
+**Data caveats.**
+- Until Agent 4 scores articles, every `m` is "unscored": `risk_norm` defaults to 0.5, and `m` rarely reaches 0.6.
+  So alerts seldom fire. Run `scripts/backfill_a4.py` or `python pipeline.py --agents 4`.
+- Candidates come only from the last 48 h, so keep ingestion running with `python ingestion_pipeline.py --schedule`.
+  Otherwise digests empty out.
+
+---
+
 ## Running Tests
 
 ```bash

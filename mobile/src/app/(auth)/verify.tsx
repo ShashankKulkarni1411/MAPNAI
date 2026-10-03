@@ -49,7 +49,10 @@ export default function Verify() {
         <>
           <Button label="Verify" disabled={code.length !== 6 || tries >= 3} loading={busy} onPress={verify} />
           <Button label={wait > 0 ? `Resend code in ${wait}s` : 'Resend code'} variant="text" disabled={wait > 0}
-            onPress={() => { setWait(30); setTries(0); setCode(''); setError(null); }} />
+            onPress={() => {
+              setWait(30); setTries(0); setCode(''); setError(null);
+              if (session.email) api.resend(session.email).catch((e) => setError(errorCopy(e, "Couldn't send a new code. Try again.")));
+            }} />
         </>
       }
     >

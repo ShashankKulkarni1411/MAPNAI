@@ -163,6 +163,18 @@ class ExposureStore:
         with self._session() as session:
             return session.run(cypher, key=key).data()
 
+    def display_names(self, keys: List[str]) -> Dict[str, str]:
+        """{key: most-mentioned spelling} for the keys that exist (one query; uses the name_lower index)."""
+        if not keys:
+            return {}
+        cypher = f"""
+        MATCH (e:{self._entity}) WHERE e.name_lower IN $keys
+        RETURN e.name_lower AS key, collect({{name: e.{self._name}, freq: coalesce(e.frequency, 0)}}) AS variants
+        """
+        with self._session() as session:
+            rows = session.run(cypher, keys=list(keys)).data()
+        return {r["key"]: self._display_name(r["variants"]) for r in rows if r["variants"]}
+
     @staticmethod
     def _display_name(variants: List[Dict]) -> str:
         """Most-mentioned spelling of the key (ties → alphabetical)."""
@@ -260,6 +272,37 @@ class ExposureStore:
     def get_seeds(self, user_id: str) -> List[Dict]:
         """[{key, role, weight}] — the spread seeds."""
         return [{"key": e["key"], "role": e["role"], "weight": e["weight"]} for e in self.get_exposures(user_id)]
+
+    def neighbours(self, keys: List[str], top: int) -> Dict[str, List[Dict]]:
+        """
+        Entity–entity neighbours of each key, grouped per (key, neighbour key, relationship type):
+        {key: [{key, rel_type, strength, freq}]}, the `top` strongest per key (ties → higher freq, then key).
+        strength = Σ coalesce(r.count, r.weight, 1) across the type variants of both ends (plan C4);
+        MENTIONED_WITH was MERGEd without a direction, so the match is undirected.
+        """
+        if not keys:
+            return {}
+        n_key = f"coalesce(n.name_lower, toLower(trim(n.{self._name})))"
+        cypher = f"""
+        MATCH (s:{self._entity}) WHERE s.name_lower IN $keys
+        MATCH (s)-[r]-(n:{self._entity})
+        WHERE type(r) <> $exposure AND coalesce(n.created_by, '') <> 'user_exposure'
+        WITH s.name_lower AS src, {n_key} AS dst, type(r) AS rel, r, n
+        WHERE dst <> src
+        WITH src, dst, rel, sum(coalesce(r.count, r.weight, 1)) AS strength, collect(DISTINCT n) AS ns
+        RETURN src, dst, rel, strength, reduce(f = 0, x IN ns | f + coalesce(x.frequency, 0)) AS freq
+        """
+        with self._session() as session:
+            rows = session.run(cypher, keys=list(keys), exposure=self._rel).data()
+        out: Dict[str, List[Dict]] = {}
+        for r in rows:
+            out.setdefault(r["src"], []).append(
+                {"key": r["dst"], "rel_type": r["rel"], "strength": float(r["strength"]), "freq": int(r["freq"])}
+            )
+        for src, nbrs in out.items():
+            nbrs.sort(key=lambda n: (-n["strength"], -n["freq"], n["key"]))
+            del nbrs[top:]
+        return out
 
     def _edge(self, r: Dict) -> Dict:
         """Edge properties, tolerating v1 edges that sync_name_lower hasn't migrated yet."""

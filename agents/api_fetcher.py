@@ -23,6 +23,7 @@ from utils.logger import logger
     wait=wait_exponential(multiplier=1, min=2, max=15),
     retry=retry_if_exception_type(requests.exceptions.RequestException),
     reraise=False,
+    retry_error_callback=lambda _: None,   # retries exhausted → None, which callers treat as "no data"
 )
 def _get_json(url: str, params: dict, headers: dict = None) -> Optional[Dict]:
     """Make a GET request and return JSON, with retry logic."""

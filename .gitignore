@@ -21,5 +21,11 @@ __pycache__/
 data/classifier/colab_bundle.zip
 data/classifier/colab_bundle/
 
+# Personalization FAISS index (rebuilt from Mongo: scripts/rebuild_pers_faiss.py)
+data/pers_faiss_*
+
+# Demo persona ids written by scripts/seed_demo_personas.py (read by scripts/smoke_test.py)
+data/demo_personas.json
+
 # Runtime logs (may contain hostnames / connection details)
 logs/

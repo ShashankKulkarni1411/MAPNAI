@@ -58,6 +58,9 @@ v2 **changes** these parts of v1, which is safe because v1 was never committed:
 | C16 | Provenance ∈ declared / proposed / confirmed | Proposals must not change anything silently | No edge is written at proposal time. User-added edges get `declared`. An accepted proposal writes the edge with `confirmed` and `proposal_id`. `proposed` is the proposal doc's `origin`. It is also allowed on an edge only if a later flag wants shadow edges (off) |
 | C17 | Feedback `save`, `needed`, `not_needed`, `missed` | E defines Beta deltas only for more / less / open / dwell | `save` → history (w = 2) with no Beta change. `needed`/`not_needed`/`missed` are logged only, for τ and metrics. Config `beta_deltas`, `history_w` |
 | C18 | Dates | `published_at` is an ISO string with offsets, `ingested_at` is naive | Keep v1's approach: a coarse string prefilter in Mongo, then exact `scoring.parse_ts`. All new collections use BSON Dates |
+| C19 | Alerts scan "`materiality.computed_at` > last successful run" (§5) | `job_cluster` stamps `computed_at` with its start time but writes at its end, so an alerts tick that starts during clustering (both fire at :05) moves the watermark past articles written after it, and they are never scanned | Per-article mark: the alerts job sets `materiality.alerts_scanned_at`, conditional on `computed_at` being unchanged. `set_materiality` replaces the whole subdoc, so any recompute clears it. `jobs alerts --rescan` re-evaluates the window (e.g. after lowering `PERS_ALERT_MIN_M`); the unique (user, cluster) index prevents duplicates |
+| C20 | Render through `init_groq_llm` (C13) | The client's hard-coded `llama-3.3-70b-versatile` returns 404 `model_not_found` for this key (2026-09-29), and it ignores `GROQ_MODEL`. `utils/` is off-limits | Reuse the client, but take the model from `PERS_RENDER_MODEL` (default `openai/gpt-oss-120b`, `reasoning_effort: low`), chosen in a trial against gpt-oss-20b and qwen3. **Agents 2–4 use the same dead default and fall back offline until `utils/groq_client.py` is fixed** |
+| C21 | Source = `summary_long` → `summary_short` → `body[:600]`; fact-check = nothing missing | A short rewrite of a long summary must drop facts, and the check doesn't catch invented numbers | The source is sized for the target length (short → `summary_short` first, medium → `summary_long` first; the body is cut at a sentence end). The check also fails on **added** numbers (number words in the source, e.g. "two", may come back as digits) |
 
 ---
 
@@ -86,7 +89,7 @@ v2 **changes** these parts of v1, which is safe because v1 was never committed:
 | `scripts/rebuild_pers_faiss.py` | one-off full build of the personalization index |
 | `scripts/seed_entity_aliases.py` | + `config/entity_aliases_seed.json` |
 | `scripts/seed_demo_personas.py` | 3 demo users (see Phase 8), created via the service |
-| `scripts/smoke_personalization.py` | end-to-end run against the live DBs with TestClient |
+| `scripts/smoke_test.py` | end-to-end run against the live DBs (TestClient, or `--base-url` for a running API) |
 | `tests/test_pers_*.py` | one per pure module + store (mocked) + API (fake service) |
 
 ### Modified (all v1 files, all uncommitted)
@@ -159,7 +162,8 @@ idx: user_id unique
 entity_keys: [str]                    // multikey index
 cluster_id: str, cluster_size: int, first_report: article_id (earliest in cluster)
 materiality: {m, risk_norm, size_score, first_report: 0|1, source_cred, unscored: bool,
-              risk_seen_at: <risk_processed_at or null>, computed_at: Date}
+              risk_seen_at: <risk_processed_at or null>, computed_at: Date,
+              alerts_scanned_at?: Date}   // set by job_alerts; cleared by every recompute (C19)
 pers_indexed_at: Date                 // present once the article is in the pers FAISS index
 indexes: entity_keys, cluster_id, materiality.m, (published_at desc, materiality.m desc)
 ```
@@ -473,7 +477,7 @@ When several of the article's entities hit pi, the text lists up to 2 more, e.g.
 - With a denominator of 0, τ stays the same (a row is still logged).
 
 **Alerts**
-- Scan articles with `materiality.computed_at > last successful run` and `published ≤ 48h`.
+- Scan articles with `published ≤ 48h` whose current materiality has no `alerts_scanned_at` mark (C19).
 - Look each article's `entity_keys` up in `pi_index` (rebuilt each run from `personas.pi_topk`, which is 500 × users
   in memory, fine).
 - Fire when `need ≥ .5 ∧ m ≥ .6`, with no existing alert for (user, cluster) and `alerts_today < max_per_day`.
@@ -578,16 +582,21 @@ stays at 12 failed / 46 passed.
 
 ### Phase 8: jobs + metrics + demo personas + smoke tests
 - `build_scheduler` in the lifespan, `/admin/metrics`, and health with job last runs.
-- `scripts/seed_demo_personas.py`, with entities checked against the live graph:
-  1. "Football fan": owns/high `manchester city`, follows/medium `england`, topics sports 1.0.
-  2. "Film buff": covers/high a top `entertainment_movies` Person/Org chosen by frequency at seed time;
-     topics entertainment_movies 1.0, sports 0.2.
-  3. "India desk": operates_in/high `india`, regulated_by/medium `who`; topics health, geopolitics.
-- `scripts/smoke_personalization.py`: health → search → create → onboarding → digest → feedback × types → τ job
-  → proposals job → alerts job → render → metrics. It asserts status codes and shapes and prints a summary.
+- `scripts/seed_demo_personas.py`, with entities checked against the live graph (each slot has fallback keys):
+  1. "Club & Team Investor": owns manchester city, chelsea (high), mclaren, red bull (medium), alpine (low);
+     topics sports 1.0, finance 0.3.
+  2. "Film Release Supply-Chain Manager": depends_on netflix, disney (high), ramayana, hollywood, ott (medium),
+     follows drishyam (low); topics entertainment_movies 1.0.
+  3. "Sports Governance & Media Analyst": covers uefa, fifa, espn (high), fia, nfl (medium), nba (low);
+     topics sports 1.0, technology 0.3.
+- `scripts/smoke_test.py`: health → jobs → search → headlines, then per persona profile → digest (fresh + cached)
+  → render → alerts → proposals, and on a scratch clone create → onboarding → PATCH × 4 → digest → feedback × 8
+  types; then the six jobs through `/admin/jobs/{name}/run` → accept/reject proposals → metrics. It asserts status
+  codes and shapes, prints each digest as `section | title | why`, flags must_know overlap > 30% between personas,
+  and deletes the clones (and the τ row it wrote) at the end.
 - **Verify:**
   - `py -3.10 run_api.py` logs the 6 scheduled jobs.
-  - `py -3.10 scripts/smoke_personalization.py` exits with 0.
+  - `python scripts/smoke_test.py` exits with 0.
   - `pytest tests/test_pers_*.py` passes offline (mongomock + fake Neo4j + an in-memory FAISS with 8 dims).
 
 ---
