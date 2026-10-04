@@ -15,6 +15,7 @@ from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_excep
 from config.settings import settings
 from config.sources import RSSSource, ALL_RSS_SOURCES
 from utils.models import RawArticle, SourceType, Domain
+from utils.image_extractor import from_feed_entry
 from utils.logger import logger
 
 
@@ -115,10 +116,12 @@ def fetch_rss_source(
                 domain=Domain(source.domain),
                 published_at=_parse_published(entry),
                 language=source.language,
+                author=(entry.get("author") or "").strip() or None,
                 raw_metadata={
                     "feed_url": source.url,
                     "tags": [t.get("term", "") for t in entry.get("tags", [])],
                 },
+                images=from_feed_entry(entry),
             )
             articles.append(article)
 

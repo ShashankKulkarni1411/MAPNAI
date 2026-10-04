@@ -65,7 +65,7 @@ class TopicsPatch(BaseModel):
 class FeedbackIn(BaseModel):
     user_id: str = Field(min_length=1)
     article_id: str = Field(min_length=1)
-    type: str = Field(description="open|more|less|dwell|save|needed|not_needed|missed")
+    type: str = Field(description="open|more|less|unreact|dwell|save|unsave|share|needed|not_needed|missed")
     value: Optional[float] = Field(default=None, description="dwell seconds")
     section: Optional[str] = Field(default=None, description="default: the section the article was last served in")
 
@@ -230,6 +230,22 @@ def top_articles(
 def story(article_id: str, user_id: Optional[str] = Query(default=None),
           svc: PersonalizationService = Depends(get_service)):
     return svc.story(article_id, user_id)
+
+
+class CommentIn(BaseModel):
+    user_id: str = Field(min_length=1)
+    text: str = Field(min_length=1, max_length=pers_settings.comment_max_chars)
+
+
+@router.get("/articles/{article_id}/comments")
+def list_comments(article_id: str, limit: int = Query(default=50, ge=1, le=pers_settings.comments_page_max),
+                  svc: PersonalizationService = Depends(get_service)):
+    return svc.comments(article_id, limit)
+
+
+@router.post("/articles/{article_id}/comments", status_code=status.HTTP_201_CREATED)
+def add_comment(article_id: str, body: CommentIn, svc: PersonalizationService = Depends(get_service)):
+    return svc.add_comment(article_id, body.user_id, body.text)
 
 
 @router.get("/clusters/by-article/{article_id}")

@@ -4,7 +4,7 @@
 import { API_MODE, http } from './client';
 import { mock } from './mockServer';
 import type {
-  Alert, AlertPrefs, AskAnswer, Digest, EntityHit, Exposure, FeedbackType, FeedPage, Headline, Health,
+  Alert, AlertPrefs, AskAnswer, Comment, Digest, EntityHit, Exposure, FeedbackType, FeedPage, Headline, Health,
   Profile, Proposal, Role, SearchPage, StoryDetail, StoryItem, Style, WeightLevel,
 } from './types';
 
@@ -106,6 +106,14 @@ export const api = {
 
   cluster: (article_id: string) =>
     built ? http<any[]>(`/v1/clusters/by-article/${enc(article_id)}`) : mock.cluster(article_id),
+
+  comments: (article_id: string): Promise<Comment[]> =>
+    built ? http(`/v1/articles/${enc(article_id)}/comments`) : mock.comments(article_id),
+
+  addComment: (id: string, article_id: string, text: string): Promise<Comment> =>
+    built
+      ? http(`/v1/articles/${enc(article_id)}/comments`, { method: 'POST', body: { user_id: id, text } })
+      : mock.addComment(id, article_id, text),
 
   saved: (id: string): Promise<StoryItem[]> => (built ? http(`/v1/users/${enc(id)}/saved`) : mock.saved(id)),
 

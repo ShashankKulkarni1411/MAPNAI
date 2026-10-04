@@ -21,6 +21,7 @@ from utils.text_cleaner import (
     classify_domain, passes_quality_gates, is_english,
 )
 from utils.deduplicator import ArticleDeduplicator
+from utils.image_extractor import build_media
 from utils.logger import logger
 from config.settings import settings
 
@@ -215,6 +216,8 @@ class PreprocessingAgent:
             source_type=raw.source_type,
             domain=domain,
             raw_source=raw.raw_metadata.get("feed_url", "") or str(raw.source_type.value),
+            author=raw.author,
+            media=build_media(raw.images),
             published_at=pub_at,
             ingested_at=datetime.utcnow(),
             language=lang,

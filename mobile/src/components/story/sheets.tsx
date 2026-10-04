@@ -1,15 +1,22 @@
-// W1 Why sheet and W2 Story actions sheet.
-import { Share, View } from 'react-native';
+// W1 Why sheet, W2 Story actions sheet, and the Flash comments sheet.
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useState } from 'react';
+import { Share, TextInput, View } from 'react-native';
 import { router } from 'expo-router';
 
-import type { StoryItem } from '@/api/types';
+import { errorCopy } from '@/api/client';
+import { api } from '@/api/endpoints';
+import { useUserId } from '@/api/hooks';
+import type { Comment, StoryItem } from '@/api/types';
 import { importance, sectionMeaning } from '@/lib/labels';
+import { ageLabel } from '@/lib/time';
 import { hideToday, react, toggleSave, useFeedback } from '@/state/feedback';
+import { fonts, radius, space } from '@/theme/tokens';
 import { useTheme } from '@/theme/useTheme';
 import { Button } from '../Button';
 import { Sheet } from '../Sheet';
 import { Txt } from '../Txt';
-import { Chip, Row } from '../ui';
+import { Chip, InlineError, Row, Skeleton } from '../ui';
 
 export function WhySheet({ item, onClose }: { item: StoryItem | null; onClose: () => void }) {
   const { c } = useTheme();
@@ -67,6 +74,61 @@ export function ActionsSheet({ item, onClose, onWhy }: { item: StoryItem | null;
           <Row title="Why this?" onPress={close(() => onWhy(item))} />
           <Row title="Ask about this story" onPress={close(() => router.push({ pathname: '/ask', params: { article: item.article_id, title: item.title } }))} />
         </View>
+      )}
+    </Sheet>
+  );
+}
+
+const MAX_COMMENT = 500;
+
+export function CommentsSheet({ item, onClose }: { item: StoryItem | null; onClose: () => void }) {
+  const { c } = useTheme();
+  const uid = useUserId();
+  const qc = useQueryClient();
+  const [text, setText] = useState('');
+  const id = item?.article_id ?? '';
+  const list = useQuery({ queryKey: ['comments', id], queryFn: () => api.comments(id), enabled: !!item });
+  const post = useMutation({
+    mutationFn: (t: string) => api.addComment(uid, id, t),
+    onSuccess: (cm) => {
+      qc.setQueryData<Comment[]>(['comments', id], (old) => [cm, ...(old ?? [])]);
+      setText('');
+    },
+  });
+  const body = text.trim();
+  return (
+    <Sheet visible={!!item} onClose={onClose} title="Comments">
+      {item && (
+        <>
+          <Txt v="meta" muted numberOfLines={2}>{item.title}</Txt>
+          <View style={{ flexDirection: 'row', alignItems: 'flex-end', gap: space.sm }}>
+            <TextInput
+              value={text}
+              onChangeText={setText}
+              placeholder="Add a comment"
+              placeholderTextColor={c.ink2}
+              accessibilityLabel="Add a comment"
+              multiline
+              maxLength={MAX_COMMENT}
+              style={{ flex: 1, minHeight: 44, maxHeight: 120, paddingHorizontal: 14, paddingVertical: 10, borderRadius: radius.button, borderWidth: 1.5, borderColor: c.hairline, backgroundColor: c.surface, color: c.ink, fontFamily: fonts.body400, fontSize: 16 }}
+            />
+            <Button label="Post" small disabled={!body || !uid} loading={post.isPending} onPress={() => post.mutate(body)} />
+          </View>
+          {post.isError && <Txt v="meta" color={c.impact} accessibilityLiveRegion="polite">{errorCopy(post.error, "Couldn't post. Try again.")}</Txt>}
+          {list.isLoading && <View style={{ gap: 8 }}><Skeleton h={14} w="40%" /><Skeleton h={16} /><Skeleton h={14} w="30%" /></View>}
+          {list.isError && <InlineError text="Couldn't load comments." onRetry={() => list.refetch()} />}
+          {list.data && list.data.length === 0 && <Txt v="body" muted>No comments yet. Start the conversation.</Txt>}
+          {list.data?.map((cm) => (
+            <View key={cm.comment_id} style={{ gap: 2, paddingBottom: space.sm, borderBottomWidth: 1, borderBottomColor: c.hairline }}
+              accessible accessibilityLabel={`${cm.author_name ?? 'Reader'}: ${cm.text}`}>
+              <View style={{ flexDirection: 'row', gap: 6 }}>
+                <Txt v="metaBold">{cm.user_id === uid ? 'You' : cm.author_name ?? 'Reader'}</Txt>
+                {ageLabel(cm.created_at) && <Txt v="meta" muted>{ageLabel(cm.created_at)}</Txt>}
+              </View>
+              <Txt v="body">{cm.text}</Txt>
+            </View>
+          ))}
+        </>
       )}
     </Sheet>
   );

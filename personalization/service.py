@@ -14,8 +14,9 @@ Phase 5: feedback (section from the last impression), adaptive τ (update_tau), 
 Phase 6: alerts (run_alerts: inverted pi index, thresholds, one per cluster, per-day cap, quiet hours; alerts).
 Phase 7: render (style rewrite through the shared Groq client, cached per style, fact-checked, + persona brief).
 Phase 8: metrics (admin), delete_user (demo seeding / smoke cleanup); the jobs run on APScheduler (jobs.py).
-App views (mobile/): feed, Big today, story page, cluster sources, saved, story search, Ask (Agent 5); the digest,
-         alerts and proposals also carry the fields the app shows (additive).
+App views (mobile/): feed, Big today, story page, cluster sources, saved, story search, Ask (Agent 5), comments; the
+         digest, alerts and proposals also carry the fields the app shows (additive), including each article's
+         ingested images (`media`) and its engagement counts.
 """
 
 import re
@@ -1174,7 +1175,7 @@ class PersonalizationService:
         c = self.cfg
         fields = [c.id_field, c.title_field, c.topic_field, c.url_field, c.source_field, c.published_field,
                   c.entities_field, "entity_keys", "cluster_id", "cluster_size", "first_report", "materiality",
-                  "summary_short", "topic_tags", "risk_level", "urgency_flag", *more]
+                  "summary_short", "summary_long", "topic_tags", "risk_level", "urgency_flag", "media", "author", *more]
         return {"_id": 0, **{f: 1 for f in fields}}
 
     def _story_item(self, doc: Dict, **extra) -> Dict:
@@ -1190,7 +1191,8 @@ class PersonalizationService:
         body = doc.get("body") or ""
         return {
             "article_id": doc[c.id_field], "url": doc.get(c.url_field) or "", "title": doc.get(c.title_field) or "",
-            "summary_short": doc.get("summary_short"), "body_snippet": body[:280] or None,
+            "summary_short": doc.get("summary_short"), "summary_long": doc.get("summary_long"),
+            "body_snippet": body[:280] or None, "media": doc.get("media"), "author": doc.get("author"),
             "source_name": doc.get(c.source_field), "published_at": doc.get(c.published_field),
             "topic": doc.get(c.topic_field), "topic_tags": doc.get("topic_tags") or [], "entities": entities,
             "cluster_id": doc.get("cluster_id"), "cluster_size": doc.get("cluster_size") or 1,
@@ -1230,6 +1232,7 @@ class PersonalizationService:
                 entries += [{"entity": a["entity"], "path": {"seed": a["entity"], "via": []}}
                             for a in wp.get("also") or []]
         names = self._display_names(user_id, docs, entries) if entries else {}
+        counts = self._engagement([i["article_id"] for i in items], user_id)
         out = []
         for i in items:
             doc = docs.get(i["article_id"])
@@ -1238,8 +1241,19 @@ class PersonalizationService:
                 angle = {**angle, "url": docs[angle["article_id"]].get(c.url_field)}
             out.append({**(self._story_item(doc) if doc else {}), **i, "another_angle": angle,
                         "explanation": i.get("why"),
-                        "explanation_parts": self._app_parts(i.get("why_parts") or {}, i.get("topic"), names)})
+                        "explanation_parts": self._app_parts(i.get("why_parts") or {}, i.get("topic"), names),
+                        **counts.get(i["article_id"], {})})
         return out
+
+    def _engagement(self, article_ids: List[str], viewer: Optional[str]) -> Dict[str, Dict]:
+        """{article_id: {"engagement": counts without the viewer, "viewer": their reaction / saved}}; {} on a store error."""
+        try:
+            rows = self.logs.engagement(article_ids, viewer)
+        except Exception as e:
+            logger.warning(f"[Personalization] engagement counts unavailable: {type(e).__name__}: {e}")
+            return {}
+        return {a: {"engagement": {k: v for k, v in r.items() if k != "viewer"},
+                    **({"viewer": r["viewer"]} if viewer else {})} for a, r in rows.items()}
 
     def feed(self, user_id: str, cursor: Optional[str] = None, limit: int = 10,
              exclude: Optional[List[str]] = None) -> Dict:
@@ -1284,11 +1298,14 @@ class PersonalizationService:
         for d in docs:
             best.setdefault(d.get("cluster_id") or d[c.id_field], d)
         out = []
-        for d in list(best.values())[:limit]:
+        picked = list(best.values())[:limit]
+        counts = self._engagement([d[c.id_field] for d in picked], None)
+        for d in picked:
             n = d.get("cluster_size") or 1
             out.append(self._story_item(
                 d, section="big_today", explanation_parts={"kind": "big_today"},
-                explanation=f"Covered by {n} sources" if n > 1 else "One of the most significant stories today"))
+                explanation=f"Covered by {n} sources" if n > 1 else "One of the most significant stories today",
+                **counts.get(d[c.id_field], {})))
         return out
 
     @staticmethod
@@ -1342,6 +1359,35 @@ class PersonalizationService:
                         if d[c.id_field] not in seen]
         return self._story_item(doc, summary_long=doc.get("summary_long"), risk=self._risk(doc), personal=personal,
                                 related=[self._story_item(d) for d in related[: c.related_max]])
+
+    def comments(self, article_id: str, limit: int = 50) -> List[Dict]:
+        """An article's comments, newest first."""
+        if not self.articles.by_ids([article_id], {"_id": 0, self.cfg.id_field: 1}):
+            raise ArticleNotFound(f"article {article_id} not found")
+        return [self._comment_out(d) for d in self.logs.comments_for(article_id, min(limit, self.cfg.comments_page_max))]
+
+    def add_comment(self, article_id: str, user_id: str, text: str) -> Dict:
+        """A reader's comment on an article, shown under their profile name."""
+        c = self.cfg
+        text = re.sub(r"\s+", " ", text or "").strip()
+        if not text:
+            raise InvalidInput("text is empty")
+        if len(text) > c.comment_max_chars:
+            raise InvalidInput(f"text is longer than {c.comment_max_chars} characters")
+        persona = self._require_persona(user_id)
+        if not self.articles.by_ids([article_id], {"_id": 0, c.id_field: 1}):
+            raise ArticleNotFound(f"article {article_id} not found")
+        doc = self.logs.add_comment({"comment_id": str(uuid.uuid4()), "article_id": article_id, "user_id": user_id,
+                                     "author_name": persona.get("name") or "Reader", "text": text, "t": self.clock()})
+        return self._comment_out(doc)
+
+    @staticmethod
+    def _comment_out(doc: Dict) -> Dict:
+        t = doc["t"]
+        if isinstance(t, datetime) and t.tzinfo is None:      # Mongo returns naive UTC
+            t = t.replace(tzinfo=timezone.utc)
+        return {"comment_id": doc["comment_id"], "article_id": doc["article_id"], "user_id": doc["user_id"],
+                "author_name": doc.get("author_name"), "text": doc["text"], "created_at": t}
 
     def cluster_sources(self, article_id: str) -> List[Dict]:
         """Every outlet's version of the article's story (its cluster), oldest first."""

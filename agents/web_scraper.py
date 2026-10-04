@@ -14,6 +14,7 @@ from tenacity import retry, stop_after_attempt, wait_exponential
 from config.settings import settings
 from utils.models import RawArticle, SourceType, Domain
 from utils.text_cleaner import normalize_timestamp
+from utils.image_extractor import from_html
 from utils.logger import logger
 
 
@@ -152,6 +153,7 @@ def scrape_target(target: dict, max_articles: int = 10) -> List[RawArticle]:
                 published_at=None,   # Timestamp extracted during preprocessing if available
                 language="en",
                 raw_metadata={"scraped_from": listing_url},
+                images=from_html(soup, url),
             ))
 
         except Exception as e:

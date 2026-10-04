@@ -98,14 +98,15 @@ function haptic() {
 }
 
 // More / Less share one slot per story: switching within the window replaces the pending event,
-// tapping the same control again removes it.
+// tapping the same control again removes it (an `unreact` goes out when the reaction was already sent).
 export function react(article_id: string, kind: 'more' | 'less') {
   const slot = `${article_id}:reaction`;
   const cur = useFeedback.getState().reaction[article_id];
   haptic();
   if (cur === kind) {
     useFeedback.setState((s) => ({ reaction: { ...s.reaction, [article_id]: undefined } }));
-    cancel(slot);
+    if (useFeedback.getState().pending[slot]) cancel(slot);
+    else queue(slot, { article_id, type: 'unreact' });
     return;
   }
   useFeedback.setState((s) => ({ reaction: { ...s.reaction, [article_id]: kind } }));
@@ -149,8 +150,22 @@ export function calibrate(article_id: string, kind: 'needed' | 'not_needed' | 'm
   });
 }
 
-// open / dwell: no undo, once per story per day
-export function implicit(article_id: string, type: 'open' | 'dwell', value?: number) {
+// Server-side reaction / save for stories this session hasn't touched (the feed carries `viewer`)
+export function hydrate(items: { article_id: string; viewer?: { reaction: 'more' | 'less' | null; saved: boolean } }[]) {
+  useFeedback.setState((s) => {
+    const reaction = { ...s.reaction };
+    const saved = { ...s.saved };
+    for (const i of items) {
+      if (!i.viewer) continue;
+      if (!(i.article_id in reaction)) reaction[i.article_id] = i.viewer.reaction ?? undefined;
+      if (!(i.article_id in saved)) saved[i.article_id] = i.viewer.saved;
+    }
+    return { reaction, saved };
+  });
+}
+
+// open / dwell / share: no undo, once per story per day
+export function implicit(article_id: string, type: 'open' | 'dwell' | 'share', value?: number) {
   const uid = useSession.getState().userId;
   const key = `${uid}|${article_id}|${type}|${isoDate()}`;
   if (useFeedback.getState().sent[key]) return;

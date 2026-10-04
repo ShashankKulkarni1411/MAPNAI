@@ -67,6 +67,11 @@ class Settings(BaseSettings):
     min_article_length: int = Field(default=100, env="MIN_ARTICLE_LENGTH")
     request_timeout_seconds: int = Field(default=15, env="REQUEST_TIMEOUT_SECONDS")
     max_retries: int = Field(default=3, env="MAX_RETRIES")
+    # Article images: when the feed/API gave no usable hero image, read og:image / JSON-LD from the article page
+    media_page_lookup: bool = Field(default=True, env="MEDIA_PAGE_LOOKUP")
+    media_lookup_workers: int = Field(default=8, env="MEDIA_LOOKUP_WORKERS")
+    media_lookup_timeout_seconds: int = Field(default=8, env="MEDIA_LOOKUP_TIMEOUT_SECONDS")
+    media_lookup_max: int = Field(default=400, env="MEDIA_LOOKUP_MAX")   # page fetches per run
 
     # ── Language ─────────────────────────────────────────────
     primary_language: str = Field(default="en", env="PRIMARY_LANGUAGE")

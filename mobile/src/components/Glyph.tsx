@@ -4,7 +4,8 @@ import Svg, { Circle, Path, Rect } from 'react-native-svg';
 export type GlyphName =
   | 'ball' | 'film' | 'globe' | 'person' | 'link' | 'echo' | 'compass' | 'spotlight' | 'stack' | 'bell'
   | 'search' | 'dots' | 'back' | 'close' | 'chevron' | 'home' | 'flash' | 'insights' | 'profile' | 'ask'
-  | 'check' | 'heart' | 'skip' | 'undo' | 'share' | 'bookmark' | 'plus' | 'gear' | 'alert';
+  | 'check' | 'heart' | 'skip' | 'undo' | 'share' | 'bookmark' | 'plus' | 'gear' | 'alert'
+  | 'thumbUp' | 'thumbDown' | 'comment' | 'forward';
 
 type Props = { name: GlyphName; size?: number; color: string; filled?: boolean };
 
@@ -70,6 +71,14 @@ export function Glyph({ name, size = 18, color, filled }: Props) {
         return (<><Circle cx={12} cy={12} r={3} {...p} /><Path d="M12 2v3 M12 19v3 M2 12h3 M19 12h3 M4.9 4.9l2.1 2.1 M17 17l2.1 2.1 M4.9 19.1L7 17 M17 7l2.1-2.1" {...p} /></>);
       case 'alert':
         return <Path d="M12 3l9 17H3z M12 10v4 M12 17h.01" {...p} />;
+      case 'thumbUp':
+        return (<><Path d="M7 10v11" {...p} /><Path d="M15 5.9L14 10h5.8a2 2 0 011.9 2.6l-2.3 8a2 2 0 01-1.9 1.4H4a2 2 0 01-2-2v-8a2 2 0 012-2h2.8a2 2 0 001.8-1.1L12 2a3.1 3.1 0 013 3.9z" {...p} fill={filled ? color : 'none'} /></>);
+      case 'thumbDown':
+        return (<><Path d="M17 14V3" {...p} /><Path d="M9 18.1L10 14H4.2a2 2 0 01-1.9-2.6l2.3-8A2 2 0 016.5 2H20a2 2 0 012 2v8a2 2 0 01-2 2h-2.8a2 2 0 00-1.8 1.1L12 22a3.1 3.1 0 01-3-3.9z" {...p} fill={filled ? color : 'none'} /></>);
+      case 'comment':
+        return <Path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z M8 9h8 M8 13h5" {...p} />;
+      case 'forward':
+        return <Path d="M15 17l5-5-5-5 M4 18v-2a4 4 0 014-4h12" {...p} />;
     }
   })();
   return (

@@ -40,6 +40,21 @@ class SentimentLabel(str, Enum):
     NEUTRAL  = "neutral"
 
 
+# ── Article images (utils/image_extractor.py) ────────────────
+class ArticleImage(BaseModel):
+    """One image referenced at its original URL. width/height only when the source states them."""
+    url:     str
+    width:   Optional[int] = None
+    height:  Optional[int] = None
+    alt:     Optional[str] = None
+    source:  str = ""                  # og:image | json-ld | twitter:image | media:content | enclosure | api | …
+
+
+class ArticleMedia(BaseModel):
+    primary_image:     Optional[ArticleImage] = None
+    additional_images: List[ArticleImage]     = Field(default_factory=list)
+
+
 # ── Raw article (pre-preprocessing) ─────────────────────────
 class RawArticle(BaseModel):
     """Produced by source fetchers. Not yet cleaned or deduplicated."""
@@ -49,10 +64,12 @@ class RawArticle(BaseModel):
     url:           str           = ""
     source_name:   str
     source_type:   SourceType
+    author:        Optional[str] = None
     domain:        Domain        = Domain.GENERAL
     published_at:  Optional[datetime] = None
     language:      str           = "unknown"
     raw_metadata:  Dict[str, Any] = Field(default_factory=dict)
+    images:        List[Dict[str, Any]] = Field(default_factory=list)   # candidates, ranked in preprocessing
 
 
 # ── Processed article (post-preprocessing) ───────────────────
@@ -73,6 +90,7 @@ class ProcessedArticle(BaseModel):
     source_type:    SourceType
     domain:         Domain
     raw_source:     str      = ""     # original feed URL or API name
+    author:         Optional[str] = None
 
     # ── Timestamps (ISO 8601 UTC) ─────────────────────────────
     published_at:   Optional[datetime] = None
@@ -103,6 +121,9 @@ class ProcessedArticle(BaseModel):
     # ── Summaries (filled by Summarization Agent — later) ─────
     summary_short:   Optional[str]   = None
     summary_long:    Optional[str]   = None
+
+    # ── Images (hero + extras, original URLs; None = none found) ─
+    media:           Optional[ArticleMedia] = None
 
     # ── Vector store reference ────────────────────────────────
     embedding_id:    Optional[str]   = None

@@ -79,6 +79,7 @@ export const type = {
   cardHeadline: { fontFamily: fonts.head600, fontSize: 20, lineHeight: 24 },
   compactHeadline: { fontFamily: fonts.head600, fontSize: 17, lineHeight: 22 },
   summary: { fontFamily: fonts.body400, fontSize: 17, lineHeight: 26 },
+  flashSummary: { fontFamily: fonts.body400, fontSize: 16, lineHeight: 24 },
   storySummary: { fontFamily: fonts.body400, fontSize: 18, lineHeight: 28 },
   body: { fontFamily: fonts.body400, fontSize: 16, lineHeight: 22 },
   why: { fontFamily: fonts.body700, fontSize: 15, lineHeight: 20 },

@@ -6,7 +6,8 @@ This is the single entry point for one complete ingestion run.
 
 Pipeline flow:
   1. Fetch from RSS + APIs + Bluesky Firehose + Scrapers (parallel)
-  2. Preprocess batch (clean, dedupe, classify, normalize)
+  2. Preprocess batch (clean, dedupe, classify, normalize, rank feed images)
+  2b. Article images: page lookup (og:image / JSON-LD) for articles the feed gave no good image
   3. Enrich with entities (spaCy NER; Agent 1 re-runs NER with fine-tuned BERT)
   4. Store to MongoDB + FAISS + Neo4j (simultaneous)
   5. Log run statistics
@@ -28,6 +29,7 @@ from agents.bluesky_fetcher    import fetch_all_bluesky
 from agents.web_scraper        import scrape_all_targets
 from agents.preprocessing_agent import PreprocessingAgent
 from agents.enrichment_agent   import EnrichmentAgent
+from agents.media_agent        import MediaAgent
 
 from storage.mongo_store  import MongoStore
 from storage.faiss_store  import FAISSStore
@@ -123,6 +125,13 @@ def _preprocess_phase(
         f"Quality dropped={stats['failed_quality']}"
     )
     return processed
+
+
+# ── Phase 2b: Article images ─────────────────────────────────
+
+def _media_phase(articles: List[ProcessedArticle]) -> List[ProcessedArticle]:
+    """Page lookup for articles without a good hero image. Failures leave articles unchanged."""
+    return MediaAgent().enrich_batch(articles)
 
 
 # ── Phase 3: Enrich ──────────────────────────────────────────
@@ -238,6 +247,12 @@ def run_ingestion_pipeline() -> IngestionRunStats:
         logger.error(f"[Pipeline] Preprocess phase failed: {e}")
         run_stats.errors.append(f"preprocess:{e}")
         processed = []
+
+    # ── Phase 2b: Article images ─────────────────────────────
+    try:
+        processed = _media_phase(processed)
+    except Exception as e:
+        logger.warning(f"[Pipeline] Media phase warning (non-fatal): {e}")
 
     # ── Phase 3: Enrich ──────────────────────────────────────
     try:

@@ -13,6 +13,7 @@ from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_excep
 from config.settings import settings
 from utils.models import RawArticle, SourceType, Domain
 from utils.text_cleaner import normalize_timestamp
+from utils.image_extractor import candidate
 from utils.logger import logger
 
 
@@ -129,7 +130,9 @@ class NewsAPIFetcher:
                 domain=Domain(domain),
                 published_at=normalize_timestamp(item.get("publishedAt")),
                 language="en",
+                author=(item.get("author") or "").strip() or None,
                 raw_metadata={"author": item.get("author", ""), "query": query},
+                images=[c for c in [candidate(item.get("urlToImage"), "api")] if c],
             ))
 
         logger.info(f"[NewsAPI] Fetched {len(articles)} articles for query: '{query[:40]}'")
@@ -200,6 +203,7 @@ class GNewsFetcher:
                 published_at=normalize_timestamp(item.get("publishedAt")),
                 language="en",
                 raw_metadata={"query": query},
+                images=[c for c in [candidate(item.get("image"), "api")] if c],
             ))
 
         logger.info(f"[GNews] Fetched {len(articles)} for '{query[:40]}'")
@@ -269,10 +273,13 @@ class NewsDataFetcher:
                 domain=Domain(domain),
                 published_at=normalize_timestamp(item.get("pubDate")),
                 language=item.get("language", "en"),
+                author=(", ".join(item["creator"]) if isinstance(item.get("creator"), list)
+                        else item.get("creator")) or None,
                 raw_metadata={
                     "keywords": item.get("keywords", []),
                     "query":    query,
                 },
+                images=[c for c in [candidate(item.get("image_url"), "api")] if c],
             ))
 
         logger.info(f"[NewsData] Fetched {len(articles)} for '{query[:40]}'")

@@ -28,7 +28,8 @@
       "expo-font",
       "expo-secure-store",
       "expo-web-browser",
-      "expo-localization"
+      "expo-localization",
+      "expo-image"
     ],
     "scheme": "mapnai",
     "backgroundColor": "#0F1B2D",

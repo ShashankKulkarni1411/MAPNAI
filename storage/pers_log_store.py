@@ -3,6 +3,7 @@ MAPNAI — storage/pers_log_store.py
 Mongo collections owned by the personalization engine (PERSONALIZATION_PLAN.md §2.2).
 Phase 1: entity_aliases and feedback. Phase 2: job_runs. Phase 4: impressions, digests, thresholds (read: current τ).
 Phase 5: thresholds (write), feedback/impression windows for τ, proposals. Phase 6: alerts. Phase 7: render_cache.
+App views: per-article engagement counts (from feedback) and comments.
 """
 
 import re
@@ -39,6 +40,10 @@ class PersLogStore:
         feedback = db[self.cfg.feedback_collection]
         feedback.create_index([("user_id", ASCENDING), ("t", DESCENDING)])
         feedback.create_index([("type", ASCENDING), ("t", DESCENDING)])
+        feedback.create_index([("article_id", ASCENDING), ("type", ASCENDING)])
+        comments = db[self.cfg.comments_collection]
+        comments.create_index([("article_id", ASCENDING), ("t", DESCENDING)])
+        comments.create_index([("comment_id", ASCENDING)], unique=True)
         db[self.cfg.job_runs_collection].create_index([("job", ASCENDING), ("started_at", DESCENDING)])
         impressions = db[self.cfg.impressions_collection]
         impressions.create_index([("user_id", ASCENDING), ("t", DESCENDING)])
@@ -118,6 +123,58 @@ class PersLogStore:
         for d in cursor:
             latest.setdefault(d["article_id"], d["type"])
         return [a for a, t in latest.items() if t == "save"]
+
+    def engagement(self, article_ids: List[str], viewer: Optional[str] = None) -> Dict[str, Dict]:
+        """
+        {article_id: {likes, dislikes, comments, saves, shares, viewer}} from the feedback log. Likes / dislikes are
+        readers whose latest more / less / unreact is more / less; saves those whose latest save / unsave is a save;
+        shares distinct sharers. The viewer is left out of every count and reported in `viewer`
+        ({reaction: "more" | "less" | None, saved}), so the app can add its own on-screen state once.
+        """
+        ids = list(dict.fromkeys(a for a in article_ids if a))
+        if not ids:
+            return {}
+        reaction: Dict[Tuple[str, str], str] = {}
+        saved: Dict[Tuple[str, str], bool] = {}
+        sharers: Dict[str, set] = {}
+        cursor = self._col(self.cfg.feedback_collection).find(
+            {"article_id": {"$in": ids}, "type": {"$in": ["more", "less", "unreact", "save", "unsave", "share"]}},
+            {"_id": 0, "user_id": 1, "article_id": 1, "type": 1}).sort([("t", ASCENDING), ("_id", ASCENDING)])
+        for d in cursor:
+            key, kind = (d["article_id"], d["user_id"]), d["type"]
+            if kind in ("more", "less", "unreact"):
+                reaction[key] = kind
+            elif kind in ("save", "unsave"):
+                saved[key] = kind == "save"
+            elif d["user_id"] != viewer:
+                sharers.setdefault(d["article_id"], set()).add(d["user_id"])
+        comments: Dict[str, int] = {}
+        for d in self._col(self.cfg.comments_collection).find({"article_id": {"$in": ids}}, {"_id": 0, "article_id": 1}):
+            comments[d["article_id"]] = comments.get(d["article_id"], 0) + 1
+        out = {a: {"likes": 0, "dislikes": 0, "comments": comments.get(a, 0), "saves": 0,
+                   "shares": len(sharers.get(a, ())), "viewer": {"reaction": None, "saved": False}} for a in ids}
+        for (a, u), kind in reaction.items():
+            if u == viewer:
+                out[a]["viewer"]["reaction"] = kind if kind != "unreact" else None
+            elif kind != "unreact":
+                out[a]["likes" if kind == "more" else "dislikes"] += 1
+        for (a, u), on in saved.items():
+            if u == viewer:
+                out[a]["viewer"]["saved"] = on
+            elif on:
+                out[a]["saves"] += 1
+        return out
+
+    # ── Comments ─────────────────────────────────────────────
+
+    def add_comment(self, doc: Dict) -> Dict:
+        self._col(self.cfg.comments_collection).insert_one(dict(doc))
+        return {k: v for k, v in doc.items() if k != "_id"}
+
+    def comments_for(self, article_id: str, limit: int) -> List[Dict]:
+        """An article's comments, newest first."""
+        return list(self._col(self.cfg.comments_collection).find({"article_id": article_id}, {"_id": 0})
+                    .sort([("t", DESCENDING), ("_id", DESCENDING)]).limit(limit))
 
     def feedback_window(self, since: datetime, types: List[str], user_id: Optional[str] = None) -> List[Dict]:
         """Feedback of the given types from `since` on (one user or all), oldest first."""
@@ -260,7 +317,7 @@ class PersLogStore:
         return {
             name: self._col(name).delete_many({"user_id": user_id}).deleted_count
             for name in (c.feedback_collection, c.impressions_collection, c.digests_collection,
-                         c.proposals_collection, c.alerts_collection)
+                         c.proposals_collection, c.alerts_collection, c.comments_collection)
         }
 
     def drop_tau_since(self, since: datetime) -> int:

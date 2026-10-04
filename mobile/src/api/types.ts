@@ -82,11 +82,24 @@ export type ExplanationParts = {
   also?: string[];
 };
 
+// Images come from ingestion (og:image / JSON-LD / feed media), referenced at the publisher's URL
+export type ArticleImage = { url: string; width?: number | null; height?: number | null; alt?: string | null; source?: string };
+export type ArticleMedia = { primary_image: ArticleImage | null; additional_images: ArticleImage[] };
+
+// Counts from the feedback log and comments, leaving the viewer out; `viewer` is their own reaction / save
+export type Engagement = { likes: number; dislikes: number; comments: number; saves: number; shares: number };
+export type ViewerState = { reaction: 'more' | 'less' | null; saved: boolean };
+
 export type StoryItem = {
   article_id: string;
   url: string;
   title: string;
   summary_short?: string | null;
+  summary_long?: string | null;
+  media?: ArticleMedia | null;
+  author?: string | null;
+  engagement?: Engagement;
+  viewer?: ViewerState;
   summary_text?: string | null; // Proposed: rendered in the user's style
   body_snippet?: string | null;
   source_name?: string | null;
@@ -120,7 +133,6 @@ export type Digest = {
 export type FeedPage = { items: StoryItem[]; next_cursor: string | null; exhausted: boolean; window_h: number };
 
 export type StoryDetail = StoryItem & {
-  summary_long?: string | null;
   risk?: {
     score: number;
     level: RiskLevel;
@@ -133,7 +145,16 @@ export type StoryDetail = StoryItem & {
 };
 
 export type FeedbackType =
-  | 'more' | 'less' | 'save' | 'unsave' | 'share' | 'open' | 'dwell' | 'needed' | 'not_needed' | 'missed';
+  | 'more' | 'less' | 'unreact' | 'save' | 'unsave' | 'share' | 'open' | 'dwell' | 'needed' | 'not_needed' | 'missed';
+
+export type Comment = {
+  comment_id: string;
+  article_id: string;
+  user_id: string;
+  author_name: string | null;
+  text: string;
+  created_at: string;
+};
 
 export type Alert = {
   alert_id: string;

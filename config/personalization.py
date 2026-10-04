@@ -67,6 +67,7 @@ class PersonalizationSettings(BaseSettings):
     alerts_collection: str = "alerts"
     render_cache_collection: str = "render_cache"
     job_runs_collection: str = "job_runs"
+    comments_collection: str = "comments"
     job_lease_s: int = 3600
 
     # ── Neo4j labels / properties ────────────────────────────
@@ -189,8 +190,9 @@ class PersonalizationSettings(BaseSettings):
     why_min_need_lift: float = 0.01      # for_you: name the exposure only if need_bonus · need adds this much to rel
 
     # ── I. Feedback / τ / proposals ──────────────────────────
-    feedback_types: List[str] = ["open", "more", "less", "dwell", "save", "unsave", "share", "needed", "not_needed",
-                                 "missed"]
+    # unreact: the reader took back their more/less (logged for the reaction counts; no Beta change)
+    feedback_types: List[str] = ["open", "more", "less", "unreact", "dwell", "save", "unsave", "share", "needed",
+                                 "not_needed", "missed"]
     read_feedback_types: List[str] = ["open", "more", "save", "dwell"]      # these mark an article as read
     # τ ← clip(τ − tau_step·(miss_rate − miss_target), tau_min, tau_max), miss_rate = missed / (missed + needed)
     # over the last tau_window_d days; `needed` counts only on an article served in tau_section
@@ -241,6 +243,8 @@ class PersonalizationSettings(BaseSettings):
     related_max: int = 5                 # story page: related stories (cluster mates, then shared entities)
     story_search_scan: int = 200         # newest matching articles ranked per search
     story_search_limit: int = 30
+    comment_max_chars: int = 500
+    comments_page_max: int = 100
 
     # ── L. Jobs (cron, in tz) ────────────────────────────────
     job_pi_topk: str = "0 1 * * *"

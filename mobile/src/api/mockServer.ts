@@ -6,7 +6,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { ApiError } from './client';
 import { ARTICLES, COMENTIONS, ENTITIES, FixtureArticle } from './fixtures';
 import type {
-  Alert, AlertPrefs, AskAnswer, Digest, EntityHit, Exposure, FeedbackType, FeedPage, Headline, Health,
+  Alert, AlertPrefs, AskAnswer, Comment, Digest, EntityHit, Exposure, FeedbackType, FeedPage, Headline, Health,
   Profile, Proposal, Role, SearchPage, Section, StoryDetail, StoryItem, Style, WeightLevel,
 } from './types';
 
@@ -28,7 +28,7 @@ type MockUser = {
   created_at: string;
 };
 type Account = { email: string; password: string; birthYear: number; verified: boolean; user_id?: string };
-type DB = { users: Record<string, MockUser>; accounts: Record<string, Account> };
+type DB = { users: Record<string, MockUser>; accounts: Record<string, Account>; comments?: Comment[] };
 
 let db: DB | null = null;
 
@@ -104,6 +104,8 @@ function toItem(a: FixtureArticle, section?: Section, slot?: number, extra?: Par
     url: `https://example.com/${a.id}`,
     title: a.title,
     summary_short: a.summary,
+    summary_long: a.summaryLong ?? null,
+    media: null, // fixtures have no ingested images: Flash shows its no-image treatment in mock mode
     body_snippet: a.body ?? null,
     source_name: a.source,
     published_at: ago(a.ageH),
@@ -453,6 +455,21 @@ export const mock = {
     else u.rejected.push(key);
     void save();
     return { ok: true };
+  },
+
+  async comments(article_id: string): Promise<Comment[]> {
+    await delay(150);
+    const d = await load();
+    return (d.comments ?? []).filter((c) => c.article_id === article_id).reverse();
+  },
+
+  async addComment(id: string, article_id: string, text: string): Promise<Comment> {
+    const u = await user(id);
+    const d = await load();
+    const c: Comment = { comment_id: uuid(), article_id, user_id: id, author_name: u.name, text: text.trim(), created_at: nowIso() };
+    d.comments = [...(d.comments ?? []), c];
+    void save();
+    return c;
   },
 
   async saved(id: string): Promise<StoryItem[]> {

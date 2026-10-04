@@ -189,3 +189,60 @@ class TestApi:
         dsvc._query_agent = FakeAgent([])
         assert client.post("/v1/ask", json={"query": "Why?"}).json()["answer"] is None
         assert client.post("/v1/ask", json={"query": ""}).status_code == 422
+
+
+class TestFlashFields:
+    """Images, the full summary, engagement counts and comments on the items Flash renders."""
+
+    def test_media_and_summary_long_pass_through(self, dsvc):
+        media = {"primary_image": {"url": "https://img.example/hero.jpg", "width": 1200, "height": 630,
+                                   "alt": None, "source": "og:image"}, "additional_images": []}
+        dsvc.mongo.db.processed_articles.update_one({"article_id": "mk-s1"},
+                                                    {"$set": {"media": media, "summary_long": "Long. Summary."}})
+        top = dsvc.get_digest("u1")["items"][0]
+        assert top["article_id"] == "mk-s1" and top["media"] == media and top["summary_long"] == "Long. Summary."
+        assert dsvc.feed("u1", None, 30, [])["items"][1]["media"] is None   # no image ingested: null, not invented
+
+    def test_engagement_counts_leave_the_viewer_out(self, dsvc):
+        fb = dsvc.mongo.db.feedback
+        rows = [("u2", "more"), ("u3", "more"), ("u4", "less"), ("u3", "unreact"), ("u2", "save"), ("u2", "share"),
+                ("u2", "share"), ("u1", "more"), ("u1", "save"), ("u1", "unsave")]
+        fb.insert_many([{"user_id": u, "article_id": "mk-s1", "type": t, "t": NOW + timedelta(seconds=i)}
+                        for i, (u, t) in enumerate(rows)])
+        row = dsvc.logs.engagement(["mk-s1"], "u1")["mk-s1"]
+        assert row == {"likes": 1, "dislikes": 1, "comments": 0, "saves": 1, "shares": 1,
+                       "viewer": {"reaction": "more", "saved": False}}
+        big = next(i for i in dsvc.top(48, 50) if i["article_id"] == "mk-s1")
+        assert big["engagement"]["likes"] == 2 and "viewer" not in big   # no viewer: everyone counts
+        fb.delete_many({"user_id": "u1"})                                  # (the viewer's more marks it read)
+        top = dsvc.get_digest("u1", refresh=True)["items"][0]
+        assert top["article_id"] == "mk-s1" and top["engagement"]["likes"] == 1
+        assert top["viewer"] == {"reaction": None, "saved": False}
+
+    def test_comments(self, dsvc):
+        with pytest.raises(InvalidInput):
+            dsvc.add_comment("mk-s1", "u1", "   ")
+        with pytest.raises(ArticleNotFound):
+            dsvc.add_comment("nope", "u1", "hi")
+        first = dsvc.add_comment("mk-s1", "u1", "  Big   news ")
+        assert first["text"] == "Big news" and first["author_name"] == "Ana"
+        dsvc.clock = lambda: NOW + timedelta(minutes=1)
+        dsvc.add_comment("mk-s1", "u1", "Second")
+        listed = dsvc.comments("mk-s1")
+        assert [c["text"] for c in listed] == ["Second", "Big news"]
+        assert all(c["created_at"].tzinfo is not None for c in listed)      # read back from Mongo as UTC
+        assert dsvc.get_digest("u1")["items"][0]["engagement"]["comments"] == 2
+
+    def test_unreact_is_feedback_without_beta(self, dsvc):
+        out = dsvc.record_feedback("u1", "mk-s1", "unreact")
+        assert out["beta_deltas"] == {} and out["history_added"] is False
+
+    def test_comment_routes(self, dsvc):
+        app = create_app()
+        app.dependency_overrides[get_service] = lambda: dsvc
+        client = TestClient(app)
+        r = client.post("/v1/articles/mk-s1/comments", json={"user_id": "u1", "text": "Hello"})
+        assert r.status_code == 201 and r.json()["author_name"] == "Ana"
+        assert [c["text"] for c in client.get("/v1/articles/mk-s1/comments").json()] == ["Hello"]
+        assert client.post("/v1/articles/mk-s1/comments", json={"user_id": "u1", "text": "x" * 501}).status_code == 422
+        assert client.get("/v1/articles/nope/comments").status_code == 404
