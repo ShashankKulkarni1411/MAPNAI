@@ -1,10 +1,10 @@
-// F1 Flash story page: the article's ingested image full-bleed behind the text (faded into the background so the
-// text stays readable), a reels-style action rail on the right, and why this story was picked under the summary.
+// F1 Flash story page: the article's ingested image across the top 40–55% (fading into the page only at its lower
+// edge), the story below it, a slim reels-style action rail on the right, and why this story was picked under the summary.
 import { useQuery } from '@tanstack/react-query';
 import { Image } from 'expo-image';
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { Pressable, Share, StyleSheet, View } from 'react-native';
+import { LayoutChangeEvent, Pressable, Share, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Defs, LinearGradient, Rect, Stop } from 'react-native-svg';
 
@@ -23,7 +23,11 @@ import { Chip } from '../ui';
 import { Badges, openStory } from './StoryCard';
 import { WhyLine } from './why';
 
-const RAIL_W = 60;
+const RAIL_W = 48;
+const IMAGE_MIN = 0.4; // of the page, status bar included
+const IMAGE_MAX = 0.55;
+const SUMMARY_LH = 23; // type.flashSummary.lineHeight
+const SUMMARY_MAX = 5;
 
 export function heroImage(item: StoryItem): ArticleImage | null {
   return item.media?.primary_image ?? null;
@@ -42,16 +46,15 @@ export function compactCount(n: number): string {
 }
 
 // Fades the picture into the page colour: a light scrim under the progress bar, clear through the middle,
-// solid behind the text
+// melting into the page over the bottom edge where the story starts
 function Fade({ color }: { color: string }) {
   return (
     <Svg style={StyleSheet.absoluteFill} width="100%" height="100%" preserveAspectRatio="none">
       <Defs>
         <LinearGradient id="flashFade" x1="0" y1="0" x2="0" y2="1">
-          <Stop offset="0" stopColor={color} stopOpacity={0.55} />
-          <Stop offset="0.18" stopColor={color} stopOpacity={0} />
-          <Stop offset="0.45" stopColor={color} stopOpacity={0.08} />
-          <Stop offset="0.78" stopColor={color} stopOpacity={0.88} />
+          <Stop offset="0" stopColor={color} stopOpacity={0.5} />
+          <Stop offset="0.2" stopColor={color} stopOpacity={0} />
+          <Stop offset="0.7" stopColor={color} stopOpacity={0} />
           <Stop offset="1" stopColor={color} stopOpacity={1} />
         </LinearGradient>
       </Defs>
@@ -75,8 +78,8 @@ function NoImage({ item }: { item: StoryItem }) {
         </Defs>
         <Rect x="0" y="0" width="100%" height="100%" fill="url(#flashTint)" />
       </Svg>
-      <View style={{ opacity: 0.22, marginBottom: '25%' }}>
-        <Glyph name={topicGlyph(item.topic)} size={112} color={tint} />
+      <View style={{ opacity: 0.22 }}>
+        <Glyph name={topicGlyph(item.topic)} size={88} color={tint} />
       </View>
     </View>
   );
@@ -115,8 +118,8 @@ function SourceMark({ name }: { name: string }) {
   const { c } = useTheme();
   const initials = name.split(/[\s.-]+/).filter(Boolean).slice(0, 2).map((w) => w[0]).join('').toUpperCase();
   return (
-    <View style={{ width: 34, height: 34, borderRadius: 17, backgroundColor: c.ink, alignItems: 'center', justifyContent: 'center' }}>
-      <Txt v="label" color={c.bg}>{initials || '•'}</Txt>
+    <View style={{ width: 22, height: 22, borderRadius: 11, backgroundColor: c.ink, alignItems: 'center', justifyContent: 'center' }}>
+      <Txt v="label" color={c.bg} style={{ fontSize: 9, lineHeight: 11, letterSpacing: 0 }}>{initials || '•'}</Txt>
     </View>
   );
 }
@@ -147,14 +150,14 @@ function FollowButton({ item }: { item: StoryItem }) {
         onPress={() => setEditing(f ? { key: f.key, name: f.name, role: f.role, weight: f.weight } : { key: target.key, name: target.name, role: 'follows', weight: 2 })}
         accessibilityRole="button"
         accessibilityLabel={f ? `Following ${target.name}. Edit` : `Follow ${target.name}`}
-        hitSlop={6}
+        hitSlop={10}
         style={({ pressed }) => ({
-          minHeight: 32, maxWidth: 150, flexShrink: 1, paddingHorizontal: 12, borderRadius: radius.chip, borderWidth: 1.5,
-          borderColor: f ? c.hairline : c.ink, flexDirection: 'row', alignItems: 'center', gap: 4, opacity: pressed ? 0.7 : 1,
+          minHeight: 22, maxWidth: 140, flexShrink: 1, marginLeft: 2, paddingHorizontal: 8, borderRadius: radius.chip, borderWidth: 1,
+          borderColor: c.hairline, flexDirection: 'row', alignItems: 'center', gap: 3, opacity: pressed ? 0.7 : 1,
         })}
       >
-        {!f && <Glyph name="plus" size={14} color={c.ink} />}
-        <Txt v="metaBold" color={c.ink} numberOfLines={1} style={{ flexShrink: 1 }}>{f ? `Following ${target.name}` : target.name}</Txt>
+        {!f && <Glyph name="plus" size={11} color={c.ink2} />}
+        <Txt v="label" color={c.ink2} numberOfLines={1} style={{ flexShrink: 1 }}>{f ? `Following ${target.name}` : target.name}</Txt>
       </Pressable>
       <ConnectionSheet value={editing} onClose={() => setEditing(null)} onSave={save} saving={follow.isPending}
         onRemove={f ? remove : undefined} />
@@ -173,10 +176,10 @@ function RailButton({ icon, label, count, active, activeColor, onPress }: {
       accessibilityLabel={count > 0 ? `${label}, ${count}` : label}
       accessibilityState={{ selected: !!active }}
       hitSlop={4}
-      style={({ pressed }) => ({ alignItems: 'center', justifyContent: 'center', minWidth: 52, minHeight: 58, gap: 3, opacity: pressed ? 0.6 : 1 })}
+      style={({ pressed }) => ({ alignItems: 'center', justifyContent: 'center', minWidth: 44, minHeight: 44, gap: 2, opacity: pressed ? 0.6 : 1 })}
     >
-      <Glyph name={icon} size={30} color={active ? activeColor ?? c.ink : c.ink} filled={active} />
-      <Txt v="label" color={c.ink} tabular>{count > 0 ? compactCount(count) : label}</Txt>
+      <Glyph name={icon} size={23} color={active ? activeColor ?? c.ink : c.ink} filled={active} />
+      <Txt v="label" color={c.ink2} tabular style={{ fontSize: 10, lineHeight: 13, letterSpacing: 0.1 }}>{count > 0 ? compactCount(count) : label}</Txt>
     </Pressable>
   );
 }
@@ -201,7 +204,7 @@ function ActionRail({ item, onComments }: { item: StoryItem; onComments: () => v
   };
 
   return (
-    <View style={{ alignItems: 'center', gap: space.sm }}>
+    <View style={{ alignItems: 'center', gap: space.xs }}>
       <RailButton icon="thumbUp" label="Like" active={reaction === 'more'} activeColor={c.highlight}
         count={(e?.likes ?? 0) + (reaction === 'more' ? 1 : 0)} onPress={() => react(item.article_id, 'more')} />
       <RailButton icon="thumbDown" label="Dislike" active={reaction === 'less'}
@@ -234,36 +237,22 @@ export function FlashStory({ item, index, total, inBrief, height, showHint, onWh
   const text = flashText(item);
   const age = ageLabel(item.published_at);
   const source = item.source_name || (item.url ? item.url.replace(/^https?:\/\/(www\.)?/, '').split('/')[0] : '');
-  // the summary gets the room the image, header and the rest of the text leave (8 lines ≈ 30 s of reading)
-  const lines = Math.max(3, Math.min(8, Math.floor((height - 430) / 24)));
+  // the picture takes what the story leaves above it, between IMAGE_MIN and IMAGE_MAX of the page (laid out by flex)
+  const [imageH, setImageH] = useState(Math.round(height * IMAGE_MIN));
+  // the summary gets whatever room the headline and the rest leave (measured), never more than SUMMARY_MAX lines
+  const [fit, setFit] = useState<{ height: number; lines: number } | null>(null);
+  const lines = fit?.height === height ? fit.lines : SUMMARY_MAX;
+  const fitSummary = (e: LayoutChangeEvent) => {
+    const n = Math.max(1, Math.min(SUMMARY_MAX, Math.floor((e.nativeEvent.layout.height + 1) / SUMMARY_LH)));
+    if (n !== lines) setFit({ height, lines: n });
+  };
 
   return (
     <View style={{ height, overflow: 'hidden', backgroundColor: c.bg }}>
-      <Backdrop item={item} height={Math.round(height * 0.68)} />
-
-      {/* Progress across the brief; after the divider it becomes a plain label */}
-      <View style={{ paddingTop: insets.top + space.sm, paddingHorizontal: space.gutter, gap: 6 }}>
-        {inBrief ? (
-          <View style={{ gap: 6 }} accessibilityLabel={`${index + 1} of ${total}`}>
-            <View style={{ flexDirection: 'row', gap: 3 }}>
-              {Array.from({ length: total }).map((_, i) => (
-                <View key={i} style={{ flex: 1, height: 3, borderRadius: 2, backgroundColor: i <= index ? c.ink : c.hairline }} />
-              ))}
-            </View>
-            <Txt v="label" color={c.ink} style={{ alignSelf: 'flex-end' }} tabular>{index + 1} of {total}</Txt>
-          </View>
-        ) : (
-          <Txt v="label" color={c.ink}>{item.section === 'big_today' ? 'Outside your usual: a big story today' : sectionLabel.feed}</Txt>
-        )}
-        {showHint && (
-          <View style={{ alignSelf: 'center', backgroundColor: c.scrim, borderRadius: radius.chip, paddingHorizontal: 14, paddingVertical: 6 }}>
-            <Txt v="meta" color={c.ink}>Swipe up for the next story · tap to read · hold for more</Txt>
-          </View>
-        )}
-      </View>
+      <Backdrop item={item} height={imageH} />
 
       <Pressable
-        style={{ flex: 1, justifyContent: 'flex-end', paddingLeft: space.gutter, paddingRight: RAIL_W + space.md, paddingBottom: space.lg }}
+        style={[StyleSheet.absoluteFill, { paddingLeft: space.gutter, paddingRight: RAIL_W + space.md, paddingBottom: space.lg }]}
         onPress={() => openStory(item)}
         onLongPress={onActions}
         accessibilityRole="button"
@@ -285,28 +274,55 @@ export function FlashStory({ item, index, total, inBrief, height, showHint, onWh
           if (n === 'why') onWhy();
         }}
       >
-        <View style={{ gap: space.sm + 2, maxWidth: 600 }}>
+        <View style={{ flexGrow: 1, flexBasis: 0, minHeight: height * IMAGE_MIN, maxHeight: height * IMAGE_MAX }}
+          onLayout={(e) => setImageH(Math.round(e.nativeEvent.layout.height))} />
+        <View style={{ flexShrink: 1, gap: space.sm, maxWidth: 600, marginTop: -space.lg }}>
           <Badges item={item} />
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: space.sm }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
             <SourceMark name={source} />
-            <Txt v="metaBold" color={c.ink} numberOfLines={1} style={{ flexShrink: 1, minWidth: 48 }}>{source}</Txt>
-            {age && <Txt v="meta" color={c.ink2} numberOfLines={1} style={{ flexShrink: 0 }}>{age} ago</Txt>}
+            <Txt v="metaBold" color={c.ink} numberOfLines={1} style={{ flexShrink: 1, minWidth: 40, fontSize: 12, lineHeight: 16 }}>{source}</Txt>
+            {age && <Txt v="meta" color={c.ink2} numberOfLines={1} style={{ flexShrink: 0, fontSize: 12, lineHeight: 16 }}>{age} ago</Txt>}
             <FollowButton item={item} />
           </View>
-          <Txt v="flashHeadline" color={c.ink} numberOfLines={4}>{item.title}</Txt>
-          {text && <Txt v="flashSummary" color={c.ink2} numberOfLines={lines}>{text}</Txt>}
-          <WhyLine item={item} onPress={onWhy} />
+          <Txt v="flashHeadline" color={c.ink} numberOfLines={4} style={{ marginTop: 2 }}>{item.title}</Txt>
+          {text && (
+            <View style={{ flexShrink: 1, minHeight: SUMMARY_LH, overflow: 'hidden' }} onLayout={fitSummary}>
+              <Txt v="flashSummary" color={c.ink2} numberOfLines={lines}>{text}</Txt>
+            </View>
+          )}
+          <WhyLine item={item} onPress={onWhy} compact />
           {!!item.entities?.length && (
-            <View style={{ flexDirection: 'row', gap: 6, flexWrap: 'wrap' }}>
+            <View style={{ flexDirection: 'row', gap: 6, flexWrap: 'wrap', marginTop: 2 }}>
               {item.entities.slice(0, 3).map((e) => (
-                <Chip key={e.key} label={e.name} onPress={() => router.push({ pathname: '/entity/[key]', params: { key: e.key } })} />
+                <Chip key={e.key} small label={e.name} onPress={() => router.push({ pathname: '/entity/[key]', params: { key: e.key } })} />
               ))}
             </View>
           )}
         </View>
       </Pressable>
 
-      <View style={{ position: 'absolute', right: 4, bottom: space.lg, width: RAIL_W, alignItems: 'center' }}>
+      {/* Progress across the brief; after the divider it becomes a plain label */}
+      <View pointerEvents="none" style={{ paddingTop: insets.top + space.sm, paddingHorizontal: space.gutter, gap: 6 }}>
+        {inBrief ? (
+          <View style={{ gap: 6 }} accessibilityLabel={`${index + 1} of ${total}`}>
+            <View style={{ flexDirection: 'row', gap: 3 }}>
+              {Array.from({ length: total }).map((_, i) => (
+                <View key={i} style={{ flex: 1, height: 3, borderRadius: 2, backgroundColor: i <= index ? c.ink : c.hairline }} />
+              ))}
+            </View>
+            <Txt v="label" color={c.ink} style={{ alignSelf: 'flex-end' }} tabular>{index + 1} of {total}</Txt>
+          </View>
+        ) : (
+          <Txt v="label" color={c.ink}>{item.section === 'big_today' ? 'Outside your usual: a big story today' : sectionLabel.feed}</Txt>
+        )}
+        {showHint && (
+          <View style={{ alignSelf: 'center', backgroundColor: c.scrim, borderRadius: radius.chip, paddingHorizontal: 14, paddingVertical: 6 }}>
+            <Txt v="meta" color={c.ink}>Swipe up for the next story · tap to read · hold for more</Txt>
+          </View>
+        )}
+      </View>
+
+      <View style={{ position: 'absolute', right: 4, top: imageH, width: RAIL_W, alignItems: 'center' }}>
         <ActionRail item={item} onComments={onComments} />
       </View>
     </View>

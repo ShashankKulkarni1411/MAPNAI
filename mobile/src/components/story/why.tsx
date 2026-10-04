@@ -36,24 +36,26 @@ export function whyShort(item: StoryItem): { lead: string; name?: string; tail?:
   return { lead: 'Picked for you', glyph: 'echo' };
 }
 
-export function WhyLine({ item, onPress, forceDark }: { item: StoryItem; onPress?: () => void; forceDark?: boolean }) {
+export function WhyLine({ item, onPress, forceDark, compact }: { item: StoryItem; onPress?: () => void; forceDark?: boolean; compact?: boolean }) {
   const { c } = useTheme({ forceDark });
   const w = whyShort(item);
   const highlight = item.section === 'must_know' || item.section === 'just_in';
   const level = item.explanation_parts?.seed_weight;
   const a11y = [w.lead, w.name].filter(Boolean).join(' ');
+  const v = compact ? 'metaBold' : 'why';
+  const leadV = compact ? 'meta' : 'why';
   return (
     <Pressable onPress={onPress} disabled={!onPress} hitSlop={6} accessibilityRole="button"
       accessibilityLabel={`Why this story: ${a11y}`} accessibilityHint="Opens why you're seeing this"
-      style={{ flexDirection: 'row', alignItems: 'center', gap: 6, minHeight: 28, flexWrap: 'wrap' }}>
-      <Glyph name={w.glyph} size={15} color={c.ink2} />
-      <Txt v="why" numberOfLines={2} style={{ flexShrink: 1 }}>
+      style={{ flexDirection: 'row', alignItems: 'center', gap: compact ? 5 : 6, minHeight: compact ? 20 : 28, flexWrap: 'wrap' }}>
+      <Glyph name={w.glyph} size={compact ? 13 : 15} color={c.ink2} />
+      <Txt v={leadV} color={compact ? c.ink2 : undefined} numberOfLines={2} style={{ flexShrink: 1 }}>
         {w.lead}
         {w.name ? ' ' : ''}
       </Txt>
       {w.name && (
         <View style={{ backgroundColor: highlight ? c.highlight : 'transparent', paddingHorizontal: highlight ? 5 : 0, borderRadius: 3 }}>
-          <Txt v="why" color={highlight ? c.onHighlight : c.ink}>{w.name}</Txt>
+          <Txt v={v} color={highlight ? c.onHighlight : c.ink}>{w.name}</Txt>
         </View>
       )}
       {level && <SignalBars level={level} color={c.ink} dim={c.hairline} />}

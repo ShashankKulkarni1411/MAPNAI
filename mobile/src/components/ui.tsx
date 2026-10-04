@@ -10,10 +10,10 @@ import { Glyph, GlyphName } from './Glyph';
 import { Txt } from './Txt';
 
 export function Chip({
-  label, selected, onPress, icon, trailing, accessibilityHint, forceDark,
+  label, selected, onPress, icon, trailing, accessibilityHint, forceDark, small,
 }: {
   label: string; selected?: boolean; onPress?: () => void; icon?: GlyphName; trailing?: ReactNode;
-  accessibilityHint?: string; forceDark?: boolean;
+  accessibilityHint?: string; forceDark?: boolean; small?: boolean;
 }) {
   const { c } = useTheme({ forceDark });
   return (
@@ -25,13 +25,13 @@ export function Chip({
       accessibilityHint={accessibilityHint}
       hitSlop={6}
       style={({ pressed }) => ({
-        minHeight: 36, paddingHorizontal: 14, borderRadius: radius.chip, borderWidth: 1.5,
+        minHeight: small ? 26 : 36, paddingHorizontal: small ? 10 : 14, borderRadius: radius.chip, borderWidth: small ? 1 : 1.5,
         borderColor: selected ? c.ink : c.hairline, backgroundColor: selected ? c.ink : c.surface,
         flexDirection: 'row', alignItems: 'center', gap: 6, opacity: pressed ? 0.7 : 1,
       })}
     >
       {icon && <Glyph name={icon} size={15} color={selected ? c.bg : c.ink} />}
-      <Txt v="metaBold" color={selected ? c.bg : c.ink}>{label}</Txt>
+      <Txt v={small ? 'label' : 'metaBold'} color={selected ? c.bg : small ? c.ink2 : c.ink}>{label}</Txt>
       {trailing}
     </Pressable>
   );

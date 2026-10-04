@@ -71,7 +71,7 @@ export const fonts = {
 
 // size / line height in pt (spec §30 typography table)
 export const type = {
-  flashHeadline: { fontFamily: fonts.head700, fontSize: 30, lineHeight: 34 },
+  flashHeadline: { fontFamily: fonts.head600, fontSize: 26, lineHeight: 30 },
   storyHeadline: { fontFamily: fonts.head700, fontSize: 28, lineHeight: 32 },
   heroHeadline: { fontFamily: fonts.head700, fontSize: 26, lineHeight: 30 },
   screenTitle: { fontFamily: fonts.head700, fontSize: 30, lineHeight: 34 },
@@ -79,7 +79,7 @@ export const type = {
   cardHeadline: { fontFamily: fonts.head600, fontSize: 20, lineHeight: 24 },
   compactHeadline: { fontFamily: fonts.head600, fontSize: 17, lineHeight: 22 },
   summary: { fontFamily: fonts.body400, fontSize: 17, lineHeight: 26 },
-  flashSummary: { fontFamily: fonts.body400, fontSize: 16, lineHeight: 24 },
+  flashSummary: { fontFamily: fonts.body400, fontSize: 16, lineHeight: 23 },
   storySummary: { fontFamily: fonts.body400, fontSize: 18, lineHeight: 28 },
   body: { fontFamily: fonts.body400, fontSize: 16, lineHeight: 22 },
   why: { fontFamily: fonts.body700, fontSize: 15, lineHeight: 20 },
