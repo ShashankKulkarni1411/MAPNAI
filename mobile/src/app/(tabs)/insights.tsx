@@ -22,7 +22,7 @@ export default function Insights() {
   const scroll = useRef<ScrollView>(null);
   useScrollToTop(scroll);
   const follows = profile.data?.exposures ?? [];
-  const connected = (profile.data?.pi_topk ?? []).filter((p) => !follows.some((f) => f.key === p.key)).slice(0, 20);
+  const connected = (profile.data?.pi_topk ?? []).filter((p) => !follows.some((f) => f.key === p.entity)).slice(0, 20);
 
   return (
     <ScrollView ref={scroll} style={{ backgroundColor: c.bg }}
@@ -49,9 +49,9 @@ export default function Insights() {
           <SectionTitle title="Connected to what you follow" sub="Links come from stories that mention both. They show association, not a relationship." />
           <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6 }}>
             {connected.map((p) => (
-              <Pressable key={p.key} onPress={() => router.push({ pathname: '/entity/[key]', params: { key: p.key } })} accessibilityRole="button"
+              <Pressable key={p.entity} onPress={() => router.push({ pathname: '/entity/[key]', params: { key: p.entity } })} accessibilityRole="button"
                 style={{ borderWidth: 1, borderColor: c.hairline, borderRadius: radius.chip, paddingHorizontal: 12, minHeight: 36, justifyContent: 'center' }}>
-                <Txt v="meta">{p.name ?? titleCaseKey(p.key)}</Txt>
+                <Txt v="meta">{p.name ?? titleCaseKey(p.entity)}</Txt>
               </Pressable>
             ))}
           </View>

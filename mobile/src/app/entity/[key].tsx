@@ -34,7 +34,7 @@ export default function Entity() {
   const name = hit.data?.name ?? titleCaseKey(key);
   const stories = useQuery({ queryKey: ['entity-stories', key], queryFn: () => api.search(name) });
   const f = followOf(profile.data, key);
-  const neighbours = (profile.data?.pi_topk ?? []).filter((p) => p.key !== key && p.score <= 0.1).slice(0, 8);
+  const neighbours = (profile.data?.pi_topk ?? []).filter((p) => p.entity !== key && p.score <= 0.1).slice(0, 8);
 
   const save = (conn: Connection) =>
     follow.mutate({ upsert: [{ key: conn.key, role: conn.role, weight: conn.weight }] }, {
@@ -88,9 +88,9 @@ export default function Entity() {
           <>
             <SectionTitle title="Often mentioned with" sub="Often in the same stories, not necessarily related" />
             {neighbours.map((n) => (
-              <View key={n.key} style={{ flexDirection: 'row', alignItems: 'center', minHeight: 52, borderBottomWidth: 1, borderBottomColor: c.hairline }}>
-                <Txt v="body" style={{ flex: 1 }}>{n.name ?? titleCaseKey(n.key)}</Txt>
-                <Button label="Open" variant="text" small onPress={() => router.push({ pathname: '/entity/[key]', params: { key: n.key } })} />
+              <View key={n.entity} style={{ flexDirection: 'row', alignItems: 'center', minHeight: 52, borderBottomWidth: 1, borderBottomColor: c.hairline }}>
+                <Txt v="body" style={{ flex: 1 }}>{n.name ?? titleCaseKey(n.entity)}</Txt>
+                <Button label="Open" variant="text" small onPress={() => router.push({ pathname: '/entity/[key]', params: { key: n.entity } })} />
               </View>
             ))}
           </>

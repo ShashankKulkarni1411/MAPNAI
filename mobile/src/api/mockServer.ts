@@ -260,7 +260,7 @@ export const mock = {
     const sentences = [
       ...u.exposures.map((e) => `You ${e.role === 'follows' ? 'follow' : e.role.replace('_', ' ')} ${e.name} (${e.weight_label}).`),
     ];
-    const pi = [...seeds(u).entries()].map(([key, v]) => ({ key, score: v.score, name: ENTITIES[key]?.name ?? key }));
+    const pi = [...seeds(u).entries()].map(([key, v]) => ({ entity: key, score: v.score, name: ENTITIES[key]?.name ?? key }));
     return {
       user_id: u.user_id, name: u.name, sentences, exposures: u.exposures, topics: u.topics, style: u.style,
       alert_prefs: u.alert_prefs, beta: u.beta, pi_topk: pi, persona_version: u.persona_version,

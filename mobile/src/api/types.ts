@@ -43,7 +43,7 @@ export type Profile = {
   style: Style;
   alert_prefs: AlertPrefs | null;
   beta: Record<string, [number, number]>;
-  pi_topk?: { key: string; score: number; name?: string; path?: unknown }[];
+  pi_topk?: { entity: string; score: number; name?: string; path?: unknown }[];
   recent_reads?: { article_id: string; title?: string; t?: string }[];
   persona_version: number;
   created_at?: string;
