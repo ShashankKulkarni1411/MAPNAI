@@ -39,6 +39,30 @@ class Settings(BaseSettings):
     summarizer_backend: str = Field(default="auto", env="SUMMARIZER_BACKEND")
     openai_api_key: str = Field(default="", env="OPENAI_API_KEY")
 
+    # ── Agent 5 query graph (agents/query_graph.py) ──────────
+    # Off, or no GROQ_API_KEY → Agent 5 runs its single-pass retrieve → generate path.
+    query_graph_enabled: bool = Field(default=True, env="QUERY_GRAPH_ENABLED")
+    # Blank → GROQ_MODEL. The grader runs once per retrieval, so a smaller model keeps it cheap.
+    query_graph_model: str = Field(default="", env="QUERY_GRAPH_MODEL")
+    query_graph_grader_model: str = Field(default="", env="QUERY_GRAPH_GRADER_MODEL")
+    query_graph_max_rewrites: int = Field(default=2, env="QUERY_GRAPH_MAX_REWRITES")
+    query_graph_max_regenerations: int = Field(default=1, env="QUERY_GRAPH_MAX_REGENERATIONS")
+    # Hard cap on Groq calls per question, single-pass fallback included (the graph keeps one in reserve for it).
+    # Worst case with the defaults above: grade + 2×(rewrite + grade) + 2×(generate + check) = 9, +1 reserved.
+    query_graph_max_llm_calls: int = Field(default=10, env="QUERY_GRAPH_MAX_LLM_CALLS")
+    # Fewer graded-relevant articles than this → rewrite the query (while rewrites remain). 1 = rewrite only when
+    # nothing relevant survived; specific questions often have a single matching story.
+    query_graph_min_relevant_docs: int = Field(default=1, env="QUERY_GRAPH_MIN_RELEVANT_DOCS")
+    # No rewrite/regeneration starts after this many seconds (the app's /v1/ask timeout is 20 s).
+    query_graph_deadline_seconds: float = Field(default=12.0, env="QUERY_GRAPH_DEADLINE_SECONDS")
+    query_graph_llm_timeout_seconds: float = Field(default=8.0, env="QUERY_GRAPH_LLM_TIMEOUT_SECONDS")
+    # Ranking: relevance × (1 − w + w·source_cred); articles below min_credibility are dropped
+    # unless that would drop every article.
+    query_graph_credibility_weight: float = Field(default=0.3, env="QUERY_GRAPH_CREDIBILITY_WEIGHT")
+    query_graph_min_credibility: float = Field(default=0.2, env="QUERY_GRAPH_MIN_CREDIBILITY")
+    # After a Neo4j failure, graph retrieval is skipped for this long (connecting can block ~10 s).
+    query_graph_neo4j_cooldown_seconds: float = Field(default=300.0, env="QUERY_GRAPH_NEO4J_COOLDOWN_SECONDS")
+
     # ── Reddit ───────────────────────────────────────────────
     reddit_client_id: str = Field(default="", env="REDDIT_CLIENT_ID")
     reddit_client_secret: str = Field(default="", env="REDDIT_CLIENT_SECRET")

@@ -63,7 +63,7 @@ cbor2>=5.4.0                      # decode ATProto DAG-CBOR frames
 
 # ── Config & Environment ────────────────────────────────────
 python-dotenv==1.0.1
-pydantic==2.7.1
+pydantic==2.7.4               # >=2.7.4 required by langchain-core (Agent 5 graph)
 pydantic-settings==2.3.1
 
 # ── Logging ──────────────────────────────────────────────────
@@ -81,6 +81,10 @@ openai==2.37.0                # OpenAI-compatible client (Groq endpoint) used by
 groq==0.37.1                  # native Groq SDK used by the query agents
 praw==7.7.1                   # Reddit fetcher
 termcolor==3.3.0              # coloured CLI output in agent test harnesses
+
+# ── Agent 5 query graph (agents/query_graph.py) ─────────────
+langgraph==1.2.16             # StateGraph orchestration of the RAG agent
+langchain-groq==1.1.3         # ChatGroq structured output for grade/rewrite/generate/check
 
 # ── Agent 2 classifier (own model) ───────────────────────────
 transformers==4.57.6

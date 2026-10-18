@@ -5,15 +5,27 @@ Hybrid Retrieval Layer for Query Agent (Agent 5).
 Provides:
   - Keyword / Entity Retrieval: Direct MongoDB text, regex, and entity-level search
   - Semantic Retrieval: Dense vector search via FAISS + sentence-transformers
+  - Graph Retrieval: articles that MENTION the entities of a "how is X connected to Y?" question (Neo4j)
   - Automated Query Routing: Heuristic detection between entity/specific vs general questions
   - Ranked result aggregation and score normalization
 """
 
 import re
+import threading
+import time
 from typing import List, Dict, Any, Optional, Tuple
+from config.settings import settings
 from storage.mongo_store import MongoStore
 from storage.faiss_store import FAISSStore
 from utils.logger import logger
+
+
+# "how is X connected to Y", "relationship between X and Y", "what links X to Y"
+_CONNECTION_PATTERNS = [
+    re.compile(r"\b(?:how|what)\s+(?:is|are|was|were)\s+(.+?)\s+(?:connected|related|linked|tied)\s+(?:to|with)\s+(.+)", re.I),
+    re.compile(r"\b(?:connection|connections|relationship|relation|link|links|ties)\s+between\s+(.+?)\s+and\s+(.+)", re.I),
+    re.compile(r"\bwhat\s+(?:links|connects|ties)\s+(.+?)\s+(?:to|and|with)\s+(.+)", re.I),
+]
 
 
 class QueryRetriever:
@@ -26,9 +38,13 @@ class QueryRetriever:
         self,
         mongo_store: Optional[MongoStore] = None,
         faiss_store: Optional[FAISSStore] = None,
+        neo4j_store=None,
     ):
         self.mongo_store = mongo_store or MongoStore()
         self.faiss_store = faiss_store or FAISSStore()
+        self._neo4j_store = neo4j_store   # storage.neo4j_store.Neo4jStore, created on the first graph search
+        self._neo4j_down_until = 0.0
+        self._neo4j_lock = threading.Lock()
 
     # ── Main Retrieval Entry Point ───────────────────────────
 
@@ -37,14 +53,16 @@ class QueryRetriever:
         query: str,
         domain_filter: Optional[str] = None,
         top_k: int = 5,
+        route: Optional[str] = None,
     ) -> Tuple[List[Dict[str, Any]], str]:
         """
         Intelligently routes and retrieves the top-K relevant articles.
+        `route` ("keyword" / "semantic") skips the intent heuristic; the other route stays the fallback.
 
         Returns:
             (ranked_articles, route_used)
         """
-        route_decision = self.classify_query_intent(query)
+        route_decision = route or self.classify_query_intent(query)
         logger.info(f"[QueryRetriever] Query: '{query}' | Route Decision: '{route_decision}'")
 
         articles: List[Dict[str, Any]] = []
@@ -138,6 +156,75 @@ class QueryRetriever:
                 return "keyword"
 
         return "semantic"
+
+    @staticmethod
+    def extract_connection_entities(query: str) -> List[str]:
+        """
+        The two entities of a connection question ("How is X connected to Y?"), lowercased; [] for any other
+        question. Leading articles and trailing punctuation are stripped.
+        """
+        for pattern in _CONNECTION_PATTERNS:
+            match = pattern.search(query.strip())
+            if not match:
+                continue
+            names = []
+            for raw in match.groups():
+                name = re.sub(r"^(?:the|a|an)\s+", "", raw.strip(" ?.!,;:'\""), flags=re.I).strip().lower()
+                if len(name) >= 2:
+                    names.append(name)
+            if len(names) == 2 and names[0] != names[1]:
+                return names
+        return []
+
+    # ── Graph Search ─────────────────────────────────────────
+
+    def graph_search(
+        self,
+        entities: List[str],
+        domain_filter: Optional[str] = None,
+        top_k: int = 10,
+    ) -> List[Dict[str, Any]]:
+        """
+        Articles whose (Article)-[:MENTIONS]->(Entity) edges match the given entity names, ranked by how many
+        of them they mention, hydrated from MongoDB. Raises when Neo4j is unreachable (or cooling down after a
+        failure) so the caller can tell "graph down" from "no match".
+        """
+        keys = [e.strip().lower() for e in entities if len(e.strip()) >= 2]
+        if not keys:
+            return []
+        if time.monotonic() < self._neo4j_down_until:
+            raise ConnectionError("Neo4j marked unavailable (cooling down after a failure)")
+
+        cypher = """
+        UNWIND $keys AS k
+        MATCH (a:Article)-[:MENTIONS]->(e:Entity)
+        WHERE coalesce(e.name_lower, toLower(trim(e.name))) CONTAINS k
+          AND ($domain IS NULL OR a.domain = $domain)
+        WITH a, count(DISTINCT k) AS hits
+        RETURN a.article_id AS article_id, hits
+        ORDER BY hits DESC, a.published_at DESC
+        LIMIT $limit
+        """
+        try:
+            with self._neo4j_lock:
+                if self._neo4j_store is None:
+                    from storage.neo4j_store import Neo4jStore
+                    self._neo4j_store = Neo4jStore()
+            with self._neo4j_store.driver.session() as session:
+                rows = [r.data() for r in session.run(cypher, keys=keys, domain=domain_filter, limit=top_k)]
+        except Exception:
+            self._neo4j_down_until = time.monotonic() + settings.query_graph_neo4j_cooldown_seconds
+            raise
+
+        ranked_results: List[Dict[str, Any]] = []
+        for row in rows:
+            doc = self.mongo_store.get_article_by_id(row["article_id"])
+            if not doc:
+                continue
+            # Mentions every entity → 0.90; fewer → scaled down from there
+            relevance = 0.55 + 0.35 * (int(row["hits"]) / len(keys))
+            ranked_results.append(self._format_article_record(doc, relevance))
+        return ranked_results
 
     # ── Keyword Search ───────────────────────────────────────
 
@@ -352,4 +439,5 @@ class QueryRetriever:
             "entities": doc.get("entities", []),
             "relevance_score": round(float(relevance_score), 2),
             "risk_score": doc.get("risk_score"),
+            "source_name": doc.get("source_name"),
         }

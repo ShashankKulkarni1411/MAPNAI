@@ -1,0 +1,51 @@
+{
+  "answered": {
+    "query": "What did the Fed do?",
+    "answer": "The Fed raised rates [1].",
+    "sources": [
+      {
+        "article_id": "a1",
+        "title": "Fed hikes rates",
+        "domain": "finance",
+        "relevance_score": 0.91
+      },
+      {
+        "article_id": "a2",
+        "title": "Markets react",
+        "domain": "finance",
+        "relevance_score": 0.72
+      }
+    ],
+    "retrieval_route": "keyword",
+    "confidence": 0.88,
+    "_metadata": {
+      "articles_retrieved": 2,
+      "model_used": "fake-llm",
+      "latency_seconds": 0.0
+    }
+  },
+  "no_articles": {
+    "query": "unknown thing",
+    "answer": "No relevant articles found in the database to answer this question.",
+    "sources": [],
+    "retrieval_route": "semantic",
+    "confidence": 0.0,
+    "_metadata": {
+      "articles_retrieved": 0,
+      "model_used": "fake-llm",
+      "latency_seconds": 0.0
+    }
+  },
+  "empty_query": {
+    "query": "   ",
+    "answer": "No query provided. Please ask a valid question about news events.",
+    "sources": [],
+    "retrieval_route": "none",
+    "confidence": 0.0,
+    "_metadata": {
+      "articles_retrieved": 0,
+      "model_used": "fake-llm",
+      "latency_seconds": 0.0
+    }
+  }
+}

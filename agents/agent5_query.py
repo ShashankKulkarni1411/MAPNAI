@@ -6,20 +6,30 @@ Receives natural language questions and produces grounded, factual responses
 citing stored article summaries from MongoDB and FAISS vector store.
 
 Supports:
-  - Automated routing (Keyword vs. Semantic retrieval)
+  - LangGraph orchestration (agents/query_graph.py): route → retrieve → grade → rewrite → credibility →
+    generate → check, when QUERY_GRAPH_ENABLED and a Groq key are set; otherwise, and whenever the graph
+    degrades, the single-pass retrieve → generate path below
+  - Automated routing (Keyword vs. Semantic retrieval; Graph for "how is X connected to Y?" questions)
   - Swappable modular LLM layer (GroqQueryLLM / CustomModelQueryLLM)
   - Zero-hallucination fallback for out-of-domain / missing knowledge
   - Strict JSON contract adherence for MAPNAI pipeline downstream
 """
 
 import time
-from typing import Dict, Any, List, Optional
+from typing import Dict, Any, List, Optional, Tuple
 
 from agents.query_llm import QueryLLM, GroqQueryLLM, CustomModelQueryLLM
 from agents.query_retriever import QueryRetriever
+from config.settings import settings
 from storage.mongo_store import MongoStore
 from storage.faiss_store import FAISSStore
 from utils.logger import logger
+
+
+NO_ARTICLES_ANSWER = "No relevant articles found in the database to answer this question."
+UNSUPPORTED_ANSWER = (
+    "The stored articles mention this topic, but none of them support a verifiable answer to this question."
+)
 
 
 class QueryAgent:
@@ -34,13 +44,33 @@ class QueryAgent:
         retriever: Optional[QueryRetriever] = None,
         mongo_store: Optional[MongoStore] = None,
         faiss_store: Optional[FAISSStore] = None,
+        graph=None,
     ):
         self.llm = llm or GroqQueryLLM()
         self.retriever = retriever or QueryRetriever(
             mongo_store=mongo_store,
             faiss_store=faiss_store,
         )
-        logger.info(f"[QueryAgent] Initialized with LLM: {self.llm.__class__.__name__}")
+        # agents.query_graph.QueryGraph; None → single-pass only
+        self.graph = graph if graph is not None else self._build_graph()
+        logger.info(
+            f"[QueryAgent] Initialized with LLM: {self.llm.__class__.__name__} | "
+            f"graph: {'on' if self.graph is not None else 'off'}"
+        )
+
+    def _build_graph(self):
+        """The LangGraph path needs the setting on, the default Groq LLM and its key; else single-pass."""
+        if not settings.query_graph_enabled:
+            return None
+        if not isinstance(self.llm, GroqQueryLLM) or not self.llm.api_key:
+            logger.info("[QueryAgent] Query graph off: needs GroqQueryLLM with a GROQ_API_KEY.")
+            return None
+        try:
+            from agents.query_graph import QueryGraph
+            return QueryGraph.from_settings(self.retriever, api_key=self.llm.api_key)
+        except Exception as e:
+            logger.warning(f"[QueryAgent] Query graph unavailable ({type(e).__name__}: {e}); using single-pass.")
+            return None
 
     # ── Public API ───────────────────────────────────────────
 
@@ -74,12 +104,50 @@ class QueryAgent:
 
         logger.info(f"[QueryAgent] Processing query: '{clean_query}'")
 
+        if self.graph is None:
+            return self._process_single_pass(clean_query, domain_filter, top_k, start_time)
+
+        try:
+            state = self.graph.run(clean_query, domain_filter=domain_filter, top_k=top_k)
+        except Exception:
+            logger.exception("[QueryAgent] Query graph failed; answering single-pass.")
+            return self._process_single_pass(
+                clean_query, domain_filter, top_k, start_time,
+                graph_meta={"outcome": "degraded", "reason": "graph raised", "llm_calls": None},
+            )
+
+        if state.get("outcome") == "degraded":
+            logger.warning(f"[QueryAgent] Query graph degraded ({state.get('reason')}); answering single-pass.")
+            return self._process_single_pass(
+                clean_query, domain_filter, top_k, start_time,
+                articles=state.get("first_retrieval"),
+                route=state.get("retrieval_route"),
+                graph_meta=self._graph_meta(state),
+            )
+        return self._graph_response(clean_query, state, start_time)
+
+    # ── Single-pass path (pre-graph behaviour; also the graph's degraded fallback) ──
+
+    def _process_single_pass(
+        self,
+        clean_query: str,
+        domain_filter: Optional[str],
+        top_k: int,
+        start_time: float,
+        articles: Optional[List[Dict[str, Any]]] = None,
+        route: Optional[str] = None,
+        graph_meta: Optional[Dict[str, Any]] = None,
+    ) -> Dict[str, Any]:
+        """Retrieve (unless the graph already did) → one generate call. `graph_meta` → _metadata.graph."""
         # 1. Retrieve relevant articles
-        articles, route_used = self.retriever.retrieve(
-            query=clean_query,
-            domain_filter=domain_filter,
-            top_k=top_k,
-        )
+        if articles is None:
+            articles, route_used = self.retriever.retrieve(
+                query=clean_query,
+                domain_filter=domain_filter,
+                top_k=top_k,
+            )
+        else:
+            route_used = route or "semantic"
 
         logger.info(
             f"[QueryAgent] Retrieved {len(articles)} articles via route '{route_used}' "
@@ -88,18 +156,23 @@ class QueryAgent:
 
         # 2. Handle zero results fallback (strict zero-hallucination rule)
         if not articles:
-            return self._build_empty_response(
+            response = self._build_empty_response(
                 query=clean_query,
-                answer="No relevant articles found in the database to answer this question.",
+                answer=NO_ARTICLES_ANSWER,
                 latency=time.time() - start_time,
                 route=route_used,
             )
+            if graph_meta is not None:
+                response["_metadata"]["graph"] = graph_meta
+            return response
 
         # 3. Format context string for LLM
         context_str = self._format_context(articles)
 
         # 4. Generate grounded answer via LLM
         answer = self.llm.generate_answer(question=clean_query, context=context_str)
+        if graph_meta is not None and graph_meta.get("llm_calls") is not None:
+            graph_meta["llm_calls"] += 1
 
         # 5. Format sources and compute confidence
         sources = [
@@ -128,12 +201,110 @@ class QueryAgent:
                 "latency_seconds": round(latency, 2),
             },
         }
+        if graph_meta is not None:
+            response["_metadata"]["graph"] = graph_meta
 
         logger.info(
             f"[QueryAgent] Answer generated | Route: {route_used} | "
             f"Sources: {len(sources)} | Confidence: {confidence} | Latency: {latency:.2f}s"
         )
         return response
+
+    # ── Graph path ───────────────────────────────────────────
+
+    def _graph_response(self, clean_query: str, state: Dict[str, Any], start_time: float) -> Dict[str, Any]:
+        """
+        Same contract as the single-pass path. Additive only: each source gains `credibility` and `cited`,
+        and `_metadata.graph` carries the traced path. `[n]` in the answer is sources[n-1].
+        """
+        meta = self._graph_meta(state)
+        route = state.get("retrieval_route") or "semantic"
+        model_name = f"groq-{self.graph.model_name}"
+
+        if state.get("outcome") == "no_answer" and not state.get("relevant"):
+            response = self._build_empty_response(
+                query=clean_query,
+                answer=NO_ARTICLES_ANSWER,
+                latency=time.time() - start_time,
+                route=route,
+            )
+            response["_metadata"]["model_used"] = model_name
+            response["_metadata"]["graph"] = meta
+            return response
+
+        context = state.get("context") or []
+        unsupported = state.get("outcome") == "no_answer"
+        # [n] markers belong to the answer; a withheld answer cites nothing
+        cited = set() if unsupported else set(state.get("cited") or [])
+        sources = [
+            {
+                "article_id": a["article_id"],
+                "title": a["title"],
+                "domain": a["domain"],
+                "relevance_score": a["relevance_score"],
+                "credibility": a.get("credibility"),
+                "cited": idx in cited,
+            }
+            for idx, a in enumerate(context, start=1)
+        ]
+
+        if unsupported:
+            # Relevant articles exist, but no answer they support: say so instead of guessing.
+            answer = UNSUPPORTED_ANSWER
+            confidence = 0.0
+        else:
+            answer = state.get("answer", "")
+            confidence, meta["confidence_components"] = self._graph_confidence(context, cited)
+
+        response = {
+            "query": clean_query,
+            "answer": answer,
+            "sources": sources,
+            "retrieval_route": route,
+            "confidence": confidence,
+            "_metadata": {
+                "articles_retrieved": len(context),
+                "model_used": model_name,
+                "latency_seconds": round(time.time() - start_time, 2),
+                "graph": meta,
+            },
+        }
+        logger.info(
+            f"[QueryAgent] Graph answer | Outcome: {meta['outcome']} | Path: {' -> '.join(meta['path'])} | "
+            f"LLM calls: {meta['llm_calls']} | Confidence: {confidence} | "
+            f"Latency: {response['_metadata']['latency_seconds']}s"
+        )
+        return response
+
+    def _graph_confidence(self, context: List[Dict[str, Any]], cited: set) -> Tuple[float, Dict[str, float]]:
+        """
+        retrieval × credibility over the cited articles (all context articles if none are cited):
+          retrieval   = _calculate_confidence (0.7·top + 0.3·mean relevance), the single-pass score
+          credibility = 0.7 + 0.3·mean source_cred, so an all-default (0.5) answer keeps 85% of it
+        Clamped to [0.10, 0.99] like the single-pass score. Explainable, not calibrated against labels.
+        """
+        used = [a for i, a in enumerate(context, start=1) if i in cited] or context
+        retrieval = self._calculate_confidence(used)
+        creds = [a["credibility"] for a in used]     # set by the graph's credibility node
+        cred_factor = 0.7 + 0.3 * (sum(creds) / len(creds)) if creds else 0.85
+        confidence = round(min(0.99, max(0.10, retrieval * cred_factor)), 2)
+        return confidence, {"retrieval": retrieval, "credibility_factor": round(cred_factor, 3)}
+
+    @staticmethod
+    def _graph_meta(state: Dict[str, Any]) -> Dict[str, Any]:
+        trace = state.get("trace") or []
+        return {
+            "outcome": state.get("outcome"),
+            "reason": state.get("reason"),
+            "path": [t["node"] for t in trace],
+            "trace": trace,
+            "llm_calls": state.get("llm_calls", 0),
+            "rewrites": state.get("rewrites", 0),
+            "regenerations": max(0, state.get("generations", 0) - 1),
+            "grounded": state.get("grounded"),
+            "search_queries": state.get("search_queries", []),
+            "routes_used": state.get("routes_used", []),
+        }
 
     # ── Context Formatting ───────────────────────────────────
 

@@ -31,11 +31,15 @@ def risk_norm(raw, cfg) -> Optional[float]:
     return None if math.isnan(value) else min(1.0, max(0.0, value))
 
 
+def source_credibility(article: Dict, cfg) -> float:
+    """cfg.source_cred[source_name] (config/source_credibility.json), else source_cred_default; clamped to [0, 1]."""
+    return min(1.0, max(0.0, float(cfg.source_cred.get(article.get(cfg.source_field), cfg.source_cred_default))))
+
+
 def materiality(article: Dict, cluster_size: int, is_first: bool, cfg) -> Dict:
     """{m, risk_norm, size_score, first_report, source_cred, unscored}, rounded to 6 places."""
     risk = risk_norm(article.get(cfg.risk_field), cfg)
-    source_cred = cfg.source_cred.get(article.get(cfg.source_field), cfg.source_cred_default)
-    source_cred = min(1.0, max(0.0, float(source_cred)))
+    source_cred = source_credibility(article, cfg)
     size = size_score(cluster_size, cfg)
     first = 1 if is_first and cluster_size >= 2 else 0
 
