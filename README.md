@@ -156,6 +156,32 @@ python -m agents.agent5_query "What happened in the India vs Australia Test?" --
 The query response includes an answer, source article IDs/titles, retrieval route, and confidence.
 Agent 5 needs stored article summaries; semantic retrieval also uses the FAISS index.
 
+#### Agent 5 LangGraph orchestration
+
+When `GROQ_API_KEY` is set and `QUERY_GRAPH_ENABLED=true` (the default), Agent 5 answers through a
+LangGraph `StateGraph` (`agents/query_graph.py`) instead of a single retrieve → generate pass:
+
+```
+route_query → retrieve → grade_docs ─┬─ enough relevant → credibility → generate → check_answer → finalize
+                 ▲                   ├─ too few relevant → rewrite_query ─┘ (loops back to retrieve)
+                                     └─ none relevant → no_answer
+check_answer: answer not grounded in the articles → generate again (bounded), else no_answer
+```
+
+- **grade_docs** has the LLM drop retrieved articles that do not help answer the question.
+- **rewrite_query** rephrases the search when too few articles survive grading (`QUERY_GRAPH_MAX_REWRITES`).
+- **credibility** reranks articles by relevance × source credibility.
+- **check_answer** verifies the answer is supported by the cited articles (`QUERY_GRAPH_MAX_REGENERATIONS`).
+
+Loops are capped by rewrite/regeneration counters, a per-question LLM-call budget
+(`QUERY_GRAPH_MAX_LLM_CALLS`) and a deadline (`QUERY_GRAPH_DEADLINE_SECONDS`). If any LLM call fails
+(timeout, rate limit, malformed output) the graph degrades and Agent 5 falls back to the single-pass path,
+so answers are never lost. The path taken is reported under `_metadata.graph` in the response
+(`outcome`, `path`, `llm_calls`, …). To turn the graph off, set `QUERY_GRAPH_ENABLED=false`.
+
+LangGraph is pinned in `requirements.txt` (`langgraph==1.2.16`), so `pip install -r requirements.txt`
+(or rebuilding the Docker image) is all that is needed. Graph tests: `pytest tests/test_query_graph.py -v`.
+
 ### 2. Configure environment
 
 ```bash
@@ -537,6 +563,20 @@ No other code changes needed — the pipeline picks up changes automatically.
 | `INGESTION_INTERVAL_MINUTES` | `30` | Schedule interval |
 | `MAX_ARTICLES_PER_SOURCE` | `50` | Per-source cap |
 | `MIN_ARTICLE_LENGTH` | `100` | Min body length (chars) |
+| `GROQ_API_KEY` | — | Groq key (summaries, risk scores, Agent 5 answers + LangGraph) |
+| `GROQ_MODEL` | `openai/gpt-oss-120b` | Default Groq chat model |
+| `QUERY_GRAPH_ENABLED` | `true` | Use the LangGraph Agent 5 pipeline (needs `GROQ_API_KEY`) |
+| `QUERY_GRAPH_MODEL` | — (= `GROQ_MODEL`) | Model for rewrite/generate/check nodes |
+| `QUERY_GRAPH_GRADER_MODEL` | — (= graph model) | Model for document grading (a smaller one keeps it cheap) |
+| `QUERY_GRAPH_MAX_REWRITES` | `2` | Max query rewrites per question |
+| `QUERY_GRAPH_MAX_REGENERATIONS` | `1` | Max answer regenerations after a failed grounding check |
+| `QUERY_GRAPH_MAX_LLM_CALLS` | `10` | Hard cap on Groq calls per question |
+| `QUERY_GRAPH_MIN_RELEVANT_DOCS` | `1` | Fewer relevant articles than this → rewrite |
+| `QUERY_GRAPH_DEADLINE_SECONDS` | `12` | No new rewrite/regeneration after this |
+| `QUERY_GRAPH_LLM_TIMEOUT_SECONDS` | `8` | Per-LLM-call timeout |
+| `QUERY_GRAPH_CREDIBILITY_WEIGHT` | `0.3` | Weight of source credibility in reranking |
+| `QUERY_GRAPH_MIN_CREDIBILITY` | `0.2` | Drop sources below this (unless all would be dropped) |
+| `QUERY_GRAPH_NEO4J_COOLDOWN_SECONDS` | `300` | Skip graph retrieval this long after a Neo4j failure |
 
 ---
 

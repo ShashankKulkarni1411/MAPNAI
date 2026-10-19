@@ -22,7 +22,7 @@ from config.settings import settings
 from utils.logger import logger
 
 GROQ_BASE_URL = "https://api.groq.com/openai/v1"
-GROQ_MODEL = "llama-3.3-70b-versatile"
+GROQ_MODEL = settings.groq_model
 
 _GROQ_CLIENT = None
 
@@ -89,7 +89,7 @@ def chat_completion(
     if client is None:
         return None
 
-    model_name = model or settings.groq_model or "llama-3.3-70b-versatile"
+    model_name = model or settings.groq_model
 
     try:
         response = client.chat.completions.create(

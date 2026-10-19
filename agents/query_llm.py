@@ -53,7 +53,7 @@ class GroqQueryLLM(QueryLLM):
         temperature: float = 0.1,
         max_tokens: int = 1024,
     ):
-        self.model_name = model_name or settings.groq_model or "llama-3.3-70b-versatile"
+        self.model_name = model_name or settings.groq_model
         self.api_key = api_key or settings.groq_api_key or os.environ.get("GROQ_API_KEY", "")
         self.temperature = temperature
         self.max_tokens = max_tokens

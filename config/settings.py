@@ -33,7 +33,7 @@ class Settings(BaseSettings):
     bluesky_max_posts: int = Field(default=200, env="BLUESKY_MAX_POSTS")
 
     # ── LLM / Groq Settings ──────────────────────────────────
-    groq_model: str = Field(default="llama-3.3-70b-versatile", env="GROQ_MODEL")
+    groq_model: str = Field(default="openai/gpt-oss-120b", env="GROQ_MODEL")
     # Agent 3: "auto" = Groq LLM when GROQ_API_KEY is set, else extractive TF-IDF;
     # "extractive" = always offline TF-IDF; "llm" = Groq only
     summarizer_backend: str = Field(default="auto", env="SUMMARIZER_BACKEND")
