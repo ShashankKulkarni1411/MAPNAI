@@ -9,6 +9,7 @@ Pipeline flow:
   2. Preprocess batch (clean, dedupe, classify, normalize, rank feed images)
   2b. Article images: page lookup (og:image / JSON-LD) for articles the feed gave no good image
   3. Enrich with entities (spaCy NER; Agent 1 re-runs NER with fine-tuned BERT)
+  3b. Fallback images: Wikipedia image of the main entity for articles still without one
   4. Store to MongoDB + FAISS + Neo4j (simultaneous)
   5. Log run statistics
 
@@ -142,6 +143,12 @@ def _enrich_phase(articles: List[ProcessedArticle]) -> List[ProcessedArticle]:
     return agent.enrich_batch(articles)
 
 
+def _image_fallback_phase(articles: List[ProcessedArticle]) -> List[ProcessedArticle]:
+    """Wikipedia image of the main entity for articles still without one. Failures leave articles unchanged."""
+    mongo = _get_mongo()
+    return MediaAgent().fill_missing(articles, mongo.db if mongo.is_available() else None)
+
+
 # ── Phase 4: Store (3-way simultaneous) ──────────────────────
 
 def _store_phase(articles: List[ProcessedArticle]) -> dict:
@@ -260,6 +267,11 @@ def run_ingestion_pipeline() -> IngestionRunStats:
     except Exception as e:
         logger.warning(f"[Pipeline] Enrichment phase warning (non-fatal): {e}")
         # Continue with unenriched articles
+
+    try:
+        processed = _image_fallback_phase(processed)
+    except Exception as e:
+        logger.warning(f"[Pipeline] Image fallback warning (non-fatal): {e}")
 
     # ── Phase 4: Store ────────────────────────────────────────
     try:

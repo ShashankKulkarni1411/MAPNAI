@@ -137,3 +137,104 @@ class TestPreprocessingMedia:
                          source_name="S", source_type=SourceType.RSS)
         art, status = PreprocessingAgent().process(raw)
         assert status == "ok" and art.to_mongo_dict()["media"] is None
+
+
+# ── Fallback images (Wikipedia, network mocked) ──────────────
+
+def _wiki_page(title, extract, image="Pic.jpg", **extra):
+    return {"title": title, "extract": extract, "pageimage": image,
+            "thumbnail": {"source": f"https://upload.wikimedia.org/{image}", "width": 1200, "height": 800}, **extra}
+
+
+def _wiki_answer(pages, redirects=()):
+    def answer(url, params, **_):
+        resp = MagicMock(status_code=200, headers={})
+        if params.get("prop") == "imageinfo":
+            resp.json.return_value = {"query": {"pages": [
+                {"title": t, "imageinfo": [{"extmetadata": {"Artist": {"value": "<a>Jane Doe</a>"},
+                                                            "LicenseShortName": {"value": "CC BY-SA 4.0"}}}]}
+                for t in params["titles"].split("|")]}}
+        else:
+            asked = params["titles"].split("|")
+            resp.json.return_value = {"query": {"redirects": [{"from": a, "to": b} for a, b in redirects],
+                                                "pages": [p for p in pages if p["title"] in asked or
+                                                          p["title"] in dict(redirects).values()]}}
+        return resp
+    return answer
+
+
+NVIDIA = _wiki_page("Nvidia", "Nvidia Corporation is an American multinational technology company that designs "
+                              "graphics processing units and chips for artificial intelligence.", "Nvidia_HQ.jpg")
+SURREY = _wiki_page("Surrey", "Surrey is a ceremonial county in South East England. Cricket is popular.", "Downs.jpg")
+TREASURY = _wiki_page("Treasury", "A treasury is either a government department or a place for valuables.")
+PAUL = _wiki_page("Paul", "Paul may refer to:", pageprops={"disambiguation": ""})
+HUANG = _wiki_page("Jensen Huang", "Jen-Hsun Huang (born February 17, 1963) is the co-founder and chief executive "
+                                   "of Nvidia, the chips company.", "Huang.jpg")
+
+
+class TestImageFallback:
+    def setup_method(self):
+        from utils import image_fallback
+        self.fb = image_fallback
+
+    def _run(self, pages, title, text, entities, redirects=()):
+        cache = {}
+        with patch("utils.image_fallback.requests.get", side_effect=_wiki_answer(pages, redirects)):
+            self.fb.resolve({e["name"] for e in self.fb.pick_entities(title, entities)}, cache)
+        return self.fb.fallback_image(title, text, entities, cache), cache
+
+    def test_headline_entity_gets_its_free_image_with_credit(self):
+        img, _ = self._run([NVIDIA], "Nvidia boosts buyback as AI chips demand soars",
+                           "The chips designer said demand for artificial intelligence hardware keeps rising.",
+                           [{"name": "Nvidia", "type": "Organization", "salience": 1.0}])
+        assert img["url"].endswith("Nvidia_HQ.jpg") and img["source"] == "wikipedia"
+        assert img["credit"] == "Jane Doe · CC BY-SA 4.0 · Wikimedia Commons"
+        assert img["credit_url"] == "https://commons.wikimedia.org/wiki/File:Nvidia_HQ.jpg"
+
+    def test_surname_in_headline_and_redirect(self):
+        img, _ = self._run([HUANG], "Huang says Nvidia chips are sold out", "The chief executive spoke on Monday.",
+                           [{"name": "Jensen Huang", "type": "Person", "salience": 1.0}])
+        assert img["alt"] == "Jensen Huang"
+
+    def test_entity_not_in_headline_is_ignored(self):
+        img, cache = self._run([NVIDIA], "Thailand eyes short-term debt", "Chips and artificial intelligence...",
+                               [{"name": "Nvidia", "type": "Organization", "salience": 1.0}])
+        assert img is None and cache == {}
+
+    def test_places_generic_and_disambiguation_pages_are_rejected(self):
+        img, cache = self._run([SURREY, TREASURY, PAUL], "Surrey beat Paul's side as Treasury watches",
+                               "Cricket county championship match report.",
+                               [{"name": "Surrey", "type": "Organization"}, {"name": "Treasury", "type": "Organization"},
+                                {"name": "Paul", "type": "Person"}])
+        assert img is None
+        assert cache["treasury"] is None and cache["paul"] is None and cache["surrey"] is not None   # place → _fits
+
+    def test_unrelated_page_is_rejected(self):
+        # "Nvidia" resolves fine, but the story shares nothing with the page beyond the name
+        img, _ = self._run([NVIDIA], "Nvidia the racehorse wins at Ascot", "The filly won by two lengths.",
+                           [{"name": "Nvidia", "type": "Organization"}])
+        assert img is None
+
+    def test_person_entity_must_resolve_to_a_biography(self):
+        img, _ = self._run([NVIDIA], "Nvidia praised for AI chips", "artificial intelligence chips company",
+                           [{"name": "Nvidia", "type": "Person"}])
+        assert img is None
+
+    def test_wikipedia_down_is_not_cached(self):
+        cache = {}
+        import requests
+        with patch("utils.image_fallback.requests.get", side_effect=requests.ConnectionError("down")):
+            self.fb.resolve({"Nvidia"}, cache)
+        assert cache == {}
+
+    def test_media_agent_fills_only_articles_without_image(self):
+        good = _article("https://n.com/good", build_media([candidate("https://c.com/og.jpg", "og:image")]))
+        bare = _article("https://n.com/bare")
+        bare.title = "Nvidia boosts buyback as AI chips demand soars"
+        bare.body = "The chips designer said demand for artificial intelligence hardware keeps rising. " * 3
+        bare.entities = good.entities = [{"name": "Nvidia", "type": "Organization", "salience": 1.0}]
+        with patch("utils.image_fallback.requests.get", side_effect=_wiki_answer([NVIDIA])) as g:
+            out = MediaAgent().fill_missing([good, bare])
+        assert out[0].media.primary_image.url == "https://c.com/og.jpg"
+        assert out[1].media.primary_image.source == "wikipedia" and out[1].media.primary_image.credit
+        assert g.call_count == 2    # one batched page lookup + one batched credit lookup

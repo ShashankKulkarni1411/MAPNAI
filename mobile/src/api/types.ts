@@ -82,8 +82,12 @@ export type ExplanationParts = {
   also?: string[];
 };
 
-// Images come from ingestion (og:image / JSON-LD / feed media), referenced at the publisher's URL
-export type ArticleImage = { url: string; width?: number | null; height?: number | null; alt?: string | null; source?: string };
+// Images come from ingestion (og:image / JSON-LD / feed media), referenced at the publisher's URL; when the
+// publisher has none, a free Wikipedia image of the story's main entity (source 'wikipedia', with its credit)
+export type ArticleImage = {
+  url: string; width?: number | null; height?: number | null; alt?: string | null; source?: string;
+  credit?: string | null; credit_url?: string | null;
+};
 export type ArticleMedia = { primary_image: ArticleImage | null; additional_images: ArticleImage[] };
 
 // Counts from the feedback log and comments, leaving the viewer out; `viewer` is their own reaction / save

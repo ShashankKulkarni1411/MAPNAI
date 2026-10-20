@@ -110,6 +110,13 @@ function Backdrop({ item, height }: { item: StoryItem; height: number }) {
         <NoImage item={item} />
       )}
       <Fade color={c.bg} />
+      {img && !failed && img.credit ? (
+        // licence attribution for images not from the publisher (Wikimedia Commons)
+        <Txt v="label" color={c.ink2} numberOfLines={1}
+          style={{ position: 'absolute', right: space.sm, top: height * 0.64, maxWidth: '70%', fontSize: 9, lineHeight: 11, letterSpacing: 0, opacity: 0.85 }}>
+          {img.credit}
+        </Txt>
+      ) : null}
     </View>
   );
 }

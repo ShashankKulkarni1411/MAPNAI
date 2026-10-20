@@ -96,6 +96,11 @@ class Settings(BaseSettings):
     media_lookup_workers: int = Field(default=8, env="MEDIA_LOOKUP_WORKERS")
     media_lookup_timeout_seconds: int = Field(default=8, env="MEDIA_LOOKUP_TIMEOUT_SECONDS")
     media_lookup_max: int = Field(default=400, env="MEDIA_LOOKUP_MAX")   # page fetches per run
+    # Still no image after the page lookup: free Wikipedia image of the story's main entity (utils/image_fallback.py)
+    media_fallback: bool = Field(default=True, env="MEDIA_FALLBACK")
+    # Wikimedia throttles anonymous clients hard unless the User-Agent names the project and a contact
+    wikimedia_user_agent: str = Field(default="MAPNAI/1.0 (https://github.com/ShashankKulkarni1411/MAPNAI) news-images",
+                                      env="WIKIMEDIA_USER_AGENT")
 
     # ── Language ─────────────────────────────────────────────
     primary_language: str = Field(default="en", env="PRIMARY_LANGUAGE")

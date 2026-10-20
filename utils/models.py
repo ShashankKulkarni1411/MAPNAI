@@ -47,7 +47,9 @@ class ArticleImage(BaseModel):
     width:   Optional[int] = None
     height:  Optional[int] = None
     alt:     Optional[str] = None
-    source:  str = ""                  # og:image | json-ld | twitter:image | media:content | enclosure | api | …
+    source:  str = ""                  # og:image | json-ld | twitter:image | media:content | enclosure | api | wikipedia | …
+    credit:     Optional[str] = None   # author · licence, for images not from the article's own publisher
+    credit_url: Optional[str] = None
 
 
 class ArticleMedia(BaseModel):
