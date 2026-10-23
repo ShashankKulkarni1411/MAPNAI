@@ -1,0 +1,169 @@
+{
+ "meta": {
+  "script": "research/experiments/e03_live_descriptives.py",
+  "run_at_utc": "2026-10-23T13:12:14+00:00",
+  "git_commit": "53f4b12",
+  "python": "3.12.10",
+  "source": "live MongoDB (read-only aggregate reads)",
+  "articles": 3674
+ },
+ "clusters": {
+  "articles_clustered": 2063,
+  "clusters": 1864,
+  "singleton_clusters": 1729,
+  "singleton_cluster_share": 0.9276,
+  "articles_in_multi_member_clusters": 334,
+  "share_articles_in_multi_member": 0.1619,
+  "size_histogram": {
+   "1": 1729,
+   "2": 104,
+   "3": 16,
+   "4": 8,
+   "5": 4,
+   "6": 2,
+   "10": 1
+  },
+  "note": "histogram key 10 means ≥ 10"
+ },
+ "materiality": {
+  "m": {
+   "n": 2063,
+   "p10": 0.2356,
+   "p50": 0.2956,
+   "p90": 0.4485,
+   "max": 0.8646
+  },
+  "share_m_ge_0.6": 0.0654,
+  "unscored_share": 1.0,
+  "first_report_share": 0.0664,
+  "source_cred_values": {
+   "0.6": 1064,
+   "0.8": 577,
+   "0.4": 335,
+   "0.5": 87
+  },
+  "size_score": {
+   "n": 2063,
+   "p10": 0.2891,
+   "p50": 0.2891,
+   "p90": 0.4582,
+   "max": 1.0
+  }
+ },
+ "render": {
+  "cached_rewrites": 12,
+  "fallbacks": 4,
+  "fallback_rate": 0.3333,
+  "fallback_rate_wilson95": [
+   0.1381,
+   0.6094
+  ],
+  "by_length": {
+   "short": [
+    3,
+    7
+   ],
+   "medium": [
+    1,
+    5
+   ]
+  },
+  "note": "[fallbacks, total] per length; n is tiny"
+ },
+ "serving_developer_accounts": {
+  "label": "developer/demo accounts only — descriptive, not evidence about users",
+  "metrics.serving": {
+   "digests_served": 53,
+   "impressions": 1043,
+   "users": 11,
+   "by_section": {
+    "must_know": 135,
+    "for_you": 369,
+    "explore": 5,
+    "more_you_need": 534
+   },
+   "items_per_digest": 19.6792,
+   "explore_propensity": {
+    "n": 5,
+    "mean": 0.8716,
+    "p50": 1.0,
+    "p90": 1.0,
+    "max": 1.0
+   }
+  },
+  "metrics.engagement": {
+   "events": 105,
+   "users": 9,
+   "by_type": {
+    "dwell": 19,
+    "less": 8,
+    "missed": 1,
+    "more": 59,
+    "needed": 2,
+    "open": 13,
+    "save": 2,
+    "share": 1
+   },
+   "read_rate_by_section": {
+    "must_know": 0.0698,
+    "for_you": 0.1622,
+    "explore": 0.25,
+    "more_you_need": 0.0116
+   },
+   "less_rate": 0.0077
+  },
+  "digests": 53,
+  "catalog_coverage_unique_served_over_all_articles": 0.0653,
+  "topic_entropy_bits_per_digest_p50": 1.571,
+  "must_know_share_of_slate_items": 0.2652,
+  "propensity_values_explore": [
+   0.358,
+   1.0
+  ]
+ },
+ "classifier_silver_proxy": {
+  "label": "SILVER: feed domain is not ground truth",
+  "articles_matched_to_feed": 3464,
+  "articles_total": 3674,
+  "feed_domain_x_a2_domain": {
+   "entertainment_movies": {
+    "other": 43,
+    "entertainment_movies": 698,
+    "sports": 3
+   },
+   "finance": {
+    "other": 423,
+    "entertainment_movies": 2
+   },
+   "geopolitics": {
+    "other": 523,
+    "entertainment_movies": 6,
+    "sports": 18
+   },
+   "health": {
+    "other": 132,
+    "entertainment_movies": 1
+   },
+   "sports": {
+    "sports": 1075,
+    "other": 52,
+    "entertainment_movies": 17
+   },
+   "supply_chain": {
+    "other": 38
+   },
+   "technology": {
+    "other": 407,
+    "entertainment_movies": 24,
+    "sports": 2
+   }
+  },
+  "agreement_on_sports_and_movie_feeds": 0.9391,
+  "agreement_wilson95": [
+   0.9274,
+   0.949
+  ],
+  "off_taxonomy_feeds_labelled_in_scope_share": 0.0336,
+  "confidence_p50": 0.989
+ }
+}

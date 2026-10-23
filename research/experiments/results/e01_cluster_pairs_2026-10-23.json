@@ -1,0 +1,191 @@
+{
+ "meta": {
+  "script": "research/experiments/e01_cluster_pairs_eval.py",
+  "run_at_utc": "2026-10-23T13:05:18+00:00",
+  "git_commit": "53f4b12",
+  "python": "3.12.10",
+  "seed": 13,
+  "bootstrap_resamples": 5000
+ },
+ "data": {
+  "file": "tests/data/cluster_pairs.jsonl",
+  "pairs": 63,
+  "positives": 46,
+  "distinct_articles": 94,
+  "cos_range": [
+   0.6807,
+   0.8915
+  ],
+  "dt_h_max": 27.74
+ },
+ "config": {
+  "cos_join": 0.77,
+  "cos_strong": 0.88,
+  "cluster_time_h": 36,
+  "fuzzy_entity_min": 88.0,
+  "title_jaccard_min": 0.25,
+  "chain_margin": 0.05
+ },
+ "equivalence_check": "re-implemented rule == clustering.pair_joins on all pairs × thresholds: passed",
+ "current_rule_in_sample": {
+  "tp": 24,
+  "fp": 2,
+  "fn": 22,
+  "tn": 15,
+  "precision": 0.9230769230769231,
+  "recall": 0.5217391304347826,
+  "f1": 0.6666666666666667,
+  "precision_wilson95": [
+   0.7586,
+   0.9786
+  ],
+  "recall_wilson95": [
+   0.3814,
+   0.6588
+  ],
+  "pair_bootstrap95": {
+   "precision": [
+    0.8,
+    1.0
+   ],
+   "recall": [
+    0.375,
+    0.6667
+   ],
+   "f1": [
+    0.5294,
+    0.7838
+   ]
+  },
+  "caveat": "cos_join was selected on these pairs: in-sample"
+ },
+ "loocv_threshold_selection": {
+  "calibration_rule_min_precision_0.95": {
+   "tp": 12,
+   "fp": 2,
+   "fn": 34,
+   "tn": 15,
+   "precision": 0.8571428571428571,
+   "recall": 0.2608695652173913,
+   "f1": 0.4,
+   "chosen_thresholds": {
+    "0.77": 51,
+    "0.82": 12
+   }
+  },
+  "max_f1_rule": {
+   "tp": 39,
+   "fp": 12,
+   "fn": 7,
+   "tn": 5,
+   "precision": 0.7647058823529411,
+   "recall": 0.8478260869565217,
+   "f1": 0.8041237113402062,
+   "chosen_thresholds": {
+    "0.7": 63
+   }
+  }
+ },
+ "variants_at_configured_threshold": {
+  "cosine_only": {
+   "tp": 26,
+   "fp": 2,
+   "fn": 20,
+   "tn": 15,
+   "precision": 0.9285714285714286,
+   "recall": 0.5652173913043478,
+   "f1": 0.7027027027027025
+  },
+  "current_rule": {
+   "tp": 24,
+   "fp": 2,
+   "fn": 22,
+   "tn": 15,
+   "precision": 0.9230769230769231,
+   "recall": 0.5217391304347826,
+   "f1": 0.6666666666666667
+  },
+  "no_title_jaccard": {
+   "tp": 23,
+   "fp": 2,
+   "fn": 23,
+   "tn": 15,
+   "precision": 0.92,
+   "recall": 0.5,
+   "f1": 0.647887323943662
+  },
+  "no_entity_evidence": {
+   "tp": 18,
+   "fp": 1,
+   "fn": 28,
+   "tn": 16,
+   "precision": 0.9473684210526315,
+   "recall": 0.391304347826087,
+   "f1": 0.5538461538461538
+  },
+  "exact_entities_only": {
+   "tp": 24,
+   "fp": 2,
+   "fn": 22,
+   "tn": 15,
+   "precision": 0.9230769230769231,
+   "recall": 0.5217391304347826,
+   "f1": 0.6666666666666667
+  },
+  "no_strong_override": {
+   "tp": 24,
+   "fp": 2,
+   "fn": 22,
+   "tn": 15,
+   "precision": 0.9230769230769231,
+   "recall": 0.5217391304347826,
+   "f1": 0.6666666666666667
+  },
+  "evidence_only_no_cos": {
+   "tp": 41,
+   "fp": 13,
+   "fn": 5,
+   "tn": 4,
+   "precision": 0.7592592592592593,
+   "recall": 0.8913043478260869,
+   "f1": 0.8200000000000001
+  }
+ },
+ "auroc_same_event": {
+  "cosine": 0.7142,
+  "title_jaccard": 0.7366,
+  "note": "within the sampled cosine band only"
+ },
+ "near_duplicate_baseline": {
+  "simhash_hamming_le_3": {
+   "tp": 0,
+   "fp": 0,
+   "fn": 46,
+   "precision": null,
+   "recall": 0.0,
+   "f1": null
+  },
+  "minhash_lsh_j_ge_0.5": {
+   "tp": 4,
+   "fp": 0,
+   "fn": 42,
+   "precision": 1.0,
+   "recall": 0.08695652173913043,
+   "f1": 0.16
+  },
+  "union": {
+   "tp": 4,
+   "fp": 0,
+   "fn": 42,
+   "precision": 1.0,
+   "recall": 0.08695652173913043,
+   "f1": 0.16
+  },
+  "hamming_min_median_max": [
+   12,
+   25,
+   34
+  ],
+  "input_note": "title + ~220-char snippet (production uses title + body[:500])"
+ }
+}

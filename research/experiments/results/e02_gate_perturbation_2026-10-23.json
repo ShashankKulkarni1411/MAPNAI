@@ -1,0 +1,658 @@
+{
+ "meta": {
+  "script": "research/experiments/e02_gate_perturbation.py",
+  "run_at_utc": "2026-10-23T13:11:17+00:00",
+  "git_commit": "53f4b12",
+  "python": "3.12.10",
+  "seed": 13,
+  "snapshot": "data/e02_gate_sources_2026-10-23.jsonl",
+  "source_rows": 1843,
+  "gate": "personalization/factcheck.py:verify (unchanged)",
+  "label": "SYNTHETIC perturbations — sensitivity diagnostic, not a real-world error rate"
+ },
+ "pooled": {
+  "number_change": {
+   "expected": "reject",
+   "n": 2076,
+   "rejected": 2027,
+   "reject_rate": 0.9764,
+   "reject_rate_wilson95": [
+    0.9689,
+    0.9821
+   ],
+   "reasons": {
+    "number": 1732,
+    "added_number": 1951,
+    "entity": 204,
+    "month": 4
+   }
+  },
+  "number_added": {
+   "expected": "reject",
+   "n": 3686,
+   "rejected": 3686,
+   "reject_rate": 1.0,
+   "reject_rate_wilson95": [
+    0.999,
+    1.0
+   ],
+   "reasons": {
+    "added_number": 3686,
+    "month": 4
+   }
+  },
+  "entity_substitution": {
+   "expected": "reject",
+   "n": 3554,
+   "rejected": 3553,
+   "reject_rate": 0.9997,
+   "reject_rate_wilson95": [
+    0.9984,
+    1.0
+   ],
+   "reasons": {
+    "entity": 3553,
+    "number": 87,
+    "added_number": 78,
+    "month": 5
+   }
+  },
+  "month_change": {
+   "expected": "reject",
+   "n": 320,
+   "rejected": 287,
+   "reject_rate": 0.8969,
+   "reject_rate_wilson95": [
+    0.8587,
+    0.9256
+   ],
+   "reasons": {
+    "month": 287,
+    "entity": 1
+   }
+  },
+  "entity_role_swap": {
+   "expected": "reject",
+   "n": 2985,
+   "rejected": 2,
+   "reject_rate": 0.0007,
+   "reject_rate_wilson95": [
+    0.0002,
+    0.0024
+   ],
+   "reasons": {
+    "month": 2
+   }
+  },
+  "negation_inserted": {
+   "expected": "reject",
+   "n": 2665,
+   "rejected": 4,
+   "reject_rate": 0.0015,
+   "reject_rate_wilson95": [
+    0.0006,
+    0.0039
+   ],
+   "reasons": {
+    "month": 4
+   }
+  },
+  "hedge_removed": {
+   "expected": "reject",
+   "n": 407,
+   "rejected": 0,
+   "reject_rate": 0.0,
+   "reject_rate_wilson95": [
+    0.0,
+    0.0094
+   ],
+   "reasons": {}
+  },
+  "outcome_flipped": {
+   "expected": "reject",
+   "n": 467,
+   "rejected": 3,
+   "reject_rate": 0.0064,
+   "reject_rate_wilson95": [
+    0.0022,
+    0.0187
+   ],
+   "reasons": {
+    "entity": 3
+   }
+  },
+  "identity": {
+   "expected": "accept",
+   "n": 3686,
+   "rejected": 4,
+   "reject_rate": 0.0011,
+   "reject_rate_wilson95": [
+    0.0004,
+    0.0028
+   ],
+   "reasons": {
+    "month": 4
+   }
+  },
+  "number_reformat": {
+   "expected": "accept",
+   "n": 138,
+   "rejected": 0,
+   "reject_rate": 0.0,
+   "reject_rate_wilson95": [
+    0.0,
+    0.0271
+   ],
+   "reasons": {}
+  },
+  "possessive_stripped": {
+   "expected": "accept",
+   "n": 197,
+   "rejected": 197,
+   "reject_rate": 1.0,
+   "reject_rate_wilson95": [
+    0.9809,
+    1.0
+   ],
+   "reasons": {
+    "entity": 197
+   }
+  },
+  "sentence_reorder": {
+   "expected": "accept",
+   "n": 2183,
+   "rejected": 21,
+   "reject_rate": 0.0096,
+   "reject_rate_wilson95": [
+    0.0063,
+    0.0147
+   ],
+   "reasons": {
+    "entity": 17,
+    "month": 4
+   }
+  },
+  "surname_only": {
+   "expected": "contestable",
+   "n": 2667,
+   "rejected": 2661,
+   "reject_rate": 0.9978,
+   "reject_rate_wilson95": [
+    0.9951,
+    0.999
+   ],
+   "reasons": {
+    "entity": 2661,
+    "month": 4
+   }
+  },
+  "drop_last_sentence": {
+   "expected": "omission",
+   "n": 2183,
+   "rejected": 1257,
+   "reject_rate": 0.5758,
+   "reject_rate_wilson95": [
+    0.555,
+    0.5964
+   ],
+   "reasons": {
+    "entity": 1072,
+    "number": 580,
+    "month": 74
+   }
+  },
+  "lead_50_words": {
+   "expected": "omission",
+   "n": 1853,
+   "rejected": 1617,
+   "reject_rate": 0.8726,
+   "reject_rate_wilson95": [
+    0.8567,
+    0.8871
+   ],
+   "reasons": {
+    "entity": 1522,
+    "number": 968,
+    "month": 130
+   }
+  }
+ },
+ "per_field": {
+  "summary_short": {
+   "number_change": {
+    "expected": "reject",
+    "n": 1012,
+    "rejected": 993,
+    "reject_rate": 0.9812,
+    "reject_rate_wilson95": [
+     0.9709,
+     0.9879
+    ],
+    "reasons": {
+     "number": 858,
+     "added_number": 956,
+     "entity": 106,
+     "month": 2
+    }
+   },
+   "number_added": {
+    "expected": "reject",
+    "n": 1843,
+    "rejected": 1843,
+    "reject_rate": 1.0,
+    "reject_rate_wilson95": [
+     0.9979,
+     1.0
+    ],
+    "reasons": {
+     "added_number": 1843,
+     "month": 2
+    }
+   },
+   "entity_substitution": {
+    "expected": "reject",
+    "n": 1774,
+    "rejected": 1774,
+    "reject_rate": 1.0,
+    "reject_rate_wilson95": [
+     0.9978,
+     1.0
+    ],
+    "reasons": {
+     "entity": 1774,
+     "number": 41,
+     "added_number": 33,
+     "month": 3
+    }
+   },
+   "month_change": {
+    "expected": "reject",
+    "n": 147,
+    "rejected": 135,
+    "reject_rate": 0.9184,
+    "reject_rate_wilson95": [
+     0.8627,
+     0.9527
+    ],
+    "reasons": {
+     "month": 135,
+     "entity": 1
+    }
+   },
+   "entity_role_swap": {
+    "expected": "reject",
+    "n": 1477,
+    "rejected": 1,
+    "reject_rate": 0.0007,
+    "reject_rate_wilson95": [
+     0.0001,
+     0.0038
+    ],
+    "reasons": {
+     "month": 1
+    }
+   },
+   "negation_inserted": {
+    "expected": "reject",
+    "n": 1312,
+    "rejected": 2,
+    "reject_rate": 0.0015,
+    "reject_rate_wilson95": [
+     0.0004,
+     0.0055
+    ],
+    "reasons": {
+     "month": 2
+    }
+   },
+   "hedge_removed": {
+    "expected": "reject",
+    "n": 167,
+    "rejected": 0,
+    "reject_rate": 0.0,
+    "reject_rate_wilson95": [
+     0.0,
+     0.0225
+    ],
+    "reasons": {}
+   },
+   "outcome_flipped": {
+    "expected": "reject",
+    "n": 225,
+    "rejected": 1,
+    "reject_rate": 0.0044,
+    "reject_rate_wilson95": [
+     0.0008,
+     0.0247
+    ],
+    "reasons": {
+     "entity": 1
+    }
+   },
+   "identity": {
+    "expected": "accept",
+    "n": 1843,
+    "rejected": 2,
+    "reject_rate": 0.0011,
+    "reject_rate_wilson95": [
+     0.0003,
+     0.0039
+    ],
+    "reasons": {
+     "month": 2
+    }
+   },
+   "number_reformat": {
+    "expected": "accept",
+    "n": 58,
+    "rejected": 0,
+    "reject_rate": 0.0,
+    "reject_rate_wilson95": [
+     0.0,
+     0.0621
+    ],
+    "reasons": {}
+   },
+   "possessive_stripped": {
+    "expected": "accept",
+    "n": 97,
+    "rejected": 97,
+    "reject_rate": 1.0,
+    "reject_rate_wilson95": [
+     0.9619,
+     1.0
+    ],
+    "reasons": {
+     "entity": 97
+    }
+   },
+   "sentence_reorder": {
+    "expected": "accept",
+    "n": 1091,
+    "rejected": 7,
+    "reject_rate": 0.0064,
+    "reject_rate_wilson95": [
+     0.0031,
+     0.0132
+    ],
+    "reasons": {
+     "entity": 5,
+     "month": 2
+    }
+   },
+   "surname_only": {
+    "expected": "contestable",
+    "n": 1321,
+    "rejected": 1318,
+    "reject_rate": 0.9977,
+    "reject_rate_wilson95": [
+     0.9933,
+     0.9992
+    ],
+    "reasons": {
+     "entity": 1318,
+     "month": 2
+    }
+   },
+   "drop_last_sentence": {
+    "expected": "omission",
+    "n": 1091,
+    "rejected": 736,
+    "reject_rate": 0.6746,
+    "reject_rate_wilson95": [
+     0.6462,
+     0.7018
+    ],
+    "reasons": {
+     "entity": 647,
+     "number": 325,
+     "month": 40
+    }
+   },
+   "lead_50_words": {
+    "expected": "omission",
+    "n": 875,
+    "rejected": 762,
+    "reject_rate": 0.8709,
+    "reject_rate_wilson95": [
+     0.847,
+     0.8915
+    ],
+    "reasons": {
+     "entity": 715,
+     "number": 427,
+     "month": 51
+    }
+   }
+  },
+  "summary_long": {
+   "number_change": {
+    "expected": "reject",
+    "n": 1064,
+    "rejected": 1034,
+    "reject_rate": 0.9718,
+    "reject_rate_wilson95": [
+     0.96,
+     0.9802
+    ],
+    "reasons": {
+     "number": 874,
+     "added_number": 995,
+     "entity": 98,
+     "month": 2
+    }
+   },
+   "number_added": {
+    "expected": "reject",
+    "n": 1843,
+    "rejected": 1843,
+    "reject_rate": 1.0,
+    "reject_rate_wilson95": [
+     0.9979,
+     1.0
+    ],
+    "reasons": {
+     "added_number": 1843,
+     "month": 2
+    }
+   },
+   "entity_substitution": {
+    "expected": "reject",
+    "n": 1780,
+    "rejected": 1779,
+    "reject_rate": 0.9994,
+    "reject_rate_wilson95": [
+     0.9968,
+     0.9999
+    ],
+    "reasons": {
+     "entity": 1779,
+     "number": 46,
+     "added_number": 45,
+     "month": 2
+    }
+   },
+   "month_change": {
+    "expected": "reject",
+    "n": 173,
+    "rejected": 152,
+    "reject_rate": 0.8786,
+    "reject_rate_wilson95": [
+     0.8216,
+     0.9192
+    ],
+    "reasons": {
+     "month": 152
+    }
+   },
+   "entity_role_swap": {
+    "expected": "reject",
+    "n": 1508,
+    "rejected": 1,
+    "reject_rate": 0.0007,
+    "reject_rate_wilson95": [
+     0.0001,
+     0.0037
+    ],
+    "reasons": {
+     "month": 1
+    }
+   },
+   "negation_inserted": {
+    "expected": "reject",
+    "n": 1353,
+    "rejected": 2,
+    "reject_rate": 0.0015,
+    "reject_rate_wilson95": [
+     0.0004,
+     0.0054
+    ],
+    "reasons": {
+     "month": 2
+    }
+   },
+   "hedge_removed": {
+    "expected": "reject",
+    "n": 240,
+    "rejected": 0,
+    "reject_rate": 0.0,
+    "reject_rate_wilson95": [
+     0.0,
+     0.0158
+    ],
+    "reasons": {}
+   },
+   "outcome_flipped": {
+    "expected": "reject",
+    "n": 242,
+    "rejected": 2,
+    "reject_rate": 0.0083,
+    "reject_rate_wilson95": [
+     0.0023,
+     0.0296
+    ],
+    "reasons": {
+     "entity": 2
+    }
+   },
+   "identity": {
+    "expected": "accept",
+    "n": 1843,
+    "rejected": 2,
+    "reject_rate": 0.0011,
+    "reject_rate_wilson95": [
+     0.0003,
+     0.0039
+    ],
+    "reasons": {
+     "month": 2
+    }
+   },
+   "number_reformat": {
+    "expected": "accept",
+    "n": 80,
+    "rejected": 0,
+    "reject_rate": 0.0,
+    "reject_rate_wilson95": [
+     0.0,
+     0.0458
+    ],
+    "reasons": {}
+   },
+   "possessive_stripped": {
+    "expected": "accept",
+    "n": 100,
+    "rejected": 100,
+    "reject_rate": 1.0,
+    "reject_rate_wilson95": [
+     0.963,
+     1.0
+    ],
+    "reasons": {
+     "entity": 100
+    }
+   },
+   "sentence_reorder": {
+    "expected": "accept",
+    "n": 1092,
+    "rejected": 14,
+    "reject_rate": 0.0128,
+    "reject_rate_wilson95": [
+     0.0077,
+     0.0214
+    ],
+    "reasons": {
+     "entity": 12,
+     "month": 2
+    }
+   },
+   "surname_only": {
+    "expected": "contestable",
+    "n": 1346,
+    "rejected": 1343,
+    "reject_rate": 0.9978,
+    "reject_rate_wilson95": [
+     0.9935,
+     0.9992
+    ],
+    "reasons": {
+     "entity": 1343,
+     "month": 2
+    }
+   },
+   "drop_last_sentence": {
+    "expected": "omission",
+    "n": 1092,
+    "rejected": 521,
+    "reject_rate": 0.4771,
+    "reject_rate_wilson95": [
+     0.4476,
+     0.5068
+    ],
+    "reasons": {
+     "entity": 425,
+     "number": 255,
+     "month": 34
+    }
+   },
+   "lead_50_words": {
+    "expected": "omission",
+    "n": 978,
+    "rejected": 855,
+    "reject_rate": 0.8742,
+    "reject_rate_wilson95": [
+     0.852,
+     0.8936
+    ],
+    "reasons": {
+     "entity": 807,
+     "number": 541,
+     "month": 79
+    }
+   }
+  }
+ },
+ "summary": {
+  "macro_detection_lexically_visible_edits": 0.9683,
+  "macro_detection_semantic_edits": 0.0022,
+  "macro_acceptance_benign_edits": 0.6635,
+  "macro_balanced_accuracy_all_unfaithful_vs_benign": 0.5744,
+  "identity_pass_rate": 0.9989
+ },
+ "latency_us_per_verify": {
+  "n": 29067,
+  "mean": 976.9,
+  "p50": 501.4,
+  "p95": 3418.7
+ },
+ "source_length": {
+  "summary_short": {
+   "words_p50": 47,
+   "share_over_50_words": 0.4748
+  },
+  "summary_long": {
+   "words_p50": 56,
+   "share_over_50_words": 0.5307
+  }
+ }
+}

@@ -1,0 +1,9 @@
+{
+ "script": "research/experiments/e02_export_gate_sources.py",
+ "run_at_utc": "2026-10-23T13:07:18+00:00",
+ "git_commit": "53f4b12",
+ "python": "3.12.10",
+ "rows": 1843,
+ "query": "{'summary_short': {'$nin': [None, '']}, 'summary_long': {'$nin': [None, '']}}",
+ "collection": "processed_articles (read-only)"
+}
