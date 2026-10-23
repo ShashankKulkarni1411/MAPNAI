@@ -44,6 +44,8 @@ class PersArticleStore:
         arts.create_index([("cluster_id", ASCENDING)])
         arts.create_index([("materiality.m", DESCENDING)])
         arts.create_index([(c.published_field, DESCENDING), ("materiality.m", DESCENDING)])
+        arts.create_index([("published_ts", DESCENDING)])
+        arts.create_index([("ingested_ts", DESCENDING)])
         clusters = db[c.clusters_collection]
         clusters.create_index([("cluster_id", ASCENDING)], unique=True)
         clusters.create_index([("updated_at", DESCENDING)])
@@ -76,6 +78,24 @@ class PersArticleStore:
         docs = self.articles.find({c.published_field: {"$gte": coarse}, **(extra or {})},
                                   projection or self._projection())
         return [d for d in docs if (ts := parse_ts(d.get(c.published_field))) and cutoff <= ts <= now]
+
+    def _between(self, field: str, start: datetime, end: datetime) -> Dict:
+        """published_ts / ingested_ts in [start, end), or for rows from before those fields existed (not yet
+        backfilled), the ISO string's date prefix a day either side (callers apply the exact bounds)."""
+        legacy = {"published_ts": self.cfg.published_field, "ingested_ts": "ingested_at"}[field]
+        return {"$or": [
+            {field: {"$gte": start, "$lt": end}},
+            {field: {"$exists": False}, legacy: {"$gte": (start - timedelta(days=1)).date().isoformat(),
+                                                 "$lt": (end + timedelta(days=1)).date().isoformat()}},
+        ]}
+
+    def by_time(self, start: datetime, end: datetime, projection: Optional[Dict] = None) -> List[Dict]:
+        """Articles whose time (published_ts: published_at, else ingested_at) may fall in [start, end)."""
+        return list(self.articles.find(self._between("published_ts", start, end), projection or self._projection()))
+
+    def ingested_between(self, start: datetime, end: datetime, projection: Optional[Dict] = None) -> List[Dict]:
+        """Articles whose ingestion time may fall in [start, end) (late arrivals for the weekly carry-over)."""
+        return list(self.articles.find(self._between("ingested_ts", start, end), projection or self._projection()))
 
     def alert_scan_pending(self, hours: int, now: datetime, rescan: bool = False) -> List[Dict]:
         """

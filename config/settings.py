@@ -90,6 +90,9 @@ class Settings(BaseSettings):
     max_articles_per_source: int = Field(default=50, env="MAX_ARTICLES_PER_SOURCE")
     min_article_length: int = Field(default=100, env="MIN_ARTICLE_LENGTH")
     request_timeout_seconds: int = Field(default=15, env="REQUEST_TIMEOUT_SECONDS")
+    # A publish time further than this ahead of the ingestion time is a wrong date (bad feed / timezone): it is
+    # dropped and the article falls back to its ingestion time (date_source "ingested")
+    max_future_skew_minutes: int = Field(default=60, env="MAX_FUTURE_SKEW_MINUTES")
     max_retries: int = Field(default=3, env="MAX_RETRIES")
     # Article images: when the feed/API gave no usable hero image, read og:image / JSON-LD from the article page
     media_page_lookup: bool = Field(default=True, env="MEDIA_PAGE_LOOKUP")

@@ -10,7 +10,7 @@ import { FlatList, LayoutChangeEvent, Pressable, View, ViewToken } from 'react-n
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { api } from '@/api/endpoints';
-import { useDigest, useTop, useUserId } from '@/api/hooks';
+import { useBigToday, useDigest, useUserId } from '@/api/hooks';
 import type { StoryItem } from '@/api/types';
 import { Button } from '@/components/Button';
 import { FlashStory, heroImage } from '@/components/story/FlashStory';
@@ -33,7 +33,7 @@ export default function Flash() {
   const insets = useSafeAreaInsets();
   const uid = useUserId();
   const digest = useDigest();
-  const top = useTop(24);
+  const top = useBigToday();
   const [h, setH] = useState(0);
   const [index, setIndex] = useState(0);
   const [why, setWhy] = useState<StoryItem | null>(null);

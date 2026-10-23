@@ -8,6 +8,7 @@ import { Txt } from '../Txt';
 
 const KIND_GLYPH: Record<ExplanationParts['kind'], GlyphName> = {
   direct: 'person', connected: 'link', similar: 'echo', topic: 'echo', explore: 'compass', big_today: 'spotlight', alert: 'person',
+  recap: 'spotlight',
 };
 
 // Short line for the card, built from structured parts. Falls back to the engine sentence, then a section default.
@@ -28,6 +29,8 @@ export function whyShort(item: StoryItem): { lead: string; name?: string; tail?:
         return { lead: `Something new for you: ${p.topic}`, glyph: 'compass' };
       case 'big_today':
         return { lead: `Covered by ${item.cluster_size ?? 'many'} sources today`, glyph: 'spotlight' };
+      case 'recap':
+        return { lead: item.explanation ?? 'One of the biggest stories', glyph: 'spotlight' };
     }
   }
   if (item.explanation) return { lead: item.explanation, glyph: 'echo' };

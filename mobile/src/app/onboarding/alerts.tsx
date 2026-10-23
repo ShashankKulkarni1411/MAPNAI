@@ -103,12 +103,12 @@ export default function Alerts() {
         <Segmented label="Most alerts per day" value={max} onChange={setMax} options={[1, 2, 3, 4, 5].map((n) => ({ label: String(n), value: n }))} />
       </View>
       <View style={{ flexDirection: 'row', alignItems: 'center', minHeight: 48 }}>
-        <Txt v="body" style={{ flex: 1 }}>Weekly recap on Sunday</Txt>
-        <Switch value={weekly} onValueChange={setWeekly} accessibilityLabel="Weekly recap on Sunday" />
+        <Txt v="body" style={{ flex: 1 }}>Weekly recap on Sunday at 22:00</Txt>
+        <Switch value={weekly} onValueChange={setWeekly} accessibilityLabel="Weekly recap on Sunday at 22:00" />
       </View>
       <View style={{ flexDirection: 'row', alignItems: 'center', minHeight: 48 }}>
-        <Txt v="body" style={{ flex: 1 }}>Daily recap at 21:00</Txt>
-        <Switch value={daily} onValueChange={setDaily} accessibilityLabel="Daily recap at 21:00" />
+        <Txt v="body" style={{ flex: 1 }}>Daily recap of yesterday at 07:00</Txt>
+        <Switch value={daily} onValueChange={setDaily} accessibilityLabel="Daily recap of yesterday at 07:00" />
       </View>
       {note && <Txt v="meta" accessibilityLiveRegion="polite">{note}</Txt>}
       {error && <InlineError text={error} />}

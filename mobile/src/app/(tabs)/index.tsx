@@ -1,19 +1,21 @@
-// H1 Home: a finite brief. Need first, then interest, then what's big for everyone; then hand off to Flash.
+// H1 Home: a finite brief. The recap of yesterday (or the week) up top, then need, then interest, then what's big
+// for everyone today; then hand off to Flash.
 import { router, useScrollToTop } from 'expo-router';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Pressable, RefreshControl, ScrollView, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { api } from '@/api/endpoints';
-import { invalidatePersona, pendingBriefUpdate, useAlerts, useDigest, useHealth, useProfile, useProposals, useTop, useUserId } from '@/api/hooks';
+import { invalidatePersona, pendingBriefUpdate, useAlerts, useDigest, useHealth, useProfile, useBigToday, useProposals, useRecap, useUserId } from '@/api/hooks';
 import type { StoryItem } from '@/api/types';
 import { Button } from '@/components/Button';
 import { Glyph, SignalBars } from '@/components/Glyph';
+import { RecapCard } from '@/components/story/RecapCard';
 import { openStory, StoryCard } from '@/components/story/StoryCard';
 import { ActionsSheet, WhySheet } from '@/components/story/sheets';
 import { Txt } from '@/components/Txt';
 import { Banner, CardSkeleton, EmptyState, InlineError, SectionTitle } from '@/components/ui';
-import { clockLabel, dayLabel, greeting, hoursSince, isoDate } from '@/lib/time';
+import { clockLabel, dayLabel, greeting, hoursSince, isoDate, localDate } from '@/lib/time';
 import { react, useFeedback } from '@/state/feedback';
 import { usePrefs } from '@/state/prefs';
 import { useSession } from '@/state/session';
@@ -31,7 +33,9 @@ export default function Home() {
   const profile = useProfile();
   const alerts = useAlerts();
   const proposals = useProposals();
-  const top = useTop(24);
+  const top = useBigToday();
+  const daily = useRecap('daily');
+  const weekly = useRecap('weekly');
   const health = useHealth();
   const hidden = useFeedback((s) => (s.hiddenToday.day === isoDate() ? s.hiddenToday.keys : []));
   const seenTips = usePrefs((s) => s.seenTips);
@@ -69,12 +73,16 @@ export default function Home() {
   const badge = (alerts.data?.length ?? 0) + (proposals.data?.length ?? 0);
   const engineDown = health.data ? !health.data.ok : false;
   const coldStart = profile.data?.created_at ? hoursSince(profile.data.created_at) < 72 : false;
+  // The week's recap leads from Sunday 22:00 until Tuesday morning; after that it's a one-line link
+  const weeklyFresh = !!weekly.data && hoursSince(weekly.data.ready_at) < 36;
+  // Big today starts where the newest daily recap ends: midnight once yesterday's is out (07:00), else yesterday
+  const bigSince = daily.data && daily.data.period !== localDate(-1) ? 'Since yesterday' : 'Today so far';
 
   async function onRefresh() {
     setRefreshing(true);
     try {
       await digest.refresh();
-      await Promise.all([alerts.refetch(), proposals.refetch(), top.refetch()]);
+      await Promise.all([alerts.refetch(), proposals.refetch(), top.refetch(), daily.refetch(), weekly.refetch()]);
     } finally {
       setRefreshing(false);
     }
@@ -140,12 +148,21 @@ export default function Home() {
         ))}
         {recentAlerts.length > 0 && <Button label="See all" variant="text" small onPress={() => router.push('/notifications')} style={{ alignSelf: 'flex-start' }} />}
 
-        {/* 4 Catch-up card (recap builder is Proposed; R1 lands next phase) */}
+        {/* 4 Catch-up card */}
         {awayHours >= 48 && awayHours !== Infinity && (
           <View style={{ marginTop: space.md, padding: space.lg, borderRadius: radius.card, backgroundColor: c.surface2, gap: 4 }}>
             <Txt v="cardHeadline">You were away {Math.round(awayHours / 24)} days.</Txt>
-            <Txt v="meta" muted>Your must-knows below cover what you missed.</Txt>
+            <Txt v="meta" muted>{weekly.data ? 'The weekly recap below covers the big stories you missed.' : 'Your must-knows below cover what you missed.'}</Txt>
           </View>
+        )}
+
+        {/* 4b Recaps: the week's leads on Sunday night and Monday, yesterday's otherwise; the other is a link */}
+        {weeklyFresh && weekly.data!.items.length > 0 && <RecapCard recap={weekly.data!} />}
+        {daily.data && daily.data.items.length > 0 && (
+          weeklyFresh ? <View style={{ marginTop: space.sm }}><RecapCard recap={daily.data} compact /></View> : <RecapCard recap={daily.data} />
+        )}
+        {!weeklyFresh && weekly.data && weekly.data.items.length > 0 && (
+          <View style={{ marginTop: space.sm }}><RecapCard recap={weekly.data} compact /></View>
         )}
 
         {/* 5 Your world */}
@@ -224,7 +241,7 @@ export default function Home() {
         {/* 10 Big today */}
         {big.length > 0 && (
           <>
-            <SectionTitle title="Big today" sub="Most covered, whatever you follow" />
+            <SectionTitle title="Big today" sub={`${bigSince} · most covered, whatever you follow`} />
             <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: space.md }}>
               {big.map((i) => (
                 <Pressable key={i.article_id} onPress={() => openStory(i)} accessibilityRole="button"

@@ -1,12 +1,14 @@
 """
 MAPNAI — api/admin_router.py
-/v1/admin: engine metrics, the job schedule, and manual job runs (the same run_job the scheduler calls, so a
-manual run takes the job_runs lease and shows up in health). No auth — bind the API to 127.0.0.1 (plan R13).
+/v1/admin: engine metrics, the job schedule, manual job runs (the same run_job the scheduler calls, so a
+manual run takes the job_runs lease and shows up in health), and recap rebuilds with an editor's exclusions / pins.
+No auth — bind the API to 127.0.0.1 (plan R13).
 """
 
 from typing import List, Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
+from pydantic import BaseModel, Field
 
 from api.personalization_router import get_service
 from personalization import jobs
@@ -62,3 +64,23 @@ def run_job(
     if not result.get("ok"):
         raise HTTPException(status_code=500, detail=result)
     return result
+
+
+class RecapEdit(BaseModel):
+    exclude: Optional[List[str]] = Field(default=None, description="article ids whose stories leave the recap; "
+                                                                    "null keeps the current list")
+    pin: Optional[List[str]] = Field(default=None, description="article ids whose stories go first; null keeps")
+
+
+@router.post("/recaps/{kind}/rebuild")
+def rebuild_recap(
+    kind: str,
+    body: Optional[RecapEdit] = None,
+    period: Optional[str] = Query(default=None, description="daily: YYYY-MM-DD, weekly: YYYY-Www; default newest"),
+    tz: Optional[str] = Query(default=None, description="default PERS_TZ"),
+    svc: PersonalizationService = Depends(get_service),
+):
+    """Build a new version of a recap now (after an editor's exclusions / pins, or new articles). Readers get it
+    from their next request; earlier versions stay stored."""
+    body = body or RecapEdit()
+    return svc.rebuild_recap(kind, period, tz, body.exclude, body.pin)

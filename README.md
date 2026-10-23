@@ -327,6 +327,7 @@ Prerequisites: MongoDB and Neo4j are filled by the pipeline, and `.env` has `GRO
 python run_mapnai.py --limit 100                 # 1. ingestion + Agents 1-4 → processed_articles + the graph
 python scripts/rebuild_pers_faiss.py             # 2. first time only: personalization vector index from Mongo
 python scripts/seed_entity_aliases.py            # 3. first time only: "man city" → "manchester city", …
+python scripts/backfill_dates.py --apply         #    first time only: published_ts / ingested_ts for recaps
 python -m personalization.jobs cluster           # 4. entity keys, index sync, event clusters, materiality
 python scripts/seed_demo_personas.py             # 5. three demo users (below), checked against the live graph
 python run_api.py                                # 6. API on http://127.0.0.1:8000 (docs at /docs) + scheduler
@@ -364,6 +365,10 @@ Demo personas (`scripts/seed_demo_personas.py`; a re-run replaces them):
 | GET | `/users/{id}/proposals` | Suggested exposures; `POST …/proposals/{pid}/accept` or `/reject` |
 | GET | `/users/{id}/alerts?since=&include_pending=` | Alerts, newest first |
 | GET | `/articles/{aid}/render?user_id=` | Style rewrite plus the reader's brief (`text, why, brief, fallback`) |
+| GET | `/articles/top?after_recap=true&tz=` | Big today: everything since the newest daily recap ended (or the last `hours`) |
+| GET | `/recaps/daily?tz=&date=&user_id=` | The day before, in the device's time zone (ready at 07:00): up to 10 stories, ≥ 3 per domain |
+| GET | `/recaps/weekly?tz=&week=&user_id=` | Monday to Sunday 22:00: Stories of the week (5) + 1–2 per day, at most 20 |
+| POST | `/admin/recaps/{kind}/rebuild?period=&tz=` | New version of a recap, body `{exclude: [article ids], pin: [article ids]}` |
 | GET | `/personalization/health` | Mongo, Neo4j, the vector index, the last run of each job, the scheduler |
 | GET | `/admin/metrics?days=7` | Serving, read rate per section, must_know precision and miss rate, τ history, proposals, alerts, render fallbacks, the article window, jobs |
 | GET | `/admin/jobs` | Every job, its cron, the scheduler's next run times, the last run |
@@ -373,7 +378,7 @@ There is no auth, so keep the API bound to 127.0.0.1 (the `run_api.py` default).
 
 ### Jobs
 
-`python run_api.py` starts an in-process APScheduler with six cron jobs in `PERS_TZ` (default Asia/Kolkata). Each
+`python run_api.py` starts an in-process APScheduler with eight cron jobs in `PERS_TZ` (default Asia/Kolkata). Each
 run is recorded in `job_runs` under a lease, so a manual run and a scheduled run never overlap. Run uvicorn with
 **one worker**, or set `PERS_SCHEDULER_ENABLED=false` on the extra workers.
 
@@ -385,6 +390,8 @@ run is recorded in `job_runs` under a lease, so a manual run and a scheduled run
 | `tau` | `30 2 * * *` | One adaptive step of τ from last week's needed/missed feedback |
 | `digests` | `30 5 * * *` | Precompute today's digests |
 | `proposals` | `0 3 * * mon` | Engagement-based exposure proposals |
+| `recap_daily` | `10 7 * * *` | Build yesterday's recap in `PERS_TZ` (other time zones are built on first request) |
+| `recap_weekly` | `0 22 * * sun` | Build the recap of the week that just ended |
 
 Run any job once without the API: `python -m personalization.jobs <name> [--user ID] [--rescan]`. `recluster` is
 a manual-only job, for use after changing a clustering threshold.
@@ -415,6 +422,18 @@ Lists and dicts take JSON.
 | `PERS_W_RISK` · `PERS_W_SIZE` · `PERS_W_FIRST` · `PERS_W_CRED` | `.5` · `.2` · `.15` · `.15` | Materiality weights |
 | `PERS_RENDER_MODEL` | `openai/gpt-oss-120b` | Groq model for `/render` |
 | `PERS_POLICY_VERSION` | `v2.0` | Stamped on impressions. Changing it invalidates cached digests |
+| `PERS_RECAP_DOMAINS` | `["sports","entertainment_movies"]` | Domains the recaps cover (whatever the reader follows) |
+| `PERS_RECAP_DAILY_READY` · `PERS_RECAP_WEEK_END` | `07:00` · `22:00` | When yesterday's recap is ready · Sunday's weekly cut |
+| `PERS_RECAP_DAILY_SIZE` · `PERS_RECAP_WEEKLY_TOP` · `PERS_RECAP_WEEKLY_MAX` | `10` · `5` · `20` | Recap sizes |
+| `PERS_RECAP_MIN_M` | `.25` | Quality floor: a quiet day gets fewer stories, never filler |
+| `PERS_RECAP_OVERVIEW` | `true` | 2–3 sentence Groq overview (dropped if it adds a number the stories don't have) |
+
+**Recaps.** One recap per period and time zone, the same for every reader (only the "you follow" / "you read this"
+marks are personal). Stories are clusters ranked by materiality `m`. A recap is frozen once built (`recaps`
+collection, one doc per version), except one marked `coverage.limited` (fewer than 15 articles), which is rebuilt
+when articles for its period are ingested later. Late arrivals for the weekly (published before Sunday 22:00,
+ingested after the recap was built) go into the next week's. An article without a publish time uses its ingestion
+time, or an earlier time from a dated article on the same story.
 
 **Data caveats.**
 - Until Agent 4 scores articles, every `m` is "unscored": `risk_norm` defaults to 0.5, and `m` rarely reaches 0.6.
@@ -458,6 +477,9 @@ Every article that exits the preprocessing stage is a `ProcessedArticle`:
   "raw_source":      "https://economictimes.com/rssfeedstopstories.cms",
   "published_at":    "2026-04-19T05:30:00Z",
   "ingested_at":     "2026-04-19T10:00:45Z",
+  "published_ts":    ISODate("2026-04-19T05:30:00Z"),   // published_at, else ingested_at (BSON date)
+  "ingested_ts":     ISODate("2026-04-19T10:00:45Z"),
+  "date_source":     "published",                       // published | page_meta | ingested
   "language":        "en",
   "dedup_hash":      "a1b2c3d4e5f60001",
   "entities":        [

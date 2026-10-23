@@ -20,7 +20,7 @@ from __future__ import annotations
 
 import threading
 import time
-from datetime import datetime, timezone
+from datetime import datetime
 from typing import List, Optional
 
 try:
@@ -128,7 +128,8 @@ def fetch_bluesky_firehose(
                     created_at_raw.replace("Z", "+00:00")
                 )
             except Exception:
-                published_at = datetime.now(timezone.utc)
+                # unknown, not "now": preprocessing falls back to the ingestion time and records date_source
+                published_at = None
 
             # Build a deterministic URL from the repo DID + rkey
             rkey = path.split("/")[-1]

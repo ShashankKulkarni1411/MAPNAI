@@ -1,3 +1,5 @@
+import * as Localization from 'expo-localization';
+
 export function parseTs(s?: string | null): Date | null {
   if (!s) return null;
   const d = new Date(s);
@@ -39,4 +41,15 @@ export function dayLabel(now = new Date()): string {
 
 export function isoDate(now = new Date()): string {
   return now.toISOString().slice(0, 10);
+}
+
+// The device's IANA time zone: recaps and "today" are cut at this zone's midnights
+export function deviceTz(): string {
+  return Localization.getCalendars()[0]?.timeZone ?? Intl.DateTimeFormat().resolvedOptions().timeZone ?? 'Asia/Kolkata';
+}
+
+// YYYY-MM-DD of the device's local day, `offset` days from today (−1 = yesterday)
+export function localDate(offset = 0, now = new Date()): string {
+  const d = new Date(now.getFullYear(), now.getMonth(), now.getDate() + offset);
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 }

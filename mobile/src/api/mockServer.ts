@@ -7,7 +7,7 @@ import { ApiError } from './client';
 import { ARTICLES, COMENTIONS, ENTITIES, FixtureArticle } from './fixtures';
 import type {
   Alert, AlertPrefs, AskAnswer, Comment, Digest, EntityHit, Exposure, FeedbackType, FeedPage, Headline, Health,
-  Profile, Proposal, Role, SearchPage, Section, StoryDetail, StoryItem, Style, WeightLevel,
+  Profile, Proposal, Recap, RecapKind, Role, SearchPage, Section, StoryDetail, StoryItem, Style, WeightLevel,
 } from './types';
 
 const TAU = 0.2;
@@ -375,6 +375,56 @@ export const mock = {
         explanation: `Covered by ${a.sources} sources today`,
         explanation_parts: { kind: 'big_today' },
       }));
+  },
+
+  // Recaps from the fixtures: the biggest stories by m with at least 3 (daily) / 2 (weekly top) per domain.
+  // Every fixture is "yesterday" here; the weekly spreads the rest over the days so its sections show.
+  async recap(kind: RecapKind): Promise<Recap> {
+    await delay(250);
+    const pool = ARTICLES.filter((a) => a.topic === 'sports' || a.topic === 'entertainment_movies').sort((a, b) => b.m - a.m);
+    const n = kind === 'daily' ? 10 : 15;
+    const lead = kind === 'daily' ? 3 : 2;
+    const picks = [
+      ...pool.filter((a) => a.topic === 'sports').slice(0, lead),
+      ...pool.filter((a) => a.topic === 'entertainment_movies').slice(0, lead),
+    ];
+    for (const a of pool) if (picks.length < n && !picks.includes(a)) picks.push(a);
+    picks.sort((a, b) => b.m - a.m);
+    const day = (offset: number) => {
+      const d = new Date(Date.now() + offset * 86_400_000);
+      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    };
+    const days = Array.from({ length: 7 }, (_, i) => day(i - 7));
+    const items = picks.slice(0, n).map((a, i) => ({
+      ...toItem(a, 'recap', i + 1, {
+        explanation: a.sources > 1 ? `Covered by ${a.sources} sources` : `One of the ${kind === 'daily' ? 'day' : 'week'}'s biggest stories`,
+        explanation_parts: { kind: 'recap' as const },
+      }),
+      rank: i + 1,
+      group: kind === 'daily' ? 'day' : i < 5 ? 'top' : days[(i - 5) % 7],
+      story_id: `c-${a.id}`,
+      member_ids: [a.id],
+      happened_at: ago(a.ageH + 24),
+      marks: { follows: null, in_your_topics: false, seen: false },
+    }));
+    const titleOf = (iso: string) => new Date(`${iso}T12:00:00`).toLocaleDateString([], { weekday: 'long', day: 'numeric', month: 'short' });
+    const title = kind === 'daily'
+      ? new Date(`${day(-1)}T12:00:00`).toLocaleDateString([], { weekday: 'long', day: 'numeric', month: 'long' })
+      : `${titleOf(days[0])} – ${titleOf(days[6])}`;
+    const sections = kind === 'daily'
+      ? [{ key: 'day', title, count: items.length }]
+      : [{ key: 'top', title: 'Stories of the week', count: items.filter((i) => i.group === 'top').length },
+         ...days.filter((d) => items.some((i) => i.group === d)).map((d) => ({ key: d, title: titleOf(d), count: items.filter((i) => i.group === d).length }))];
+    const count = (t: string) => items.filter((i) => i.topic === t).length;
+    return {
+      kind, period: kind === 'daily' ? day(-1) : 'mock-week', tz: 'Asia/Kolkata', title,
+      start: ago(48), end: ago(24), ready_at: ago(17), generated_at: ago(17), next_at: ago(-7),
+      version: 1, latest: true,
+      overview: { text: 'A mock overview: the biggest sports and film stories, in two short sentences. Real recaps write this from the stories below.' },
+      items, sections,
+      coverage: { articles: 40, by_domain: { sports: count('sports'), entertainment_movies: count('entertainment_movies') },
+        stories: items.length, eligible: items.length, limited: false, carried_over: 0 },
+    };
   },
 
   async story(article_id: string, userId?: string | null): Promise<StoryDetail> {

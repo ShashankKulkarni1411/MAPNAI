@@ -45,6 +45,7 @@ export const sectionLabel: Record<Section, string> = {
   big_today: 'Big today',
   feed: 'More for you',
   just_in: 'Just in',
+  recap: 'Recap',
 };
 
 export const sectionMeaning: Record<Section, string> = {
@@ -55,6 +56,7 @@ export const sectionMeaning: Record<Section, string> = {
   big_today: 'Big today: one of today’s most covered stories, shown to everyone.',
   feed: 'More for you: ranked from your latest reading.',
   just_in: 'Just in: big news about something you follow, as it happened.',
+  recap: 'Recap: one of the biggest stories of the day or week, the same for every reader.',
 };
 
 // High impact for ALERT, Major for ESCALATE, nothing otherwise (and never for unscored)

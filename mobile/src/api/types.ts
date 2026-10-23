@@ -11,7 +11,8 @@ export type Section =
   | 'explore'
   | 'big_today'
   | 'feed'
-  | 'just_in';
+  | 'just_in'
+  | 'recap';
 export type RiskLevel = 'MONITOR' | 'ALERT' | 'ESCALATE' | null;
 
 // ── Built ────────────────────────────────────────────────
@@ -71,7 +72,7 @@ export type Health = {
 // ── Shared item shape (digest, feed, Big today, search) ───
 
 export type ExplanationParts = {
-  kind: 'direct' | 'connected' | 'similar' | 'topic' | 'explore' | 'big_today' | 'alert';
+  kind: 'direct' | 'connected' | 'similar' | 'topic' | 'explore' | 'big_today' | 'alert' | 'recap';
   seed_name?: string;
   seed_weight?: WeightLevel;
   role?: Role;
@@ -135,6 +136,46 @@ export type Digest = {
 };
 
 export type FeedPage = { items: StoryItem[]; next_cursor: string | null; exhausted: boolean; window_h: number };
+
+// Recaps (GET /v1/recaps/daily|weekly): the same stories for every reader in a time zone, frozen once built.
+// Daily = the day before (ready 07:00); weekly = Monday to Sunday 22:00. `marks` are this reader's own.
+export type RecapKind = 'daily' | 'weekly';
+export type RecapMarks = { follows: string | null; in_your_topics: boolean; seen: boolean };
+export type RecapItem = StoryItem & {
+  rank: number;
+  group: string; // daily: 'day'; weekly: 'top' (Stories of the week) or the YYYY-MM-DD the story broke
+  story_id: string;
+  member_ids: string[];
+  happened_at: string;
+  span_days?: number | null;
+  date_source?: 'published' | 'page_meta' | 'sibling' | 'ingested';
+  marks?: RecapMarks;
+};
+export type RecapSection = { key: string; title: string; count: number };
+export type Recap = {
+  kind: RecapKind;
+  period: string; // daily YYYY-MM-DD, weekly YYYY-Www
+  tz: string;
+  title: string; // "Wednesday, 21 October" / "19–25 October"
+  start: string;
+  end: string;
+  ready_at: string;
+  generated_at: string;
+  next_at: string;
+  version: number;
+  latest: boolean;
+  overview: { text: string | null; reason?: string | null } | null;
+  items: RecapItem[];
+  sections: RecapSection[];
+  coverage: {
+    articles: number;
+    by_domain: Record<string, number>;
+    stories: number;
+    eligible: number;
+    limited: boolean;
+    carried_over: number;
+  };
+};
 
 export type StoryDetail = StoryItem & {
   risk?: {

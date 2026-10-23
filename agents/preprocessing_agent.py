@@ -13,7 +13,7 @@ Produces: List[ProcessedArticle] — ready for storage.
 """
 
 from typing import List, Tuple
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 
 from utils.models import RawArticle, ProcessedArticle, SourceType, Domain, SentimentLabel
 from utils.text_cleaner import (
@@ -189,7 +189,12 @@ class PreprocessingAgent:
         self.deduplicator.register(sim_hash)
 
         # ── Step 5: Timestamp normalization ──────────────────
+        ingested_at = datetime.now(timezone.utc)
         pub_at = normalize_timestamp(raw.published_at)
+        if pub_at and pub_at > ingested_at + timedelta(minutes=settings.max_future_skew_minutes):
+            logger.debug(f"Future publish time dropped [{raw.article_id[:8]}]: {pub_at.isoformat()}")
+            pub_at = None
+        date_source = (raw.raw_metadata.get("date_source") or "published") if pub_at else "ingested"
 
         # ── Step 6: Domain classification ────────────────────
         domain = raw.domain
@@ -219,7 +224,8 @@ class PreprocessingAgent:
             author=raw.author,
             media=build_media(raw.images),
             published_at=pub_at,
-            ingested_at=datetime.utcnow(),
+            ingested_at=ingested_at,
+            date_source=date_source,
             language=lang,
             dedup_hash=sim_hash,
             sentiment_score=sentiment_score,

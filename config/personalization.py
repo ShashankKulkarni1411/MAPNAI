@@ -246,6 +246,33 @@ class PersonalizationSettings(BaseSettings):
     comment_max_chars: int = 500
     comments_page_max: int = 100
 
+    # ── N. Recaps (personalization/recap.py) ─────────────────
+    # The same for every reader (only "you follow" / "you read this" marks are per user). Daily: the local day
+    # before, ready at recap_daily_ready. Weekly: Monday to Sunday, cut at recap_week_end on Sunday, so news after
+    # it opens the next week. Stories are clusters (one item each); importance is materiality m.
+    recaps_collection: str = "recaps"
+    recap_domains: List[str] = ["sports", "entertainment_movies"]
+    recap_daily_ready: str = "07:00"
+    recap_week_end: str = "22:00"
+    recap_daily_size: int = 10
+    recap_daily_min_per_domain: int = 3
+    recap_weekly_top: int = 5            # "Stories of the week"
+    recap_weekly_top_min_per_domain: int = 2
+    recap_weekly_per_day: int = 2        # then up to this many per day, by the day the story broke
+    recap_weekly_second_min_m: float = 0.35   # a day's second story needs this m (a quiet day keeps one)
+    recap_weekly_max: int = 20
+    recap_span_bonus: float = 0.05       # weekly rank = m + bonus · (days the story ran − 1)
+    # quality floor: never fill a recap with stories below this m. m of a lone, unscored article from a
+    # default-credibility source is ≈ 0.27; not calibrated on real data yet
+    recap_min_m: float = 0.25
+    recap_dup_title_jaccard: float = 0.5  # two stories (clusters) with titles this alike are one story
+    recap_undated_lookback_h: int = 24   # an undated article takes an earlier dated sibling's time from this far back
+    recap_low_coverage: int = 15         # fewer in-scope articles than this in the period → coverage.limited
+    recap_member_ids_max: int = 30       # cluster members kept per item (for "you read this")
+    recap_overview: bool = True          # 2-3 sentence LLM overview, from the selected summaries only
+    recap_overview_max_tokens: int = 600
+    recap_overview_source_chars: int = 300   # per story, fed to the overview prompt
+
     # ── L. Jobs (cron, in tz) ────────────────────────────────
     job_pi_topk: str = "0 1 * * *"
     job_cluster: str = "5 * * * *"
@@ -253,6 +280,9 @@ class PersonalizationSettings(BaseSettings):
     job_tau: str = "30 2 * * *"
     job_proposals: str = "0 3 * * mon"
     job_digests: str = "30 5 * * *"
+    # after the 06:05 clustering run, so the night's articles have clusters and materiality
+    job_recap_daily: str = "10 7 * * *"
+    job_recap_weekly: str = "0 22 * * sun"
 
     model_config = SettingsConfigDict(
         env_prefix="PERS_",

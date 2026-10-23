@@ -6,6 +6,8 @@ Handles timeouts, retries, and rate limiting per source.
 Produces: List[RawArticle]
 """
 
+import calendar
+
 import feedparser
 import requests
 from typing import List, Optional
@@ -25,9 +27,9 @@ def _parse_published(entry: feedparser.FeedParserDict) -> Optional[datetime]:
     for field in ("published_parsed", "updated_parsed", "created_parsed"):
         val = getattr(entry, field, None)
         if val:
-            import time
             try:
-                ts = time.mktime(val)
+                # feedparser's *_parsed are UTC struct_times; time.mktime would read them as local time
+                ts = calendar.timegm(val)
                 return normalize_timestamp(ts)
             except Exception:
                 continue

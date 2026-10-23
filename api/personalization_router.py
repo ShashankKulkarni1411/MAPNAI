@@ -221,9 +221,33 @@ def saved(user_id: str, svc: PersonalizationService = Depends(get_service)):
 def top_articles(
     hours: int = Query(default=24, ge=1, le=24 * 7),
     limit: int = Query(default=8, ge=1, le=50),
+    after_recap: bool = Query(default=False, description="since the newest daily recap ended, instead of `hours`"),
+    tz: Optional[str] = Query(default=None, description="IANA time zone for after_recap, e.g. Asia/Kolkata"),
     svc: PersonalizationService = Depends(get_service),
 ):
-    return svc.top(hours, limit)
+    return svc.top(hours, limit, after_recap, tz)
+
+
+# ── N. Recaps ────────────────────────────────────────────────
+
+@router.get("/recaps/daily")
+def daily_recap(
+    tz: Optional[str] = Query(default=None, description="the device's IANA time zone (default: the reader's, else PERS_TZ)"),
+    date: Optional[str] = Query(default=None, description="YYYY-MM-DD; default: the newest ready day (yesterday after 07:00)"),
+    user_id: Optional[str] = Query(default=None, description="adds the reader's marks (follows / read)"),
+    svc: PersonalizationService = Depends(get_service),
+):
+    return svc.get_recap("daily", tz, date, user_id)
+
+
+@router.get("/recaps/weekly")
+def weekly_recap(
+    tz: Optional[str] = Query(default=None, description="the device's IANA time zone (default: the reader's, else PERS_TZ)"),
+    week: Optional[str] = Query(default=None, description="ISO week YYYY-Www; default: the newest ready week"),
+    user_id: Optional[str] = Query(default=None, description="adds the reader's marks (follows / read)"),
+    svc: PersonalizationService = Depends(get_service),
+):
+    return svc.get_recap("weekly", tz, week, user_id)
 
 
 @router.get("/articles/{article_id}")

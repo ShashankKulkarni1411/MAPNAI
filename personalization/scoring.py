@@ -24,7 +24,8 @@ def topic_shares(topics: Dict[str, float]) -> Dict[str, float]:
 def parse_ts(value: Any) -> Optional[datetime]:
     """
     ISO string (with or without offset) or datetime → timezone-aware UTC datetime.
-    processed_articles stores published_at with an offset and ingested_at naive (UTC).
+    processed_articles stores published_at with an offset; ingested_at has one too, but rows from before
+    2026-10 hold it naive (UTC). published_ts / ingested_ts come back from Mongo as naive UTC datetimes.
     """
     if value is None or value == "":
         return None

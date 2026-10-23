@@ -62,6 +62,9 @@ class PersLogStore:
         alerts.create_index([("user_id", ASCENDING), ("deliver_after", DESCENDING)])
         alerts.create_index([("user_id", ASCENDING), ("cluster_id", ASCENDING)], unique=True,
                             name="one_alert_per_cluster")
+        db[self.cfg.recaps_collection].create_index(
+            [("kind", ASCENDING), ("period", ASCENDING), ("tz", ASCENDING), ("version", DESCENDING)], unique=True,
+            name="one_recap_version")
         db[self.cfg.render_cache_collection].create_index(
             [("article_id", ASCENDING), ("tone", ASCENDING), ("length", ASCENDING), ("jargon", ASCENDING),
              ("prompt_version", ASCENDING)], unique=True, name="one_render_per_style")
@@ -307,6 +310,23 @@ class PersLogStore:
         """Upsert by (user_id, date): one cached digest per user and local day."""
         self._col(self.cfg.digests_collection).replace_one(
             {"user_id": doc["user_id"], "date": doc["date"]}, doc, upsert=True)
+
+    # ── Recaps (one frozen doc per version; a rebuild adds a version) ──
+
+    def get_recap(self, kind: str, period: str, tz: str) -> Optional[Dict]:
+        """The latest version of a recap, or None."""
+        return self._col(self.cfg.recaps_collection).find_one(
+            {"kind": kind, "period": period, "tz": tz}, {"_id": 0}, sort=[("version", DESCENDING)])
+
+    def put_recap(self, doc: Dict) -> Dict:
+        """Insert as the next version of (kind, period, tz). Returns the stored doc (with version)."""
+        latest = self.get_recap(doc["kind"], doc["period"], doc["tz"])
+        stored = {**doc, "version": (latest or {}).get("version", 0) + 1}
+        try:
+            self._col(self.cfg.recaps_collection).insert_one(dict(stored))
+        except DuplicateKeyError:                    # a concurrent build stored this version first: serve that
+            return self.get_recap(doc["kind"], doc["period"], doc["tz"])
+        return stored
 
     def invalidate_digest(self, user_id: str) -> int:
         return self._col(self.cfg.digests_collection).delete_many({"user_id": user_id}).deleted_count

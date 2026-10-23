@@ -5,7 +5,7 @@ import { API_MODE, http } from './client';
 import { mock } from './mockServer';
 import type {
   Alert, AlertPrefs, AskAnswer, Comment, Digest, EntityHit, Exposure, FeedbackType, FeedPage, Headline, Health,
-  Profile, Proposal, Role, SearchPage, StoryDetail, StoryItem, Style, WeightLevel,
+  Profile, Proposal, Recap, RecapKind, Role, SearchPage, StoryDetail, StoryItem, Style, WeightLevel,
 } from './types';
 
 const built = API_MODE !== 'mock';
@@ -96,8 +96,18 @@ export const api = {
       ? http(`/v1/users/${enc(id)}/feed`, { query: { cursor: cursor ?? undefined, limit: 10, exclude: exclude.join(',') } })
       : mock.feed(id, cursor, exclude),
 
-  top: (hours = 24, limit = 8): Promise<StoryItem[]> =>
-    built ? http('/v1/articles/top', { query: { hours, limit } }) : mock.top(hours, limit),
+  // afterRecap: everything since the newest daily recap ended (today so far), instead of the last `hours`
+  top: (hours = 24, limit = 8, afterRecap = false, tz?: string): Promise<StoryItem[]> =>
+    built
+      ? http('/v1/articles/top', { query: { hours, limit, after_recap: afterRecap || undefined, tz } })
+      : mock.top(hours, limit),
+
+  recap: (kind: RecapKind, tz: string, userId?: string | null, period?: string): Promise<Recap> =>
+    built
+      ? http(`/v1/recaps/${kind}`, {
+          query: { tz, user_id: userId ?? undefined, [kind === 'daily' ? 'date' : 'week']: period },
+        })
+      : mock.recap(kind),
 
   story: (article_id: string, userId?: string | null): Promise<StoryDetail> =>
     built

@@ -6,6 +6,10 @@ Respects robots.txt via configurable user-agent.
 Uses CSS selectors defined in ScraperTarget config.
 """
 
+import json
+import re
+from datetime import datetime
+
 import requests
 from bs4 import BeautifulSoup
 from typing import List, Optional
@@ -84,6 +88,49 @@ def _fetch_page(url: str) -> Optional[BeautifulSoup]:
         raise
 
 
+# Publish-time meta tags, most specific first (Open Graph / article, schema.org itemprop, common CMS names)
+_DATE_META = (
+    "article:published_time", "og:published_time", "datepublished", "pubdate", "publishdate",
+    "publish-date", "parsely-pub-date", "sailthru.date", "dc.date.issued", "dc.date", "date",
+)
+_URL_DATE = re.compile(r"/(20\d{2})[/-](0[1-9]|1[0-2])[/-](0[1-9]|[12]\d|3[01])(?:/|-|$)")
+
+
+def _jsonld_published(soup: BeautifulSoup) -> Optional[str]:
+    """datePublished of the first JSON-LD node that has one (top level, list or @graph)."""
+    for script in soup.find_all("script", type="application/ld+json"):
+        try:
+            data = json.loads(script.string or "")
+        except (ValueError, TypeError):
+            continue
+        nodes = data if isinstance(data, list) else data.get("@graph", [data]) if isinstance(data, dict) else []
+        for node in nodes:
+            if isinstance(node, dict) and isinstance(node.get("datePublished"), str):
+                return node["datePublished"]
+    return None
+
+
+def _page_published(soup: BeautifulSoup, url: str) -> Optional[datetime]:
+    """
+    The article's publish time from its own page: publish meta tags, then JSON-LD datePublished, then the first
+    <time datetime>, then a /YYYY/MM/DD/ date in the URL (midnight UTC). None when the page states none.
+    """
+    metas = {}
+    for tag in soup.find_all("meta"):
+        key = (tag.get("property") or tag.get("name") or tag.get("itemprop") or "").strip().lower()
+        if key and tag.get("content") and key not in metas:
+            metas[key] = tag["content"]
+    candidates = [metas.get(k) for k in _DATE_META] + [_jsonld_published(soup)]
+    time_tag = soup.find("time", attrs={"datetime": True})
+    candidates.append(time_tag["datetime"] if time_tag else None)
+    for raw in candidates:
+        ts = normalize_timestamp(raw) if raw else None
+        if ts:
+            return ts
+    m = _URL_DATE.search(url or "")
+    return normalize_timestamp("-".join(m.groups())) if m else None
+
+
 def _normalize_url(href: str, base_url: str) -> str:
     """Convert relative URLs to absolute."""
     if href.startswith("http"):
@@ -143,6 +190,7 @@ def scrape_target(target: dict, max_articles: int = 10) -> List[RawArticle]:
             if not title or not body:
                 continue
 
+            published_at = _page_published(soup, url)
             articles.append(RawArticle(
                 title=title,
                 body=body,
@@ -150,9 +198,10 @@ def scrape_target(target: dict, max_articles: int = 10) -> List[RawArticle]:
                 source_name=name,
                 source_type=SourceType.SCRAPER,
                 domain=Domain(domain),
-                published_at=None,   # Timestamp extracted during preprocessing if available
+                published_at=published_at,
                 language="en",
-                raw_metadata={"scraped_from": listing_url},
+                raw_metadata={"scraped_from": listing_url,
+                              **({"date_source": "page_meta"} if published_at else {})},
                 images=from_html(soup, url),
             ))
 

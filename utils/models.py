@@ -7,7 +7,7 @@ These are the canonical schemas — all agents produce and consume these types.
 from __future__ import annotations
 from pydantic import BaseModel, Field, field_validator
 from typing import Optional, List, Dict, Any
-from datetime import datetime
+from datetime import datetime, timezone
 from enum import Enum
 import uuid
 
@@ -96,7 +96,10 @@ class ProcessedArticle(BaseModel):
 
     # ── Timestamps (ISO 8601 UTC) ─────────────────────────────
     published_at:   Optional[datetime] = None
-    ingested_at:    datetime           = Field(default_factory=datetime.utcnow)
+    ingested_at:    datetime           = Field(default_factory=lambda: datetime.now(timezone.utc))
+    # where the article's time comes from: "published" (the source's own field), "page_meta" (read from the
+    # article page) or "ingested" (none found, ingested_at stands in); None → derived from published_at
+    date_source:    Optional[str]      = None
 
     # ── Language ──────────────────────────────────────────────
     language:       str      = "en"
@@ -142,6 +145,11 @@ class ProcessedArticle(BaseModel):
         d = self.model_dump()
         d["published_at"] = self.published_at.isoformat() if self.published_at else None
         d["ingested_at"]  = self.ingested_at.isoformat()
+        # BSON dates for exact range queries (recaps): the article's time, with ingested_at standing in when the
+        # source gave none, and the ingestion time. The ISO strings above stay for existing readers.
+        d["date_source"]  = self.date_source or ("published" if self.published_at else "ingested")
+        d["published_ts"] = self.published_at or self.ingested_at
+        d["ingested_ts"]  = self.ingested_at
         d["domain"]       = self.domain.value
         d["source_type"]  = self.source_type.value
         d["sentiment_label"] = self.sentiment_label.value

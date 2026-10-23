@@ -14,6 +14,8 @@ Phase 5: feedback (section from the last impression), adaptive τ (update_tau), 
 Phase 6: alerts (run_alerts: inverted pi index, thresholds, one per cluster, per-day cap, quiet hours; alerts).
 Phase 7: render (style rewrite through the shared Groq client, cached per style, fact-checked, + persona brief).
 Phase 8: metrics (admin), delete_user (demo seeding / smoke cleanup); the jobs run on APScheduler (jobs.py).
+Recaps (recap.py): the daily (yesterday) and weekly (Monday-Sunday 22:00) recaps, the same for every reader of a time
+         zone, frozen per version in `recaps`, with per-reader marks added on serve.
 App views (mobile/): feed, Big today, story page, cluster sources, saved, story search, Ask (Agent 5), comments; the
          digest, alerts and proposals also carry the fields the app shows (additive), including each article's
          ingested images (`media`) and its engagement counts.
@@ -32,6 +34,7 @@ from personalization import candidates, clustering, explain, interest, materiali
 from personalization import alerts as alert_rules
 from personalization import feedback as feedback_rules
 from personalization import metrics as pers_metrics
+from personalization import recap as recap_rules
 from personalization import render as render_rules
 from personalization.keys import beta_key, entity_key
 from storage.exposure_store import ExposureStore
@@ -76,6 +79,10 @@ class StoreUnavailable(PersonalizationError):
     status_code = 503
 
 
+class RecapNotReady(PersonalizationError):
+    status_code = 404
+
+
 def _shared_llm() -> Tuple[Optional[object], Optional[str]]:
     """The Groq client Agents 2–4 use (OpenAI-compatible); (None, None) without a key or the openai package."""
     from utils.groq_client import init_groq_llm
@@ -103,6 +110,7 @@ class PersonalizationService:
         self.clock = clock or (lambda: datetime.now(timezone.utc))
         self._llm_factory = llm_factory or _shared_llm
         self._renderer: Optional[render_rules.Renderer] = None
+        self._recap_llm: Optional[Tuple[Optional[object], Optional[str]]] = None
         self._query_agent_factory = query_agent_factory or self._default_query_agent
         self._query_agent = None
 
@@ -1289,10 +1297,18 @@ class PersonalizationService:
         return {"items": self._app_items(user_id, items), "next_cursor": None if exhausted else str(offset + limit),
                 "exhausted": exhausted, "window_h": c.cand_window_h}
 
-    def top(self, hours: int = 24, limit: int = 8) -> List[Dict]:
-        """Big today: the last `hours` of articles by materiality, one per cluster."""
-        c = self.cfg
-        docs = self.articles.window(hours, self.clock(), self._story_projection())
+    def top(self, hours: float = 24, limit: int = 8, after_recap: bool = False, tz: Optional[str] = None) -> List[Dict]:
+        """
+        Big today: the last `hours` of articles by materiality, one per cluster. after_recap: instead, everything
+        since the end of the newest daily recap in `tz` (today so far once it is ready, else since yesterday's
+        start), so Big today and the recap never repeat each other.
+        """
+        c, now = self.cfg, self.clock()
+        if after_recap:
+            _, z = self._recap_zone(tz)
+            start = recap_rules.daily_period(recap_rules.latest_daily(now, z, c), z, c)["end"]
+            hours = max(0.0, (now - start).total_seconds() / 3600)
+        docs = self.articles.window(hours, now, self._story_projection())
         docs.sort(key=lambda d: (-((d.get("materiality") or {}).get("m") or 0.0), d[c.id_field]))
         best: Dict[str, Dict] = {}
         for d in docs:
@@ -1307,6 +1323,242 @@ class PersonalizationService:
                 explanation=f"Covered by {n} sources" if n > 1 else "One of the most significant stories today",
                 **counts.get(d[c.id_field], {})))
         return out
+
+    # ── N. Recaps (personalization/recap.py) ─────────────────
+
+    def _recap_zone(self, tz: Optional[str], user_id: Optional[str] = None) -> Tuple[str, ZoneInfo]:
+        """(name, zone): the request's time zone (the device's), else the reader's alert_prefs.tz, else cfg.tz."""
+        if tz:
+            try:
+                return tz, ZoneInfo(tz)
+            except (ZoneInfoNotFoundError, ValueError):
+                raise InvalidInput(f"unknown time zone {tz!r}")
+        if user_id:
+            pref = ((self.personas.get(user_id) or {}).get("alert_prefs") or {}).get("tz")
+            if pref:
+                zone = alert_rules.zone(pref, self.cfg.tz)
+                return zone.key, zone
+        return self.cfg.tz, ZoneInfo(self.cfg.tz)
+
+    def _recap_period(self, kind: str, key: Optional[str], z: ZoneInfo, now: datetime) -> Dict:
+        """The asked-for period (default: the newest ready one). A period that isn't over and ready → RecapNotReady."""
+        c = self.cfg
+        if kind not in ("daily", "weekly"):
+            raise InvalidInput(f"kind must be daily or weekly, got {kind!r}")
+        latest = recap_rules.latest_daily(now, z, c) if kind == "daily" else recap_rules.latest_weekly(now, z, c)
+        try:
+            start = (recap_rules.parse_day(key) if kind == "daily" else recap_rules.parse_week(key)) if key else latest
+        except ValueError as e:
+            raise InvalidInput(str(e))
+        build = recap_rules.daily_period if kind == "daily" else recap_rules.weekly_period
+        period = build(start, z, c)
+        if start > latest:
+            raise RecapNotReady(f"the {kind} recap for {period['key']} is ready at {period['ready_at'].isoformat()}")
+        return {**period, "latest": start == latest,
+                "next_at": build(start + timedelta(days=1 if kind == "daily" else 7), z, c)["ready_at"]}
+
+    def _recap_projection(self) -> Dict:
+        return self._story_projection("published_ts", "ingested_ts", "ingested_at", "date_source",
+                                      self.cfg.risk_field, "risk_processed_at")
+
+    def _recap_client(self) -> Tuple[Optional[object], Optional[str]]:
+        if self._recap_llm is None:
+            client, model = self._llm_factory()
+            self._recap_llm = (client, self.cfg.render_model or model) if client else (None, None)
+        return self._recap_llm
+
+    def _recap_overview(self, kind: str, title: str, items: List[Dict]) -> Dict:
+        """{text, reason, model, added}: text None when off, without an LLM, on an error or a failed check."""
+        c = self.cfg
+        if not c.recap_overview or not items:
+            return {"text": None, "reason": "disabled" if items else "no_items", "model": None, "added": []}
+        client, model = self._recap_client()
+        if client is None:
+            return {"text": None, "reason": "no_llm_client", "model": None, "added": []}
+        source = recap_rules.overview_source(items, c)
+        try:
+            response = client.chat.completions.create(
+                model=model, messages=recap_rules.overview_messages(kind, title, source),
+                response_format={"type": "json_object"}, temperature=c.render_temperature,
+                max_tokens=c.recap_overview_max_tokens, extra_body=c.render_llm_extra)
+            text = recap_rules.parse_overview(response.choices[0].message.content)
+        except Exception as e:
+            logger.error(f"[Recap] overview failed ({model}): {type(e).__name__}: {e}")
+            return {"text": None, "reason": f"llm_error: {type(e).__name__}", "model": model, "added": []}
+        ok, added = recap_rules.overview_check(source, text)
+        if not ok:
+            logger.warning(f"[Recap] overview dropped: {'unparseable' if text is None else 'added'} {added}")
+            return {"text": None, "reason": "unparseable_response" if text is None else "fact_check",
+                    "model": model, "added": added}
+        return {"text": text, "reason": None, "model": model, "added": []}
+
+    def _recap_items(self, kind: str, picks: List[Dict], times: Dict[str, Tuple[datetime, str]]) -> List[Dict]:
+        """Selected stories → StoryItems of their lead article, frozen into the recap (summary filled when missing)."""
+        from agents.extractive_summarizer import extractive_summarize
+        c = self.cfg
+        full = {d[c.id_field]: d for d in self.articles.by_ids([p["lead"][c.id_field] for p in picks],
+                                                                 self._story_projection("body"))}
+        out = []
+        for p in picks:
+            article_id = p["lead"][c.id_field]
+            doc = full.get(article_id, p["lead"])
+            item = self._story_item(doc)
+            filled = False
+            if not (item["summary_short"] or item["summary_long"]) and (doc.get("body") or "").strip():
+                s = extractive_summarize(doc.get(c.title_field) or "", doc["body"], doc.get(c.entities_field) or [],
+                                         doc.get(c.topic_field) or "")
+                item.update(summary_short=s["summary_short"], summary_long=s["summary_long"])
+                filled = True
+            item.update({
+                "section": "recap", "rank": p["rank"], "group": p["group"], "story_id": p["story_id"],
+                "member_ids": p["member_ids"][: c.recap_member_ids_max], "cluster_size": p["size"],
+                "m": p["m"], "m_fallback": p["m_fallback"], "score": p["score"], "span_days": p.get("span_days"),
+                "happened_at": p["first_t"], "date_source": times[article_id][1], "summary_fallback": filled,
+                "explanation": recap_rules.story_explanation(p, kind), "explanation_parts": {"kind": "recap"},
+            })
+            out.append(item)
+        return out
+
+    def compute_recap(self, kind: str, period: Dict, z: ZoneInfo, tz: str, now: datetime,
+                      excluded: Optional[List[str]] = None, pinned: Optional[List[str]] = None) -> Dict:
+        """
+        One recap for (kind, period, tz), not stored. Weekly also takes in the late arrivals: articles from up to
+        recap_undated_lookback_h before the week whose ingestion came after last week's recap was built, and that
+        it didn't show.
+        """
+        c = self.cfg
+        lookback = timedelta(hours=c.recap_undated_lookback_h)
+        proj = self._recap_projection()
+        docs = {d[c.id_field]: d for d in self.articles.by_time(period["start"] - lookback, period["end"], proj)}
+
+        late: Dict[str, Dict] = {}
+        served: set = set()
+        built = None
+        if kind == "weekly":
+            prev = self.logs.get_recap("weekly", recap_rules.week_key(period["days"][0] - timedelta(days=7)), tz)
+            built = scoring.parse_ts((prev or {}).get("generated_at"))
+            if built:
+                served = {a for i in prev["items"] for a in i.get("member_ids") or [i["article_id"]]}
+                for d in self.articles.ingested_between(built, now, proj):
+                    ts = scoring.parse_ts(d.get("ingested_ts") or d.get("ingested_at"))
+                    if ts and ts >= built:
+                        late[d[c.id_field]] = d
+                        docs.setdefault(d[c.id_field], d)
+
+        times = recap_rules.effective_times(list(docs.values()), c)
+        carry = {a for a in late if a in times and a not in served
+                 and period["start"] - lookback <= times[a][0] < period["start"]}
+        inside = recap_rules.in_window(times, period, carry)
+        period_docs = [d for a, d in docs.items() if a in inside]
+        stories = recap_rules.drop_excluded(recap_rules.build_stories(period_docs, times, c), excluded or [])
+        if kind == "daily":
+            picks = recap_rules.select_daily(stories, c, pinned or [])
+        else:
+            picks = recap_rules.select_weekly(stories, z, period, c, pinned or [])
+        items = self._recap_items(kind, picks, times)
+        return {
+            "kind": kind, "period": period["key"], "tz": tz, "title": period["title"],
+            "start": period["start"], "end": period["end"], "ready_at": period["ready_at"],
+            "days": [d.isoformat() for d in period["days"]], "generated_at": now,
+            "policy_version": c.policy_version, "domains": list(c.recap_domains),
+            "items": items, "sections": recap_rules.sections(kind, items, period),
+            "coverage": {**recap_rules.coverage(period_docs, times, stories, c), "carried_over": len(carry)},
+            "overview": self._recap_overview(kind, period["title"], items),
+            "excluded": list(excluded or []), "pinned": list(pinned or []),
+        }
+
+    def _recap_outdated(self, doc: Dict, period: Dict) -> bool:
+        """
+        A recap is frozen, except one built on too few articles (coverage.limited): it is built again once
+        articles of its period have been ingested since (ingestion is run by hand, so it can lag a day).
+        """
+        if not (doc.get("coverage") or {}).get("limited"):
+            return False
+        built = scoring.parse_ts(doc.get("generated_at"))
+        proj = {"_id": 0, self.cfg.id_field: 1, "published_ts": 1, self.cfg.published_field: 1,
+                "ingested_ts": 1, "ingested_at": 1}
+        for d in self.articles.ingested_between(built, self.clock() + timedelta(days=1), proj):
+            ingested = scoring.parse_ts(d.get("ingested_ts") or d.get("ingested_at"))
+            ts = recap_rules._raw_time(d)
+            if ingested and ingested > built and ts and period["start"] <= ts < period["end"]:
+                return True
+        return False
+
+    def _build_recap(self, kind: str, period: Dict, z: ZoneInfo, tz: str, prev: Optional[Dict] = None,
+                     excluded: Optional[List[str]] = None, pinned: Optional[List[str]] = None) -> Dict:
+        """Compute and store a new version, keeping the previous version's exclusions and pins unless given."""
+        excluded = excluded if excluded is not None else (prev or {}).get("excluded") or []
+        pinned = pinned if pinned is not None else (prev or {}).get("pinned") or []
+        doc = self.compute_recap(kind, period, z, tz, self.clock(), excluded, pinned)
+        stored = self.logs.put_recap(doc)
+        logger.info(f"[Recap] built {kind} {period['key']} ({tz}) v{stored['version']}: "
+                    f"{len(stored['items'])} items from {stored['coverage']['articles']} articles")
+        return stored
+
+    def _recap_out(self, doc: Dict, period: Dict, user_id: Optional[str]) -> Dict:
+        """The stored recap for the app: datetimes back to UTC-aware, engagement, and the reader's marks."""
+        c = self.cfg
+        items = [{**i, "happened_at": scoring.parse_ts(i.get("happened_at"))} for i in doc["items"]]
+        counts = self._engagement([i["article_id"] for i in items], user_id)
+        persona = self.personas.get(user_id) if user_id else None
+        read, follows, topics = set(), {}, {}
+        if persona:
+            read = self.logs.read_ids(user_id, persona.get("history") or [])
+            topics = persona.get("topics") or {}
+            try:
+                follows = {e["key"]: e for e in self.exposures.get_exposures(user_id)}
+            except Exception as e:
+                logger.warning(f"[Recap] exposures unavailable: {type(e).__name__}: {e}")
+        for i in items:
+            hit = next((e for e in i.get("entities") or [] if e["key"] in follows), None)
+            i["marks"] = {"follows": hit["name"] if hit else None,
+                          "in_your_topics": float(topics.get(i.get("topic")) or 0.0) >= 0.8,
+                          "seen": bool(read & set(i.get("member_ids") or [i["article_id"]]))}
+            if hit:
+                role = follows[hit["key"]].get("role") or "follows"
+                i["explanation"] = f"You {c.role_phrases.get(role, 'follow')} {hit['name']}"
+                i["explanation_parts"] = {"kind": "direct", "seed_name": hit["name"], "role": role}
+            elif i["marks"]["in_your_topics"]:
+                i["explanation"] = f"In your topics · {i['explanation']}"
+            i.update(counts.get(i["article_id"], {}))
+        out = {k: v for k, v in doc.items() if k not in ("excluded", "pinned")}
+        for k in ("start", "end", "ready_at", "generated_at"):
+            out[k] = scoring.parse_ts(out.get(k))
+        return {**out, "items": items, "latest": period["latest"], "next_at": period["next_at"],
+                "served_at": self.clock()}
+
+    def get_recap(self, kind: str, tz: Optional[str] = None, period: Optional[str] = None,
+                  user_id: Optional[str] = None) -> Dict:
+        """
+        The daily / weekly recap of `period` (default: the newest ready one) in `tz`: the stored version, built on
+        first request (or by the job) and frozen from then on.
+        """
+        tz_name, z = self._recap_zone(tz, user_id)
+        p = self._recap_period(kind, period, z, self.clock())
+        doc = self.logs.get_recap(kind, p["key"], tz_name)
+        if doc is None or self._recap_outdated(doc, p):
+            doc = self._build_recap(kind, p, z, tz_name, doc)
+        return self._recap_out(doc, p, user_id)
+
+    def rebuild_recap(self, kind: str, period: Optional[str] = None, tz: Optional[str] = None,
+                      exclude: Optional[List[str]] = None, pin: Optional[List[str]] = None) -> Dict:
+        """Editor's override: a new version now, with these exclusions / pins (None keeps the current lists)."""
+        tz_name, z = self._recap_zone(tz)
+        p = self._recap_period(kind, period, z, self.clock())
+        doc = self._build_recap(kind, p, z, tz_name, self.logs.get_recap(kind, p["key"], tz_name), exclude, pin)
+        return self._recap_out(doc, p, None)
+
+    def run_recap(self, kind: str) -> Dict:
+        """The recap jobs' body: build the newest period in cfg.tz unless it is stored and current."""
+        tz_name, z = self._recap_zone(None)
+        p = self._recap_period(kind, None, z, self.clock())
+        doc = self.logs.get_recap(kind, p["key"], tz_name)
+        built = doc is None or self._recap_outdated(doc, p)
+        if built:
+            doc = self._build_recap(kind, p, z, tz_name, doc)
+        return {"period": p["key"], "tz": tz_name, "built": built, "version": doc["version"],
+                "items": len(doc["items"]), "articles": doc["coverage"]["articles"],
+                "limited": doc["coverage"]["limited"], "overview": bool((doc.get("overview") or {}).get("text"))}
 
     @staticmethod
     def _risk(doc: Dict) -> Optional[Dict]:

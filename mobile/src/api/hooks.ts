@@ -3,9 +3,9 @@ import { QueryClient, useMutation, useQuery, useQueryClient } from '@tanstack/re
 import { useEffect, useRef } from 'react';
 
 import { useSession } from '@/state/session';
-import { isoDate } from '@/lib/time';
+import { deviceTz, isoDate } from '@/lib/time';
 import { api } from './endpoints';
-import type { Digest, Profile, Role, WeightLevel } from './types';
+import type { Digest, Profile, RecapKind, Role, WeightLevel } from './types';
 
 export const queryClient = new QueryClient({
   defaultOptions: { queries: { retry: 2, refetchOnWindowFocus: false, staleTime: 60_000 } },
@@ -67,6 +67,24 @@ export function useDigest() {
 
 export function useTop(hours = 24) {
   return useQuery({ queryKey: ['top', hours], queryFn: () => api.top(hours, 8), staleTime: 10 * 60_000 });
+}
+
+// Big today: everything since the newest daily recap ended, so Big today and the recap never repeat each other
+export function useBigToday() {
+  const tz = deviceTz();
+  return useQuery({ queryKey: ['top', 'after_recap', tz], queryFn: () => api.top(24, 8, true, tz), staleTime: 10 * 60_000 });
+}
+
+// Recaps are frozen server-side once built, so one fetch per half hour is plenty
+export function useRecap(kind: RecapKind) {
+  const uid = useUserId();
+  const tz = deviceTz();
+  return useQuery({
+    queryKey: ['recap', kind, tz, uid],
+    queryFn: () => api.recap(kind, tz, uid || null),
+    staleTime: 30 * 60_000,
+    retry: 1,
+  });
 }
 
 export function useAlerts() {

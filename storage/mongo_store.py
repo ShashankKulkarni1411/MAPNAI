@@ -68,6 +68,8 @@ class MongoStore:
         col.create_index([("domain", ASCENDING)])
         col.create_index([("published_at", DESCENDING)])
         col.create_index([("ingested_at", DESCENDING)])
+        col.create_index([("published_ts", DESCENDING)])
+        col.create_index([("ingested_ts", DESCENDING)])
         col.create_index([("source_name", ASCENDING)])
         col.create_index([("language", ASCENDING)])
         col.create_index([("ner_processed", ASCENDING)])

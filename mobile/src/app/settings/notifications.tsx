@@ -1,4 +1,5 @@
-// T2 Notifications: alert cap, quiet hours, time zone. Built: alert_prefs. Recap/suggestion pushes: Proposed.
+// T2 Notifications: alert cap, quiet hours, time zone. Built: alert_prefs. Recap / suggestion pushes: Proposed
+// (the recaps themselves are built: Home and R1).
 import * as Localization from 'expo-localization';
 import { useEffect, useState } from 'react';
 import { Switch, View } from 'react-native';
@@ -60,14 +61,14 @@ export default function NotificationSettings() {
       {alerting.length === 0 && <Txt v="body" muted>Alerts start when you follow something as Essential or Important.</Txt>}
       {alerting.map((e) => <Row key={e.key} title={e.name} sub={importance[e.weight].label} />)}
 
-      <SectionTitle title="Recaps" sub="Recaps arrive in a later update." />
+      <SectionTitle title="Recaps" sub="Recaps are on Home. Notifications for them arrive in a later update." />
       <View style={{ flexDirection: 'row', alignItems: 'center', minHeight: 48 }}>
-        <Txt v="body" style={{ flex: 1 }}>Weekly recap on Sunday</Txt>
-        <Switch value={weekly} onValueChange={setWeekly} accessibilityLabel="Weekly recap on Sunday" />
+        <Txt v="body" style={{ flex: 1 }}>Weekly recap on Sunday at 22:00</Txt>
+        <Switch value={weekly} onValueChange={setWeekly} accessibilityLabel="Weekly recap on Sunday at 22:00" />
       </View>
       <View style={{ flexDirection: 'row', alignItems: 'center', minHeight: 48 }}>
-        <Txt v="body" style={{ flex: 1 }}>Daily recap at 21:00</Txt>
-        <Switch value={daily} onValueChange={setDaily} accessibilityLabel="Daily recap at 21:00" />
+        <Txt v="body" style={{ flex: 1 }}>Daily recap of yesterday at 07:00</Txt>
+        <Switch value={daily} onValueChange={setDaily} accessibilityLabel="Daily recap of yesterday at 07:00" />
       </View>
     </FormScreen>
   );

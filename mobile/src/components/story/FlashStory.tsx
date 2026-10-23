@@ -15,6 +15,7 @@ import { Connection, ConnectionSheet } from '@/components/follow/ConnectionSheet
 import { importance, sectionLabel } from '@/lib/labels';
 import { ageLabel } from '@/lib/time';
 import { implicit, react, toggleSave, useFeedback } from '@/state/feedback';
+import type { EntryContext } from '@/state/storyCache';
 import { radius, space } from '@/theme/tokens';
 import { useTheme } from '@/theme/useTheme';
 import { Glyph, GlyphName, topicGlyph } from '../Glyph';
@@ -236,9 +237,11 @@ type Props = {
   onComments: () => void;
   onNext: () => void;
   onPrev: () => void;
+  kicker?: string; // a line beside the progress count (a recap's section, "You read this")
+  entry?: EntryContext; // how the story page labels where it was opened from
 };
 
-export function FlashStory({ item, index, total, inBrief, height, showHint, onWhy, onActions, onComments, onNext, onPrev }: Props) {
+export function FlashStory({ item, index, total, inBrief, height, showHint, onWhy, onActions, onComments, onNext, onPrev, kicker, entry = 'slate' }: Props) {
   const { c } = useTheme();
   const insets = useSafeAreaInsets();
   const text = flashText(item);
@@ -260,7 +263,7 @@ export function FlashStory({ item, index, total, inBrief, height, showHint, onWh
 
       <Pressable
         style={[StyleSheet.absoluteFill, { paddingLeft: space.gutter, paddingRight: RAIL_W + space.md, paddingBottom: space.lg }]}
-        onPress={() => openStory(item)}
+        onPress={() => openStory(item, entry)}
         onLongPress={onActions}
         accessibilityRole="button"
         accessibilityLabel={`${item.section ? sectionLabel[item.section] + '. ' : ''}${item.title}`}
@@ -274,7 +277,7 @@ export function FlashStory({ item, index, total, inBrief, height, showHint, onWh
         ]}
         onAccessibilityAction={(e) => {
           const n = e.nativeEvent.actionName;
-          if (n === 'activate') openStory(item);
+          if (n === 'activate') openStory(item, entry);
           if (n === 'next') onNext();
           if (n === 'prev') onPrev();
           if (n === 'longpress') onActions();
@@ -317,7 +320,10 @@ export function FlashStory({ item, index, total, inBrief, height, showHint, onWh
                 <View key={i} style={{ flex: 1, height: 3, borderRadius: 2, backgroundColor: i <= index ? c.ink : c.hairline }} />
               ))}
             </View>
-            <Txt v="label" color={c.ink} style={{ alignSelf: 'flex-end' }} tabular>{index + 1} of {total}</Txt>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: space.sm }}>
+              <Txt v="label" color={c.ink} numberOfLines={1} style={{ flex: 1 }}>{kicker ?? ''}</Txt>
+              <Txt v="label" color={c.ink} tabular>{index + 1} of {total}</Txt>
+            </View>
           </View>
         ) : (
           <Txt v="label" color={c.ink}>{item.section === 'big_today' ? 'Outside your usual: a big story today' : sectionLabel.feed}</Txt>
