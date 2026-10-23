@@ -48,6 +48,8 @@ export const ENTITIES: Record<string, { name: string; mentions: number }> = {
   fifa: { name: 'FIFA', mentions: 120 },
   'siddharth anand': { name: 'Siddharth Anand', mentions: 22 },
   oscars: { name: 'Oscars', mentions: 60 },
+  'united nations': { name: 'United Nations', mentions: 140 },
+  'gulf shipping': { name: 'Gulf shipping', mentions: 35 },
 };
 
 // Co-mention links ("often mentioned with")
@@ -162,8 +164,110 @@ export const ARTICLES: FixtureArticle[] = [
     body: 'The company said its new processor is 30 percent faster than last year’s model and will ship in phones from early next year. Analysts expect the launch to…',
   },
   {
+    id: 'a-gulf', title: 'Tanker hit in the Gulf; regional talks postponed', topic: 'general', topicTag: 'World',
+    source: 'Reuters', ageH: 5, m: 0.78, risk: 'ESCALATE', unscored: false, sources: 12, first: true,
+    entities: ['gulf shipping', 'united nations'],
+    summary: 'A tanker was hit near a busy shipping lane. Two governments traded warnings and talks planned for next week were postponed.',
+    summaryLong: 'A tanker was hit near a busy shipping lane on Tuesday. Two governments traded warnings, and the talks planned for next week were postponed. The United Nations called for restraint and said the Security Council would meet on Thursday.',
+  },
+  {
     id: 'a-guardiola', title: 'Guardiola praises academy graduates', topic: 'sports', source: 'Manchester Evening News',
     ageH: 16, m: 0.25, risk: 'MONITOR', unscored: false, sources: 2, first: false, entities: ['pep guardiola', 'manchester city'],
     summary: 'The City manager said two teenagers will travel with the first team.',
   },
 ];
+
+// Insights (mock): the AI analysis of a few fixture stories, as the engine would return it after its fact check.
+// `src` are indexes into the story's sources (mock.cluster's outlets). Kohli has none: it shows the card without
+// an AI analysis (what the app shows when Groq is unavailable). Illustrative only, not real reporting.
+export type InsightFixture = {
+  what: { text: string; src: number[] };
+  why: { text: string; src: number[] }[];
+  scenarios: { title: string; explanation: string; likelihood: 'likely' | 'possible' | 'unlikely'; watch_for: string[]; src: number[] }[];
+  next: { text: string; when: string | null; src: number[] }[];
+  actions: { text: string; src: number[] }[];
+  status: 'ok' | 'partial' | 'fallback';
+  spanDays: number;
+};
+
+export const INSIGHTS: Record<string, InsightFixture> = {
+  'a-gulf': {
+    status: 'ok', spanDays: 2,
+    what: { text: 'A tanker was hit near a busy shipping lane. Two governments traded warnings and talks planned for next week were postponed.', src: [0, 1] },
+    why: [
+      { text: 'Shipping through a busy lane is at risk, which shipping and fuel markets watch closely.', src: [0, 2] },
+      { text: 'The United Nations called for restraint, so the Security Council meeting is the next marker.', src: [2] },
+    ],
+    scenarios: [
+      { title: 'Talks rescheduled', likelihood: 'likely', src: [2, 3],
+        explanation: 'Both governments step back from the warnings and the postponed talks get a new date.',
+        watch_for: ['A new date for the talks', 'Statements after the Security Council meeting'] },
+      { title: 'Further escalation', likelihood: 'possible', src: [0, 1],
+        explanation: 'The warnings turn into further strikes on ships or military moves near the shipping lane.',
+        watch_for: ['More vessels hit', 'Navies moving into the area'] },
+      { title: 'Economic pressure only', likelihood: 'possible', src: [3],
+        explanation: 'Governments answer with economic measures rather than force while the talks stay on hold.',
+        watch_for: ['Sanctions announcements', 'Shipping firms rerouting'] },
+    ],
+    next: [{ text: 'UN Security Council meeting', when: 'Thursday', src: [2] }],
+    actions: [
+      { text: 'If you ship goods or travel through the region, check with your carrier or airline for route changes.', src: [0, 2] },
+      { text: 'Follow the Security Council meeting on Thursday for the next official step.', src: [2] },
+    ],
+  },
+  'a-bumrah': {
+    status: 'ok', spanDays: 2,
+    what: { text: 'Jasprit Bumrah will miss the first match after scans showed back spasms, with Arshdeep Singh in line to replace him.', src: [0, 1] },
+    why: [
+      { text: 'India lose their lead fast bowler for the series opener, so the attack leans on Arshdeep Singh.', src: [0, 2] },
+      { text: 'Team and fantasy picks for the opener change with him out.', src: [1] },
+    ],
+    scenarios: [
+      { title: 'Back for the second game', likelihood: 'likely', src: [0, 3],
+        explanation: 'The spasms settle and he returns for the second game, as the team expects.',
+        watch_for: ['A fitness update after the first match', 'His name in the squad for the second game'] },
+      { title: 'Arshdeep keeps his place', likelihood: 'possible', src: [1, 2],
+        explanation: 'Arshdeep Singh does well in the opener and India keep the same attack.',
+        watch_for: ["Arshdeep Singh's figures in the first match"] },
+      { title: 'Out for the series', likelihood: 'unlikely', src: [0, 4],
+        explanation: 'The spasms take longer to settle and he misses the rest of the series.',
+        watch_for: ['A second scan', 'A replacement called into the squad'] },
+    ],
+    next: [
+      { text: 'Team news for the first match', when: 'Friday', src: [1] },
+      { text: 'Fitness update on Bumrah', when: 'after the first match', src: [0] },
+    ],
+    actions: [
+      { text: 'Fantasy players: leave Bumrah out of your first-match team and check Friday’s team news before the deadline.', src: [0, 1] },
+      { text: 'Fans with tickets: expect Arshdeep Singh to lead the attack in the opener.', src: [1, 2] },
+    ],
+  },
+  'a-cbfc': {
+    status: 'ok', spanDays: 1,
+    what: { text: "The certification board has asked for three cuts in Yash Raj Films' next release. The studio says the release date may move.", src: [0, 1] },
+    why: [{ text: 'Viewers and cinemas with plans for the release face a possible new date.', src: [1] }],
+    scenarios: [
+      { title: 'Cuts made, date holds', likelihood: 'likely', src: [0, 2],
+        explanation: 'The studio makes the three cuts and keeps the announced release date.',
+        watch_for: ['The film receiving its certificate', 'Advance bookings opening'] },
+      { title: 'Release moves', likelihood: 'possible', src: [1],
+        explanation: 'The edits take longer and the studio announces a new release date.',
+        watch_for: ['A revised release date from the studio'] },
+      { title: 'The studio contests the cuts', likelihood: 'unlikely', src: [2],
+        explanation: 'The studio asks for a review of the cuts, which delays certification.',
+        watch_for: ['Studio statements about a review'] },
+    ],
+    next: [{ text: 'A revised release date from the studio', when: null, src: [1] }],
+    actions: [
+      { text: 'Hold off booking first-day tickets until the studio confirms the release date.', src: [1] },
+      { text: 'Turn on "Alert me" to hear when the studio announces a date.', src: [1] },
+    ],
+  },
+  'a-kohli': {
+    status: 'fallback', spanDays: 1,
+    what: { text: 'Scans show a tear; he misses Friday. India expect him back for the second Test in Adelaide.', src: [0] },
+    why: [], scenarios: [], next: [],
+    // no AI analysis: Agent 4's recommendation on the article stands in
+    actions: [{ text: "Watch Friday's team news for the replacement.", src: [0] }],
+  },
+};

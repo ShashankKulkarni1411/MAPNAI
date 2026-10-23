@@ -44,6 +44,7 @@ export default function RootLayout() {
             <Stack.Screen name="ask" options={{ presentation: 'modal' }} />
             <Stack.Screen name="story/[id]" />
             <Stack.Screen name="recap/[kind]" />
+            <Stack.Screen name="insight/[id]" />
             <Stack.Screen name="entity/[key]" />
             <Stack.Screen name="search" />
             <Stack.Screen name="notifications" />

@@ -13,6 +13,7 @@ from pydantic import BaseModel, Field
 from config.personalization import pers_settings
 from personalization import jobs
 from personalization.service import PersonalizationService
+from utils.models import InsightsResponse
 
 router = APIRouter(prefix="/v1", tags=["personalization"])
 
@@ -248,6 +249,23 @@ def weekly_recap(
     svc: PersonalizationService = Depends(get_service),
 ):
     return svc.get_recap("weekly", tz, week, user_id)
+
+
+# ── O. Insights ──────────────────────────────────────────────
+
+@router.get("/users/{user_id}/insights", response_model=InsightsResponse)
+def insights(user_id: str, svc: PersonalizationService = Depends(get_service)):
+    return svc.get_insights(user_id)
+
+
+@router.post("/users/{user_id}/insights/{story_id}/watch")
+def watch_insight(user_id: str, story_id: str, svc: PersonalizationService = Depends(get_service)):
+    return svc.watch_insight(user_id, story_id)
+
+
+@router.delete("/users/{user_id}/insights/{story_id}/watch")
+def unwatch_insight(user_id: str, story_id: str, svc: PersonalizationService = Depends(get_service)):
+    return svc.unwatch_insight(user_id, story_id)
 
 
 @router.get("/articles/{article_id}")

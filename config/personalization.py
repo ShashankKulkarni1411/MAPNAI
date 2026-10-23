@@ -273,6 +273,39 @@ class PersonalizationSettings(BaseSettings):
     recap_overview_max_tokens: int = 600
     recap_overview_source_chars: int = 300   # per story, fed to the overview prompt
 
+    # ── O. Insights (personalization/insights.py) ────────────
+    # Developing stories with an LLM analysis (what happened, why it matters, scenarios, what to watch), cached per
+    # story and made again when the story gains articles; only "why it matters to you" is per reader.
+    insights_cache_collection: str = "insights_cache"
+    insight_watches_collection: str = "insight_watches"
+    insights_prompt_version: str = "i2"  # part of the cache key: bump it when the prompt or the checks change
+    # i2: adds "actions" (practical steps for affected readers)
+    insights_window_h: int = 72
+    insights_min_sources: int = 2        # distinct outlets for a story to count as developing
+    insights_size: int = 5
+    insights_max_per_domain: int = 2
+    insights_follow_boost: float = 0.3   # a story naming something the reader follows
+    insights_pi_boost: float = 0.15      # × pi of its best pi_topk entity, for stories without a direct follow
+    # a pi_topk entry below this is a weak co-mention hop (≈ 0.07: "BBC", "robotics"): no boost, no "linked to" line
+    insights_pi_min: float = 0.2
+    insights_max_articles: int = 8       # per story, one per outlet, fed to the prompt
+    insights_source_chars: int = 400     # per article summary in the prompt
+    insights_max_tokens: int = 1800      # gpt-oss reasons first; its tokens count in max_tokens
+    insights_attempts: int = 2           # a reply that fails validation or the fact check is asked for once more
+    insights_retry_min: int = 15         # an analysis served without the LLM (down, error) is tried again after this
+    insights_llm_workers: int = 4        # stories analysed in parallel on a cold cache
+    insights_min_scenarios: int = 2
+    insights_max_scenarios: int = 4
+    insights_max_why: int = 3
+    insights_max_watch_for: int = 3
+    insights_max_watch_next: int = 4
+    insights_max_actions: int = 3
+    insights_action_chars: int = 160
+    insights_title_chars: int = 80
+    insights_text_chars: int = 280
+    insights_watch_chars: int = 160
+    insights_sources_shown: int = 10
+
     # ── L. Jobs (cron, in tz) ────────────────────────────────
     job_pi_topk: str = "0 1 * * *"
     job_cluster: str = "5 * * * *"

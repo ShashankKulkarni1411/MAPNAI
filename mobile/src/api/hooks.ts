@@ -87,6 +87,31 @@ export function useRecap(kind: RecapKind) {
   });
 }
 
+// Insights: the analysis is shared and cached server-side; the reader's part changes with persona_version, so the key
+// carries it and a follow from the card refetches
+export function useInsights() {
+  const uid = useUserId();
+  const profile = useProfile();
+  const version = profile.data?.persona_version ?? 0;
+  return useQuery({
+    queryKey: ['insights', uid, version],
+    queryFn: () => api.insights(uid),
+    enabled: !!uid && !profile.isLoading,
+    staleTime: 15 * 60_000,
+    placeholderData: (prev) => prev,
+    retry: 1,
+  });
+}
+
+export function useWatchInsight() {
+  const uid = useUserId();
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (v: { story_id: string; on: boolean }) => api.watchInsight(uid, v.story_id, v.on),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['insights', uid] }),
+  });
+}
+
 export function useAlerts() {
   const uid = useUserId();
   return useQuery({ queryKey: ['alerts', uid], queryFn: () => api.alerts(uid), enabled: !!uid, staleTime: 5 * 60_000 });
@@ -107,6 +132,7 @@ export function invalidatePersona() {
   void queryClient.invalidateQueries({ queryKey: ['digest'] });
   void queryClient.invalidateQueries({ queryKey: ['proposals'] });
   void queryClient.invalidateQueries({ queryKey: ['alerts'] });
+  void queryClient.invalidateQueries({ queryKey: ['insights'] });
   pendingBriefUpdate.flag = true;
 }
 

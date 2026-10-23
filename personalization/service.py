@@ -16,6 +16,9 @@ Phase 7: render (style rewrite through the shared Groq client, cached per style,
 Phase 8: metrics (admin), delete_user (demo seeding / smoke cleanup); the jobs run on APScheduler (jobs.py).
 Recaps (recap.py): the daily (yesterday) and weekly (Monday-Sunday 22:00) recaps, the same for every reader of a time
          zone, frozen per version in `recaps`, with per-reader marks added on serve.
+Insights (insights.py): developing stories with an LLM analysis (what happened, why it matters, scenarios, what to
+         watch), cached per story in `insights_cache` until the story gains articles; "why it matters to you", the
+         reader's watches and their follows' week are added on serve.
 App views (mobile/): feed, Big today, story page, cluster sources, saved, story search, Ask (Agent 5), comments; the
          digest, alerts and proposals also carry the fields the app shows (additive), including each article's
          ingested images (`media`) and its engagement counts.
@@ -33,6 +36,7 @@ from config.personalization import pers_settings
 from personalization import candidates, clustering, explain, interest, materiality, scoring, slate, spread
 from personalization import alerts as alert_rules
 from personalization import feedback as feedback_rules
+from personalization import insights as insight_rules
 from personalization import metrics as pers_metrics
 from personalization import recap as recap_rules
 from personalization import render as render_rules
@@ -80,6 +84,10 @@ class StoreUnavailable(PersonalizationError):
 
 
 class RecapNotReady(PersonalizationError):
+    status_code = 404
+
+
+class InsightNotFound(PersonalizationError):
     status_code = 404
 
 
@@ -1559,6 +1567,191 @@ class PersonalizationService:
         return {"period": p["key"], "tz": tz_name, "built": built, "version": doc["version"],
                 "items": len(doc["items"]), "articles": doc["coverage"]["articles"],
                 "limited": doc["coverage"]["limited"], "overview": bool((doc.get("overview") or {}).get("text"))}
+
+    # ── O. Insights (personalization/insights.py) ────────────
+
+    def _insight_fallback(self, pick: Dict, reason: str, model: Optional[str], dropped: int = 0) -> Dict:
+        return {"content": {"what_happened": insight_rules.fallback_what(pick, self.cfg), "why_it_matters": [],
+                            "scenarios": [], "watch_next": [], "actions": []},
+                "analysis": {"status": "fallback", "reason": reason, "model": model, "dropped": dropped}}
+
+    def _analyse_story(self, pick: Dict, articles: List[Dict]) -> Dict:
+        """
+        {content, analysis}: the LLM's analysis of one story, validated and fact-checked; asked once more when it
+        fails, then served without scenarios (status "partial") or as the lead's own summary ("fallback").
+        """
+        c = self.cfg
+        client, model = self._recap_client()
+        if client is None:
+            return self._insight_fallback(pick, "no_llm_client", None)
+        retry, best, dropped, failure = None, None, 0, "unparseable_response"
+        for _ in range(max(1, c.insights_attempts)):
+            try:
+                response = client.chat.completions.create(
+                    model=model, messages=insight_rules.messages(pick["topic"], articles, c, retry),
+                    response_format={"type": "json_object"}, temperature=c.render_temperature,
+                    max_tokens=c.insights_max_tokens, extra_body=c.render_llm_extra)
+                parsed = insight_rules.parse(response.choices[0].message.content, len(articles), c)
+            except Exception as e:
+                logger.error(f"[Insights] {pick['story_id']} failed ({model}): {type(e).__name__}: {e}")
+                failure = f"llm_error: {type(e).__name__}"
+                break
+            checked, gone = insight_rules.fact_check(parsed, articles, c) if parsed else (None, [])
+            dropped += len(gone) + len((parsed or {}).get("invalid") or [])
+            ok, why = insight_rules.usable(checked, c)
+            if checked and checked["what_happened"] and (
+                    best is None or len(checked["scenarios"]) > len(best["scenarios"])):
+                best = checked
+            if ok:
+                return {"content": insight_rules.cite_ids(checked, articles, c),
+                        "analysis": {"status": "ok", "reason": None, "model": model, "dropped": dropped}}
+            failure = "unparseable_response" if checked is None else "fact_check"
+            retry = why
+            logger.warning(f"[Insights] {pick['story_id']} rejected: {why} {[g['added'] for g in gone]}")
+        if best is None:
+            return self._insight_fallback(pick, failure, model, dropped)
+        # "what happened" held up but the scenarios didn't: keep the facts, show no scenarios
+        content = insight_rules.cite_ids({**best, "scenarios": []}, articles, c)
+        return {"content": content, "analysis": {"status": "partial", "reason": failure, "model": model,
+                                                 "dropped": dropped}}
+
+    def _insight_fresh(self, cached: Optional[Dict], pick: Dict, now: datetime) -> bool:
+        """
+        The cached analysis serves while the story's articles are unchanged; one made without a complete LLM
+        analysis is tried again after insights_retry_min.
+        """
+        if not cached or cached.get("members_hash") != insight_rules.members_hash(pick):
+            return False
+        if cached["analysis"]["status"] == "ok":
+            return True
+        made = scoring.parse_ts(cached["analysis"].get("generated_at"))
+        return bool(made) and now - made < timedelta(minutes=self.cfg.insights_retry_min)
+
+    def _insight_analyses(self, picks: List[Dict], articles: Dict[str, List[Dict]]) -> Dict[str, Dict]:
+        """story_id → its cache doc; the stale and missing ones are analysed (in parallel) and stored."""
+        c, now = self.cfg, self.clock()
+        cached = self.logs.insights_get([p["story_id"] for p in picks], c.insights_prompt_version)
+        todo = [p for p in picks if not self._insight_fresh(cached.get(p["story_id"]), p, now)]
+        if len(todo) > 1 and c.insights_llm_workers > 1:
+            from concurrent.futures import ThreadPoolExecutor
+            with ThreadPoolExecutor(max_workers=min(c.insights_llm_workers, len(todo))) as pool:
+                made = list(pool.map(lambda p: self._analyse_story(p, articles[p["story_id"]]), todo))
+        else:
+            made = [self._analyse_story(p, articles[p["story_id"]]) for p in todo]
+        for p, result in zip(todo, made):
+            # no actions from the analysis (or none at all without the LLM): Agent 4's recommendations stand in
+            if not result["content"].get("actions"):
+                result["content"]["actions"] = insight_rules.fallback_actions(articles[p["story_id"]], c)
+            prev = cached.get(p["story_id"]) or {}
+            doc = {"story_id": p["story_id"], "prompt_version": c.insights_prompt_version,
+                   "members_hash": insight_rules.members_hash(p), "member_ids": p["member_ids"],
+                   "article_ids": [d[c.id_field] for d in articles[p["story_id"]]],
+                   "source_count": len(p["outlets"]), "version": int(prev.get("version") or 0) + 1,
+                   "content": result["content"], "analysis": {**result["analysis"], "generated_at": now}}
+            try:
+                self.logs.insights_put(doc)
+            except Exception as e:
+                logger.warning(f"[Insights] cache write failed: {type(e).__name__}: {e}")
+            cached[p["story_id"]] = doc
+        return cached
+
+    def _insight_out(self, pick: Dict, doc: Dict, articles: List[Dict], names: Dict[str, str],
+                     follow_keys: set, watch: Optional[Dict]) -> Dict:
+        """One Insight for the app: the shared analysis plus this reader's link to it and their watch."""
+        c = self.cfg
+        lead = pick["lead"]
+        image = ((lead.get("media") or {}).get("primary_image") or {}).get("url")
+        sources = [{"article_id": d[c.id_field], "source_name": d.get(c.source_field),
+                    "title": d.get(c.title_field) or "", "url": d.get(c.url_field),
+                    "published_at": d.get(c.published_field)} for d in articles[: c.insights_sources_shown]]
+        entities = [{"key": k, "name": names.get(k, k.title()), "followed": k in follow_keys}
+                    for k in pick["keys"][:6]]
+        out_watch = {"watching": False, "since": None, "new_sources": 0, "changed": False}
+        if watch:
+            out_watch = {"watching": True, "since": scoring.parse_ts(watch.get("since")),
+                         "new_sources": max(0, len(pick["outlets"]) - int(watch.get("sources_at") or 0)),
+                         "changed": int(doc.get("version") or 1) > int(watch.get("version_at") or 0)}
+        content = doc["content"]
+        return {
+            "story_id": pick["story_id"], "lead_article_id": lead[c.id_field], "rank": pick["rank"],
+            "topic": pick["topic"], "title": lead.get(c.title_field) or "", "image_url": image,
+            "first_seen": pick["first_t"], "last_updated": max(pick["times"]), "span_days": pick["span_days"],
+            "source_count": len(pick["outlets"]), "article_count": len(pick["member_ids"]),
+            "what_happened": content["what_happened"], "why_it_matters": content["why_it_matters"],
+            "for_you": insight_rules.for_you(pick, names, c), "scenarios": content["scenarios"],
+            "watch_next": content["watch_next"], "actions": content.get("actions") or [],
+            "entities": entities, "sources": sources,
+            "analysis": {**doc["analysis"], "generated_at": scoring.parse_ts(doc["analysis"].get("generated_at")),
+                         "version": int(doc.get("version") or 1)},
+            "watch": out_watch, "disclaimer": insight_rules.DISCLAIMER,
+        }
+
+    def get_insights(self, user_id: str) -> Dict:
+        """
+        The reader's developing stories with their analysis (shared, cached per story) and the per-reader parts:
+        why it matters to them, their watches, and what changed this week for each thing they follow.
+        """
+        c, now = self.cfg, self.clock()
+        persona = self._require_persona(user_id)
+        _, z = self._recap_zone(None, user_id)
+        try:
+            follows = self.exposures.get_exposures(user_id)
+        except Exception as e:
+            logger.warning(f"[Insights] exposures unavailable: {type(e).__name__}: {e}")
+            follows = []
+        follow_keys = {f["key"] for f in follows}
+        pi = {e["entity"]: e for e in persona.get("pi_topk") or []}
+        aliases = self.logs.alias_map()
+
+        # two weeks for the follows' "this week vs last week"; the stories come from the last insights_window_h
+        proj = {**self._recap_projection(), "action_recommendation": 1, "action_rec": 1}
+        docs = {d[c.id_field]: d for d in self.articles.by_time(now - timedelta(days=14), now + timedelta(hours=1), proj)}
+        times = {a: v for a, v in recap_rules.effective_times(list(docs.values()), c).items() if v[0] <= now}
+        keys_by_id = {a: candidates.resolve_keys(candidates.doc_entity_keys(d, c), aliases) for a, d in docs.items()}
+        start = now - timedelta(hours=c.insights_window_h)
+        window = [d for a, d in docs.items() if a in times and times[a][0] >= start]
+        stories = recap_rules.build_stories(window, times, c)
+        picks = insight_rules.select(stories, docs, keys_by_id, z, c, follow_keys, pi)
+        articles = {p["story_id"]: insight_rules.source_articles(p, docs, times, c) for p in picks}
+        cache = self._insight_analyses(picks, articles)
+
+        member_docs = {a: docs[a] for p in picks for a in p["member_ids"] if a in docs}
+        names = self._display_names(user_id, member_docs, [p["pi_hit"] for p in picks if p.get("pi_hit")])
+        try:
+            watches = self.logs.watches_for(user_id, [p["story_id"] for p in picks])
+        except Exception as e:
+            logger.warning(f"[Insights] watches unavailable: {type(e).__name__}: {e}")
+            watches = {}
+        items = [self._insight_out(p, cache[p["story_id"]], articles[p["story_id"]], names, follow_keys,
+                                   watches.get(p["story_id"])) for p in picks]
+        developing: Dict[str, str] = {}
+        for p in picks:
+            for k in p["keys"]:
+                developing.setdefault(k, p["story_id"])
+        return {
+            "user_id": user_id, "generated_at": now, "window_h": c.insights_window_h,
+            "personalized": any(i["for_you"] for i in items), "persona_version": persona.get("persona_version"),
+            "insights": items,
+            "follows": insight_rules.follow_changes(follows, list(docs.values()), keys_by_id, times, now, c,
+                                                    developing),
+        }
+
+    def watch_insight(self, user_id: str, story_id: str) -> Dict:
+        """Alert me if this changes: remember the story's outlets and analysis version as of now."""
+        self._require_persona(user_id)
+        doc = self.logs.insights_get([story_id], self.cfg.insights_prompt_version).get(story_id)
+        if doc is None:
+            raise InsightNotFound(f"no insight for story {story_id}")
+        now = self.clock()
+        self.logs.watch_put({"user_id": user_id, "story_id": story_id, "since": now,
+                             "sources_at": int(doc.get("source_count") or 0),
+                             "version_at": int(doc.get("version") or 1)})
+        return {"story_id": story_id, "watching": True, "since": now}
+
+    def unwatch_insight(self, user_id: str, story_id: str) -> Dict:
+        self._require_persona(user_id)
+        self.logs.watch_delete(user_id, story_id)
+        return {"story_id": story_id, "watching": False, "since": None}
 
     @staticmethod
     def _risk(doc: Dict) -> Optional[Dict]:

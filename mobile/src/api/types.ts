@@ -243,3 +243,68 @@ export type AskAnswer = {
 };
 
 export type SearchPage = { items: (StoryItem & { matched_terms?: string[]; connection?: { entity: string; role: Role } })[]; next_cursor: string | null };
+
+// Insights (GET /v1/users/{id}/insights): developing stories with an AI analysis that is the same for every reader
+// (cached per story, made again when the story gains articles) plus this reader's part (`for_you`, `watch`).
+// Every claim's `sources` are article ids. Scenarios are analysis, labelled by likelihood only, never a percentage.
+export type Likelihood = 'likely' | 'possible' | 'unlikely';
+export type InsightClaim = { text: string; sources: string[] };
+export type InsightScenario = {
+  title: string;
+  explanation: string;
+  likelihood: Likelihood;
+  watch_for: string[];
+  sources: string[];
+};
+export type InsightSource = {
+  article_id: string;
+  source_name?: string | null;
+  title: string;
+  url?: string | null;
+  published_at?: string | null;
+};
+export type Insight = {
+  story_id: string;
+  lead_article_id: string;
+  rank: number;
+  topic: EngineTopic;
+  title: string;
+  image_url?: string | null;
+  first_seen?: string | null;
+  last_updated?: string | null;
+  span_days: number;
+  source_count: number;
+  article_count: number;
+  what_happened: InsightClaim;
+  why_it_matters: InsightClaim[];
+  for_you: { kind: 'direct' | 'connected'; text: string; entities: string[] } | null;
+  scenarios: InsightScenario[];
+  watch_next: (InsightClaim & { when?: string | null })[];
+  // Practical steps for readers the story affects; origin 'risk_agent' = Agent 4's recommendation (no AI analysis)
+  actions: (InsightClaim & { origin: 'analysis' | 'risk_agent' })[];
+  entities: { key: string; name: string; followed: boolean }[];
+  sources: InsightSource[];
+  // ok: full analysis; partial: facts held up, scenarios didn't (none shown); fallback: no AI analysis (Groq down)
+  analysis: { status: 'ok' | 'partial' | 'fallback'; reason?: string | null; model?: string | null; generated_at?: string | null; version: number; dropped: number };
+  watch: { watching: boolean; since?: string | null; new_sources: number; changed: boolean };
+  disclaimer: string;
+};
+export type FollowChange = {
+  key: string;
+  name: string;
+  role?: Role | null;
+  weight?: WeightLevel | null;
+  this_week: number;
+  last_week: number;
+  top_story: { article_id: string; title: string; topic?: EngineTopic } | null;
+  insight_story_id?: string | null;
+};
+export type Insights = {
+  user_id: string;
+  generated_at: string;
+  window_h: number;
+  personalized: boolean;
+  persona_version?: number | null;
+  insights: Insight[];
+  follows: FollowChange[];
+};

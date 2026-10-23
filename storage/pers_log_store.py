@@ -3,6 +3,7 @@ MAPNAI — storage/pers_log_store.py
 Mongo collections owned by the personalization engine (PERSONALIZATION_PLAN.md §2.2).
 Phase 1: entity_aliases and feedback. Phase 2: job_runs. Phase 4: impressions, digests, thresholds (read: current τ).
 Phase 5: thresholds (write), feedback/impression windows for τ, proposals. Phase 6: alerts. Phase 7: render_cache.
+Insights: insights_cache (one analysis per story) and insight_watches.
 App views: per-article engagement counts (from feedback) and comments.
 """
 
@@ -68,6 +69,10 @@ class PersLogStore:
         db[self.cfg.render_cache_collection].create_index(
             [("article_id", ASCENDING), ("tone", ASCENDING), ("length", ASCENDING), ("jargon", ASCENDING),
              ("prompt_version", ASCENDING)], unique=True, name="one_render_per_style")
+        db[self.cfg.insights_cache_collection].create_index(
+            [("story_id", ASCENDING), ("prompt_version", ASCENDING)], unique=True, name="one_insight_per_story")
+        db[self.cfg.insight_watches_collection].create_index(
+            [("user_id", ASCENDING), ("story_id", ASCENDING)], unique=True, name="one_watch_per_story")
         logger.debug("[PersLog] Indexes verified.")
 
     # ── Entity aliases ───────────────────────────────────────
@@ -328,16 +333,43 @@ class PersLogStore:
             return self.get_recap(doc["kind"], doc["period"], doc["tz"])
         return stored
 
+    # ── Insights (one cached analysis per story; a reader's watches) ──
+
+    def insights_get(self, story_ids: List[str], prompt_version: str) -> Dict[str, Dict]:
+        rows = self._col(self.cfg.insights_cache_collection).find(
+            {"story_id": {"$in": list(story_ids)}, "prompt_version": prompt_version}, {"_id": 0})
+        return {r["story_id"]: r for r in rows}
+
+    def insights_put(self, doc: Dict) -> None:
+        """Upsert by (story_id, prompt_version): a story's newer analysis replaces the old one."""
+        key = {"story_id": doc["story_id"], "prompt_version": doc["prompt_version"]}
+        self._col(self.cfg.insights_cache_collection).replace_one(key, dict(doc), upsert=True)
+
+    def watches_for(self, user_id: str, story_ids: Optional[List[str]] = None) -> Dict[str, Dict]:
+        query: Dict = {"user_id": user_id}
+        if story_ids is not None:
+            query["story_id"] = {"$in": list(story_ids)}
+        return {r["story_id"]: r for r in self._col(self.cfg.insight_watches_collection).find(query, {"_id": 0})}
+
+    def watch_put(self, doc: Dict) -> None:
+        self._col(self.cfg.insight_watches_collection).replace_one(
+            {"user_id": doc["user_id"], "story_id": doc["story_id"]}, dict(doc), upsert=True)
+
+    def watch_delete(self, user_id: str, story_id: str) -> int:
+        return self._col(self.cfg.insight_watches_collection).delete_one(
+            {"user_id": user_id, "story_id": story_id}).deleted_count
+
     def invalidate_digest(self, user_id: str) -> int:
         return self._col(self.cfg.digests_collection).delete_many({"user_id": user_id}).deleted_count
 
     def purge_user(self, user_id: str) -> Dict[str, int]:
-        """Delete every per-user row (feedback, impressions, digests, proposals, alerts). Returns counts per collection."""
+        """Delete every per-user row (feedback, impressions, digests, proposals, alerts, watches). Counts per collection."""
         c = self.cfg
         return {
             name: self._col(name).delete_many({"user_id": user_id}).deleted_count
             for name in (c.feedback_collection, c.impressions_collection, c.digests_collection,
-                         c.proposals_collection, c.alerts_collection, c.comments_collection)
+                         c.proposals_collection, c.alerts_collection, c.comments_collection,
+                         c.insight_watches_collection)
         }
 
     def drop_tau_since(self, since: datetime) -> int:

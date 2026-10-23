@@ -4,10 +4,10 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { ApiError } from './client';
-import { ARTICLES, COMENTIONS, ENTITIES, FixtureArticle } from './fixtures';
+import { ARTICLES, COMENTIONS, ENTITIES, FixtureArticle, INSIGHTS } from './fixtures';
 import type {
   Alert, AlertPrefs, AskAnswer, Comment, Digest, EntityHit, Exposure, FeedbackType, FeedPage, Headline, Health,
-  Profile, Proposal, Recap, RecapKind, Role, SearchPage, Section, StoryDetail, StoryItem, Style, WeightLevel,
+  Insight, Insights, Profile, Proposal, Recap, RecapKind, Role, SearchPage, Section, StoryDetail, StoryItem, Style, WeightLevel,
 } from './types';
 
 const TAU = 0.2;
@@ -24,6 +24,7 @@ type MockUser = {
   history: { article_id: string; title: string; t: string; w: number }[];
   saved: string[];
   rejected: string[];
+  watches?: Record<string, { since: string; sources_at: number }>;
   persona_version: number;
   created_at: string;
 };
@@ -57,11 +58,29 @@ const prior = (w: number): [number, number] => [1 + 3 * w, 1 + 3 * (1 - w)];
 const theta = (b?: [number, number]) => (b ? b[0] / (b[0] + b[1]) : 0.5);
 const LABEL = { 1: 'low', 2: 'medium', 3: 'high' } as const;
 
+// A demo reader for a signed-in id the mock store doesn't know (a session left from hybrid / live mode, or cleared
+// storage): mock mode then works without signing out. Follows two fixtures so Insights shows its personal parts.
+function demoUser(user_id: string): MockUser {
+  const follow = (key: string, weight: WeightLevel): Exposure => ({
+    key, name: ENTITIES[key].name, role: 'follows', weight, weight_label: LABEL[weight], provenance: 'declared', valid_from: nowIso(),
+  });
+  return {
+    user_id, name: 'Demo reader', topics: { sports: 1.0, entertainment_movies: 0.6 },
+    style: { tone: 'plain', length: 'short', jargon: 'low' },
+    alert_prefs: { max_per_day: 3, quiet_start: '22:00', quiet_end: '07:00', tz: 'Asia/Kolkata' },
+    exposures: [follow('jasprit bumrah', 3), follow('yash raj films', 2)],
+    beta: {}, history: [], saved: [], rejected: [], persona_version: 1, created_at: nowIso(),
+  };
+}
+
 async function user(id: string): Promise<MockUser> {
   const d = await load();
-  const u = d.users[id];
-  if (!u) throw new ApiError(404, `user ${id} not found`);
-  return u;
+  if (!id) throw new ApiError(404, 'no user');
+  if (!d.users[id]) {
+    d.users[id] = demoUser(id);
+    void save();
+  }
+  return d.users[id];
 }
 function bump(u: MockUser) {
   u.persona_version += 1;
@@ -466,6 +485,74 @@ export const mock = {
       article_id: `${a.id}-${i}`, source_name: s, title: i === 0 ? a.title : `${a.title.split(' ').slice(0, 6).join(' ')}…`,
       published_at: ago(a.ageH + i * 0.5), first_report: i === 0 && a.first, url: `https://example.com/${a.id}/${i}`,
     }));
+  },
+
+  // Insights from the fixtures: followed stories first (the engine's follow boost), then by m. Sources are the
+  // story's mock.cluster rows, so "Read the sources" and the cited sources match.
+  async insights(id: string): Promise<Insights> {
+    await delay(450);
+    const u = await user(id);
+    const followed = new Set(u.exposures.map((e) => e.key));
+    const pi = seeds(u);
+    const picks = Object.keys(INSIGHTS)
+      .map((aid) => ARTICLES.find((a) => a.id === aid)!)
+      .map((a) => ({ a, hits: a.entities.filter((k) => followed.has(k)), score: a.m + (a.entities.some((k) => followed.has(k)) ? 0.3 : 0) }))
+      .sort((x, y) => y.score - x.score);
+    const items: Insight[] = await Promise.all(picks.map(async ({ a, hits }, i) => {
+      const f = INSIGHTS[a.id];
+      const sources = (await mock.cluster(a.id)).slice(0, 8);
+      const ids = (src: number[]) => src.filter((n) => n < sources.length).map((n) => sources[n].article_id);
+      const conn = !hits.length ? a.entities.map((k) => pi.get(k)).find((p) => p?.via) : undefined;
+      const w = u.watches?.[a.id];
+      return {
+        story_id: `c-${a.id}`, lead_article_id: a.id, rank: i + 1, topic: a.topic, title: a.title, image_url: null,
+        first_seen: ago(a.ageH + 24 * (f.spanDays - 1)), last_updated: ago(Math.max(0.5, a.ageH - 1)),
+        span_days: f.spanDays, source_count: a.sources, article_count: a.sources + 2,
+        what_happened: { text: f.what.text, sources: ids(f.what.src) },
+        why_it_matters: f.why.map((x) => ({ text: x.text, sources: ids(x.src) })),
+        for_you: hits.length
+          ? { kind: 'direct', text: `You follow ${hits.map((k) => ENTITIES[k]?.name ?? k).join(' and ')}`, entities: hits }
+          : conn
+            ? { kind: 'connected', text: `Involves ${ENTITIES[conn.via!]?.name ?? conn.via}, linked to ${conn.seed.name}, which you follow`, entities: [conn.via!, conn.seed.key] }
+            : null,
+        scenarios: f.scenarios.map((x) => ({ title: x.title, explanation: x.explanation, likelihood: x.likelihood, watch_for: x.watch_for, sources: ids(x.src) })),
+        watch_next: f.next.map((x) => ({ text: x.text, when: x.when, sources: ids(x.src) })),
+        actions: f.actions.map((x) => ({ text: x.text, sources: ids(x.src), origin: f.status === 'fallback' ? 'risk_agent' as const : 'analysis' as const })),
+        entities: a.entities.map((k) => ({ key: k, name: ENTITIES[k]?.name ?? k, followed: followed.has(k) })),
+        sources: sources.map((r) => ({ article_id: r.article_id, source_name: r.source_name, title: r.title, url: r.url, published_at: r.published_at })),
+        analysis: { status: f.status, reason: f.status === 'fallback' ? 'no_llm_client' : null, model: f.status === 'ok' ? 'mock' : null, generated_at: ago(1), version: 1, dropped: 0 },
+        watch: w ? { watching: true, since: w.since, new_sources: Math.max(0, a.sources - w.sources_at), changed: false } : { watching: false, since: null, new_sources: 0, changed: false },
+        disclaimer: 'AI-generated analysis of the sources below, not a prediction.',
+      };
+    }));
+    const developing = new Map<string, string>();
+    items.forEach((it) => it.entities.forEach((e) => { if (!developing.has(e.key)) developing.set(e.key, it.story_id); }));
+    const follows = u.exposures.map((e) => {
+      const mine = ARTICLES.filter((a) => a.entities.includes(e.key)).sort((x, y) => y.m - x.m);
+      return {
+        key: e.key, name: e.name, role: e.role, weight: e.weight, this_week: mine.length, last_week: e.key.length % 3,
+        top_story: mine[0] ? { article_id: mine[0].id, title: mine[0].title, topic: mine[0].topic } : null,
+        insight_story_id: developing.get(e.key) ?? null,
+      };
+    }).sort((x, y) => y.this_week - x.this_week);
+    return {
+      user_id: id, generated_at: nowIso(), window_h: 72, personalized: items.some((i) => i.for_you),
+      persona_version: u.persona_version, insights: items, follows,
+    };
+  },
+
+  async watchInsight(id: string, story_id: string, on: boolean) {
+    await delay(150);
+    const u = await user(id);
+    const aid = story_id.replace(/^c-/, '');
+    const a = ARTICLES.find((x) => x.id === aid);
+    if (!a || !INSIGHTS[aid]) throw new ApiError(404, `no insight for story ${story_id}`);
+    u.watches = u.watches ?? {};
+    const since = nowIso();
+    if (on) u.watches[aid] = { since, sources_at: a.sources };
+    else delete u.watches[aid];
+    void save();
+    return { story_id, watching: on, since: on ? since : null };
   },
 
   async alerts(id: string): Promise<Alert[]> {

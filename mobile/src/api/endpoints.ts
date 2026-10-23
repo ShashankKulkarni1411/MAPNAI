@@ -5,7 +5,7 @@ import { API_MODE, http } from './client';
 import { mock } from './mockServer';
 import type {
   Alert, AlertPrefs, AskAnswer, Comment, Digest, EntityHit, Exposure, FeedbackType, FeedPage, Headline, Health,
-  Profile, Proposal, Recap, RecapKind, Role, SearchPage, StoryDetail, StoryItem, Style, WeightLevel,
+  Insights, Profile, Proposal, Recap, RecapKind, Role, SearchPage, StoryDetail, StoryItem, Style, WeightLevel,
 } from './types';
 
 const built = API_MODE !== 'mock';
@@ -108,6 +108,15 @@ export const api = {
           query: { tz, user_id: userId ?? undefined, [kind === 'daily' ? 'date' : 'week']: period },
         })
       : mock.recap(kind),
+
+  // The first request after a story changes runs the AI analysis (a few stories in parallel): allow it time
+  insights: (id: string): Promise<Insights> =>
+    built ? http(`/v1/users/${enc(id)}/insights`, { timeoutMs: 60000 }) : mock.insights(id),
+
+  watchInsight: (id: string, story_id: string, on: boolean): Promise<{ story_id: string; watching: boolean; since: string | null }> =>
+    built
+      ? http(`/v1/users/${enc(id)}/insights/${enc(story_id)}/watch`, { method: on ? 'POST' : 'DELETE' })
+      : mock.watchInsight(id, story_id, on),
 
   story: (article_id: string, userId?: string | null): Promise<StoryDetail> =>
     built
