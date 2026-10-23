@@ -1,0 +1,309 @@
+{
+ "meta": {
+  "script": "research/experiments/e05_checker_smoke.py",
+  "run_at_utc": "2026-10-23T17:43:11+00:00",
+  "git_commit": "8911c4c",
+  "python": "3.11.9",
+  "tag": "2026-10-23b",
+  "torch": "2.6.0+cu124",
+  "cuda": "12.4",
+  "gpu": "NVIDIA GeForce RTX 3050 6GB Laptop GPU",
+  "cpu": "Intel64 Family 6 Model 183 Stepping 1, GenuineIntel",
+  "label": "SMOKE TEST on 10 hand-written pairs: not an accuracy estimate"
+ },
+ "pairs": [
+  {
+   "kind": "faithful_paraphrase",
+   "gold_supported": 1
+  },
+  {
+   "kind": "number_change",
+   "gold_supported": 0
+  },
+  {
+   "kind": "negation",
+   "gold_supported": 0
+  },
+  {
+   "kind": "omission",
+   "gold_supported": 1
+  },
+  {
+   "kind": "faithful_paraphrase",
+   "gold_supported": 1
+  },
+  {
+   "kind": "role_swap",
+   "gold_supported": 0
+  },
+  {
+   "kind": "entity_substitution",
+   "gold_supported": 0
+  },
+  {
+   "kind": "omission",
+   "gold_supported": 1
+  },
+  {
+   "kind": "hedge_removed",
+   "gold_supported": 0
+  },
+  {
+   "kind": "faithful_paraphrase",
+   "gold_supported": 1
+  }
+ ],
+ "results": {
+  "current_gate_v1": {
+   "rows": [
+    {
+     "kind": "faithful_paraphrase",
+     "gold": 1,
+     "pass": 0,
+     "missing": [
+      "entity:Elena Ruiz"
+     ],
+     "added": []
+    },
+    {
+     "kind": "number_change",
+     "gold": 0,
+     "pass": 0,
+     "missing": [
+      "number:4.2",
+      "entity:Elena Ruiz"
+     ],
+     "added": [
+      "5.2"
+     ]
+    },
+    {
+     "kind": "negation",
+     "gold": 0,
+     "pass": 0,
+     "missing": [
+      "number:4.2",
+      "entity:Elena Ruiz"
+     ],
+     "added": []
+    },
+    {
+     "kind": "omission",
+     "gold": 1,
+     "pass": 0,
+     "missing": [
+      "number:4.2"
+     ],
+     "added": []
+    },
+    {
+     "kind": "faithful_paraphrase",
+     "gold": 1,
+     "pass": 0,
+     "missing": [
+      "number:88",
+      "entity:Emirates Stadium"
+     ],
+     "added": []
+    },
+    {
+     "kind": "role_swap",
+     "gold": 0,
+     "pass": 0,
+     "missing": [
+      "number:88",
+      "entity:Bukayo Saka"
+     ],
+     "added": []
+    },
+    {
+     "kind": "entity_substitution",
+     "gold": 0,
+     "pass": 0,
+     "missing": [
+      "number:88",
+      "entity:Emirates Stadium",
+      "entity:Bukayo Saka"
+     ],
+     "added": []
+    },
+    {
+     "kind": "omission",
+     "gold": 1,
+     "pass": 0,
+     "missing": [
+      "number:1",
+      "number:2",
+      "number:88",
+      "entity:Emirates Stadium",
+      "entity:Bukayo Saka"
+     ],
+     "added": []
+    },
+    {
+     "kind": "hedge_removed",
+     "gold": 0,
+     "pass": 1,
+     "missing": [],
+     "added": []
+    },
+    {
+     "kind": "faithful_paraphrase",
+     "gold": 1,
+     "pass": 1,
+     "missing": [],
+     "added": []
+    }
+   ],
+   "correct": 5,
+   "latency_ms_p50": 0.047
+  },
+  "flan-t5-large@cuda": {
+   "model_name": "flan-t5-large",
+   "device": "cuda:0",
+   "load_seconds": 18.11,
+   "probs": [
+    0.983244,
+    0.013787,
+    0.015923,
+    0.967067,
+    0.965641,
+    0.021672,
+    0.007073,
+    0.965384,
+    0.101119,
+    0.127129
+   ],
+   "preds": [
+    1,
+    0,
+    0,
+    1,
+    1,
+    0,
+    0,
+    1,
+    0,
+    0
+   ],
+   "correct": 9,
+   "deterministic": true,
+   "in_unit_interval": true,
+   "latency_ms": {
+    "per_pair": [
+     385.9,
+     409.0,
+     378.5,
+     395.1,
+     384.5,
+     397.0,
+     379.5,
+     380.8,
+     374.3,
+     387.1
+    ],
+    "p50": 385.2,
+    "max": 409.0
+   },
+   "smoke_pass": true
+  },
+  "deberta-v3-large@cuda": {
+   "model_name": "deberta-v3-large",
+   "device": "cuda:0",
+   "load_seconds": 10.74,
+   "probs": [
+    0.962312,
+    0.013804,
+    0.034132,
+    0.940094,
+    0.953539,
+    0.050029,
+    0.01278,
+    0.970285,
+    0.917793,
+    0.916122
+   ],
+   "preds": [
+    1,
+    0,
+    0,
+    1,
+    1,
+    0,
+    0,
+    1,
+    1,
+    1
+   ],
+   "correct": 9,
+   "deterministic": true,
+   "in_unit_interval": true,
+   "latency_ms": {
+    "per_pair": [
+     1134.6,
+     229.5,
+     575.0,
+     221.1,
+     1472.0,
+     236.6,
+     242.6,
+     219.1,
+     220.5,
+     226.6
+    ],
+    "p50": 233.1,
+    "max": 1472.0
+   },
+   "smoke_pass": true
+  },
+  "deberta-v3-large@cpu": {
+   "model_name": "deberta-v3-large",
+   "device": "cpu",
+   "load_seconds": 4.03,
+   "probs": [
+    0.962312,
+    0.013804,
+    0.034132,
+    0.940094,
+    0.953539,
+    0.050029,
+    0.01278,
+    0.970285,
+    0.917792,
+    0.916122
+   ],
+   "preds": [
+    1,
+    0,
+    0,
+    1,
+    1,
+    0,
+    0,
+    1,
+    1,
+    1
+   ],
+   "correct": 9,
+   "deterministic": true,
+   "in_unit_interval": true,
+   "latency_ms": {
+    "per_pair": [
+     1670.9,
+     1693.0,
+     1569.5,
+     1731.7,
+     1510.7,
+     1501.5,
+     1492.4,
+     1359.4,
+     1519.3,
+     1421.1
+    ],
+    "p50": 1515.0,
+    "max": 1731.7
+   },
+   "smoke_pass": true
+  }
+ }
+}

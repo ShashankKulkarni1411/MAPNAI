@@ -28,6 +28,14 @@ Groq calls are logged in the "Groq budget" table at the bottom (cap: 4,000 total
 | L0020 | 2026-10-23 | 1 | FactCG-DBT average, per-dataset dev-tuned thresholds vs fixed 0.5 | 77.2 vs 75.6 | arXiv 2501.17144v1 Table 3 / App. A.3 | WebFetch | — |
 | L0021 | 2026-10-23 | 1 | Saravanakumar 2021 best B³ F1, English Miranda subset | 94.76 (P 94.28 / R 95.25); Miranda 92.36; Staykovski 94.41 | EACL 2021 PDF Table 1, p. 7 | pypdf text extraction | — |
 | L0022 | 2026-10-23 | 1 | Clustering benchmark files exist on FTP | test 49,284,104 B; dev 57,925,165 B | ftp.priberam.pt listing | curl (listing only, no download) | — |
+| L0023 | 2026-10-23 | 2 | MIND Azure blob (documented URL) unavailable | HTTP 409 "Public access is not permitted" | — | `curl -sI $BASE/MINDsmall_dev.zip` | — |
+| L0024 | 2026-10-23 | 2 | MIND-small source used (alt. #2 after the official-linked HF mirror `yjw1029/MIND` returned 401 GatedRepo) | `Recommenders/MIND` @ 2115068f; dev zip sha256 d6ce515d…c669, train 6ef97a27…3194 (match LFS hashes) | `research/experiments/data/external/mind/SHA256SUMS.txt`, `data/MANIFEST.json` | curl --fail at pinned revision | 8911c4c |
+| L0025 | 2026-10-23 | 2 | MIND-small news.tsv columns (docs say "7", list 8) | 8 columns; dev 42,416 rows, train 51,282; 0 malformed; behaviors dev 73,152 / train 156,965 | `research/experiments/results/e04_mind_sources_2026-10-23.json` | `python research/experiments/e04_mind_sources.py --tag 2026-10-23` | 8911c4c |
+| L0026 | 2026-10-23 | 2 | MIND-small dev abstracts | empty 4.76%; non-empty word p50 25 (p10 10, p90 74); ≥ 30 words 40.2% | same | same | 8911c4c |
+| L0027 | 2026-10-23 | 2 | EXP-7 source set | 120 rows, floor 30 words (pool 16,083), 14 categories; file sha256 139239e3…a5e4 | same; `data/external/mind_sources_120.jsonl` (git-ignored) | same | 8911c4c |
+| L0028 | 2026-10-23 | 2 | Checker smoke test, first run | FAILED: unpinned transitive `pyarrow 26.0.0` requires NumPy ≥ 2 (env had 1.26.4) | `research/experiments/results/e05_checker_smoke_2026-10-23.json` | `~/.venvs/mapnai-checkers/Scripts/python.exe research/experiments/e05_checker_smoke.py --tag 2026-10-23` | 8911c4c |
+| L0029 | 2026-10-23 | 2 | Checker smoke test after pinning pyarrow 18.1.0 (10 hand-written pairs; not an accuracy estimate) | FT5@cuda 9/10, p50 385 ms/pair; DeBERTa@cuda 9/10, p50 233 ms; DeBERTa@cpu 9/10, p50 1,515 ms; gate v1 5/10, p50 0.05 ms; all deterministic | `research/experiments/results/e05_checker_smoke_2026-10-23b.json` | same, `--tag 2026-10-23b` | 8911c4c |
+| L0030 | 2026-10-23 | 2 | Checkpoint integrity | FT5 pytorch_model.bin sha256 41291881…26c0; DeBERTa 32ced784…cbdf (= HF LFS hashes at pinned commits) | `research/experiments/data/MANIFEST.json` | `python research/experiments/e06_manifest.py` | 8911c4c |
 
 ## Groq budget (R9: cap 4,000 calls)
 

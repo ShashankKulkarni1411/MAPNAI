@@ -1,0 +1,244 @@
+{
+ "meta": {
+  "script": "research/experiments/e06_manifest.py",
+  "run_at_utc": "2026-10-23T17:44:58+00:00",
+  "git_commit": "8911c4c",
+  "python": "3.11.9"
+ },
+ "files": [
+  {
+   "group": "MIND-small",
+   "path": "research/experiments/data/external/mind/MINDsmall_dev.zip",
+   "exists": true,
+   "bytes": 30948560,
+   "sha256": "d6ce515dcaa6b6d47ddf0a326eebc8a31b84735ae410285c9882ca2a06eec669",
+   "source": "https://huggingface.co/datasets/Recommenders/MIND",
+   "revision": "2115068f457b577f93a268fffe22373e45727d89",
+   "licence": "Microsoft Research License (non-commercial research; no redistribution)"
+  },
+  {
+   "group": "MIND-small",
+   "path": "research/experiments/data/external/mind/MINDsmall_train.zip",
+   "exists": true,
+   "bytes": 52994575,
+   "sha256": "6ef97a271580b98ccfc4301ada55cc639423cb0576a78b8dcfcf74a4dbcc3194",
+   "source": "https://huggingface.co/datasets/Recommenders/MIND",
+   "revision": "2115068f457b577f93a268fffe22373e45727d89",
+   "licence": "Microsoft Research License (non-commercial research; no redistribution)"
+  },
+  {
+   "group": "MIND-small",
+   "path": "research/experiments/data/external/mind/dev/news.tsv",
+   "exists": true,
+   "bytes": 33519092,
+   "sha256": "e5d144667558c449d16084fe6bfa01940c2f5d5785ea9f9110292bc3b94eb822",
+   "source": "extracted from MINDsmall_dev.zip",
+   "revision": "",
+   "licence": ""
+  },
+  {
+   "group": "MIND-small",
+   "path": "research/experiments/data/external/mind/train/news.tsv",
+   "exists": true,
+   "bytes": 41202121,
+   "sha256": "cd49d7da275e9c405f627d75a0de9d4ec6ad43ff8a8db5d23a447591676e09d6",
+   "source": "extracted from MINDsmall_train.zip",
+   "revision": "",
+   "licence": ""
+  },
+  {
+   "group": "EXP-7 sources",
+   "path": "research/experiments/data/external/mind_sources_120.jsonl",
+   "exists": true,
+   "bytes": 63449,
+   "sha256": "139239e30d4ad87ca5ed7baea060de5bea89386647075939013cba893b39a5e4",
+   "source": "e04_mind_sources.py --tag 2026-10-23",
+   "revision": "",
+   "licence": "derived from MIND-small (same licence)"
+  },
+  {
+   "group": "NLTK data",
+   "path": "models/nltk_data/tokenizers/punkt_tab.zip",
+   "exists": true,
+   "bytes": 4319076,
+   "sha256": "e57f64187974277726a3417ca6f181ec5403676c717672eef6a748a7b20e0106",
+   "source": "nltk.download('punkt_tab') with nltk 3.9.1",
+   "revision": "",
+   "licence": "Apache-2.0 (NLTK data)"
+  },
+  {
+   "group": "lytang/MiniCheck-Flan-T5-Large",
+   "path": "models/ckpts/models--lytang--MiniCheck-Flan-T5-Large/snapshots/96eafd01cee2d16cf81aaa2fb226b14f422a37b3/added_tokens.json",
+   "exists": true,
+   "bytes": 2634,
+   "sha256": "4b1c1345a66fdd00264819c5adfc3142debfbd3b03767a04f95a39ac2277ca21",
+   "source": "https://huggingface.co/lytang/MiniCheck-Flan-T5-Large",
+   "revision": "96eafd01cee2d16cf81aaa2fb226b14f422a37b3",
+   "licence": "MIT"
+  },
+  {
+   "group": "lytang/MiniCheck-Flan-T5-Large",
+   "path": "models/ckpts/models--lytang--MiniCheck-Flan-T5-Large/snapshots/96eafd01cee2d16cf81aaa2fb226b14f422a37b3/config.json",
+   "exists": true,
+   "bytes": 826,
+   "sha256": "d8e91aa8739d845d2572fa8db9cb6523d06208c14fedb8f7623f49283a305653",
+   "source": "https://huggingface.co/lytang/MiniCheck-Flan-T5-Large",
+   "revision": "96eafd01cee2d16cf81aaa2fb226b14f422a37b3",
+   "licence": "MIT"
+  },
+  {
+   "group": "lytang/MiniCheck-Flan-T5-Large",
+   "path": "models/ckpts/models--lytang--MiniCheck-Flan-T5-Large/snapshots/96eafd01cee2d16cf81aaa2fb226b14f422a37b3/generation_config.json",
+   "exists": true,
+   "bytes": 112,
+   "sha256": "3c4ec6a75c47200afbecd413ee6719007f701821d07b6c11a6c30237d3f9c854",
+   "source": "https://huggingface.co/lytang/MiniCheck-Flan-T5-Large",
+   "revision": "96eafd01cee2d16cf81aaa2fb226b14f422a37b3",
+   "licence": "MIT"
+  },
+  {
+   "group": "lytang/MiniCheck-Flan-T5-Large",
+   "path": "models/ckpts/models--lytang--MiniCheck-Flan-T5-Large/snapshots/96eafd01cee2d16cf81aaa2fb226b14f422a37b3/pytorch_model.bin",
+   "exists": true,
+   "bytes": 3132786242,
+   "sha256": "41291881e13c6235ed47149cec903bee9493e45d9d7325587a9fa2e266c526c0",
+   "source": "https://huggingface.co/lytang/MiniCheck-Flan-T5-Large",
+   "revision": "96eafd01cee2d16cf81aaa2fb226b14f422a37b3",
+   "licence": "MIT"
+  },
+  {
+   "group": "lytang/MiniCheck-Flan-T5-Large",
+   "path": "models/ckpts/models--lytang--MiniCheck-Flan-T5-Large/snapshots/96eafd01cee2d16cf81aaa2fb226b14f422a37b3/README.md",
+   "exists": true,
+   "bytes": 4834,
+   "sha256": "2e5128482878408f4f2e3f21388ca313f9fc61ba3242539d0aabf6a85eede683",
+   "source": "https://huggingface.co/lytang/MiniCheck-Flan-T5-Large",
+   "revision": "96eafd01cee2d16cf81aaa2fb226b14f422a37b3",
+   "licence": "MIT"
+  },
+  {
+   "group": "lytang/MiniCheck-Flan-T5-Large",
+   "path": "models/ckpts/models--lytang--MiniCheck-Flan-T5-Large/snapshots/96eafd01cee2d16cf81aaa2fb226b14f422a37b3/special_tokens_map.json",
+   "exists": true,
+   "bytes": 2239,
+   "sha256": "47389dd56434a0d7d32f736ba34e895b331461980af760e955b62d5c39912626",
+   "source": "https://huggingface.co/lytang/MiniCheck-Flan-T5-Large",
+   "revision": "96eafd01cee2d16cf81aaa2fb226b14f422a37b3",
+   "licence": "MIT"
+  },
+  {
+   "group": "lytang/MiniCheck-Flan-T5-Large",
+   "path": "models/ckpts/models--lytang--MiniCheck-Flan-T5-Large/snapshots/96eafd01cee2d16cf81aaa2fb226b14f422a37b3/spiece.model",
+   "exists": true,
+   "bytes": 791656,
+   "sha256": "d60acb128cf7b7f2536e8f38a5b18a05535c9e14c7a355904270e15b0945ea86",
+   "source": "https://huggingface.co/lytang/MiniCheck-Flan-T5-Large",
+   "revision": "96eafd01cee2d16cf81aaa2fb226b14f422a37b3",
+   "licence": "MIT"
+  },
+  {
+   "group": "lytang/MiniCheck-Flan-T5-Large",
+   "path": "models/ckpts/models--lytang--MiniCheck-Flan-T5-Large/snapshots/96eafd01cee2d16cf81aaa2fb226b14f422a37b3/tokenizer.json",
+   "exists": true,
+   "bytes": 2422290,
+   "sha256": "ece24e1e7d9b5a26f4e68a9519b6ea1451474811b52a9da419c9145f1f458fc0",
+   "source": "https://huggingface.co/lytang/MiniCheck-Flan-T5-Large",
+   "revision": "96eafd01cee2d16cf81aaa2fb226b14f422a37b3",
+   "licence": "MIT"
+  },
+  {
+   "group": "lytang/MiniCheck-Flan-T5-Large",
+   "path": "models/ckpts/models--lytang--MiniCheck-Flan-T5-Large/snapshots/96eafd01cee2d16cf81aaa2fb226b14f422a37b3/tokenizer_config.json",
+   "exists": true,
+   "bytes": 20917,
+   "sha256": "284a01dc7b81f159449b96cd0d8814f6da64bbdb59833fe3b8398ea36a860550",
+   "source": "https://huggingface.co/lytang/MiniCheck-Flan-T5-Large",
+   "revision": "96eafd01cee2d16cf81aaa2fb226b14f422a37b3",
+   "licence": "MIT"
+  },
+  {
+   "group": "lytang/MiniCheck-DeBERTa-v3-Large",
+   "path": "models/ckpts/models--lytang--MiniCheck-DeBERTa-v3-Large/snapshots/2f2d01a54fa022a7ffadb76260e1ea8bc88c82bb/added_tokens.json",
+   "exists": true,
+   "bytes": 79,
+   "sha256": "1dbe7c2023658ad369d0e79ea05048aa0b845b518a1334fa147b5b1904d9b600",
+   "source": "https://huggingface.co/lytang/MiniCheck-DeBERTa-v3-Large",
+   "revision": "2f2d01a54fa022a7ffadb76260e1ea8bc88c82bb",
+   "licence": "MIT"
+  },
+  {
+   "group": "lytang/MiniCheck-DeBERTa-v3-Large",
+   "path": "models/ckpts/models--lytang--MiniCheck-DeBERTa-v3-Large/snapshots/2f2d01a54fa022a7ffadb76260e1ea8bc88c82bb/config.json",
+   "exists": true,
+   "bytes": 1075,
+   "sha256": "8a8eabb5f1bc47c9f221486964d208064f6649eafd6cf992020a200a4e1a4f8d",
+   "source": "https://huggingface.co/lytang/MiniCheck-DeBERTa-v3-Large",
+   "revision": "2f2d01a54fa022a7ffadb76260e1ea8bc88c82bb",
+   "licence": "MIT"
+  },
+  {
+   "group": "lytang/MiniCheck-DeBERTa-v3-Large",
+   "path": "models/ckpts/models--lytang--MiniCheck-DeBERTa-v3-Large/snapshots/2f2d01a54fa022a7ffadb76260e1ea8bc88c82bb/pytorch_model.bin",
+   "exists": true,
+   "bytes": 1740386738,
+   "sha256": "32ced784f4831d5f324a072e43b96d4072cac4bf41042bc42243605ffbbccbdf",
+   "source": "https://huggingface.co/lytang/MiniCheck-DeBERTa-v3-Large",
+   "revision": "2f2d01a54fa022a7ffadb76260e1ea8bc88c82bb",
+   "licence": "MIT"
+  },
+  {
+   "group": "lytang/MiniCheck-DeBERTa-v3-Large",
+   "path": "models/ckpts/models--lytang--MiniCheck-DeBERTa-v3-Large/snapshots/2f2d01a54fa022a7ffadb76260e1ea8bc88c82bb/README.md",
+   "exists": true,
+   "bytes": 4629,
+   "sha256": "b5b57b1ba37a3c7dde8b169b40ce12977679303e8507a6d5e3f8bf785c34e81d",
+   "source": "https://huggingface.co/lytang/MiniCheck-DeBERTa-v3-Large",
+   "revision": "2f2d01a54fa022a7ffadb76260e1ea8bc88c82bb",
+   "licence": "MIT"
+  },
+  {
+   "group": "lytang/MiniCheck-DeBERTa-v3-Large",
+   "path": "models/ckpts/models--lytang--MiniCheck-DeBERTa-v3-Large/snapshots/2f2d01a54fa022a7ffadb76260e1ea8bc88c82bb/special_tokens_map.json",
+   "exists": true,
+   "bytes": 276,
+   "sha256": "df07ec76585071dc1ffa857ab911880a32c7818d87f7b7fad0142e545dd6d1e5",
+   "source": "https://huggingface.co/lytang/MiniCheck-DeBERTa-v3-Large",
+   "revision": "2f2d01a54fa022a7ffadb76260e1ea8bc88c82bb",
+   "licence": "MIT"
+  },
+  {
+   "group": "lytang/MiniCheck-DeBERTa-v3-Large",
+   "path": "models/ckpts/models--lytang--MiniCheck-DeBERTa-v3-Large/snapshots/2f2d01a54fa022a7ffadb76260e1ea8bc88c82bb/spm.model",
+   "exists": true,
+   "bytes": 2464616,
+   "sha256": "c679fbf93643d19aab7ee10c0b99e460bdbc02fedf34b92b05af343b4af586fd",
+   "source": "https://huggingface.co/lytang/MiniCheck-DeBERTa-v3-Large",
+   "revision": "2f2d01a54fa022a7ffadb76260e1ea8bc88c82bb",
+   "licence": "MIT"
+  },
+  {
+   "group": "lytang/MiniCheck-DeBERTa-v3-Large",
+   "path": "models/ckpts/models--lytang--MiniCheck-DeBERTa-v3-Large/snapshots/2f2d01a54fa022a7ffadb76260e1ea8bc88c82bb/tokenizer.json",
+   "exists": true,
+   "bytes": 8648917,
+   "sha256": "8bfb874b90f3b3ea9481289bf351eef77462f0935f526ea107f53789708cc5d4",
+   "source": "https://huggingface.co/lytang/MiniCheck-DeBERTa-v3-Large",
+   "revision": "2f2d01a54fa022a7ffadb76260e1ea8bc88c82bb",
+   "licence": "MIT"
+  },
+  {
+   "group": "lytang/MiniCheck-DeBERTa-v3-Large",
+   "path": "models/ckpts/models--lytang--MiniCheck-DeBERTa-v3-Large/snapshots/2f2d01a54fa022a7ffadb76260e1ea8bc88c82bb/tokenizer_config.json",
+   "exists": true,
+   "bytes": 1496,
+   "sha256": "c5d20c69691d05875de7ac9a8cb735c8cd89499114ef0071dd51c2a17fb20278",
+   "source": "https://huggingface.co/lytang/MiniCheck-DeBERTa-v3-Large",
+   "revision": "2f2d01a54fa022a7ffadb76260e1ea8bc88c82bb",
+   "licence": "MIT"
+  }
+ ],
+ "pending": {
+  "lytang/LLM-AggreFact": "PENDING (H4): gated on Hugging Face; needs the user's login and acceptance of the CC-BY-ND-4.0 evaluation-only terms",
+  "bespokelabs/Bespoke-MiniCheck-7B": "NOT DOWNLOADED locally (6 GB GPU); Colab script research/colab/run_bespoke.py"
+ }
+}
