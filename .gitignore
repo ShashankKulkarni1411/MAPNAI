@@ -29,3 +29,10 @@ data/demo_personas.json
 
 # Runtime logs (may contain hostnames / connection details)
 logs/
+
+# Research: local environments, downloaded datasets/checkpoints, third-party news text
+envs/
+research/experiments/data/external/
+research/experiments/data/e02_gate_sources_*.jsonl
+research/experiments/cache/
+research/colab/outputs/
