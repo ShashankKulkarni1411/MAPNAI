@@ -23,6 +23,11 @@ Groq calls are logged in the "Groq budget" table at the bottom (cap: 4,000 total
 | L0015 | 2026-10-23 | 0 | Full test-suite baseline, pinned CPython 3.11.9 + requirements.lock | 720 passed / 0 failed / 0 skipped (196.6 s) | `research/experiments/results/baseline_pytest_2026-10-23.txt` (sha256 b6174f57…f4e8) | PREFLIGHT.md §4 | e642c48 (app code = 53f4b12) |
 | L0016 | 2026-10-23 | 0 | LLM-AggreFact HF row counts (card, not yet downloaded) | test 29,320 · dev 30,420 | https://huggingface.co/datasets/lytang/LLM-AggreFact (retrieved 2026-10-23) | WebFetch | — |
 | L0017 | 2026-10-23 | 0 | Leaderboard average, MiniCheck-Flan-T5-L / Bespoke-MiniCheck-7B (default view, 14 of 42 models) | 75.0 / 77.4 | https://llm-aggrefact.github.io/ (retrieved 2026-10-23) | WebFetch | — |
+| L0018 | 2026-10-23 | 1 | Full leaderboard snapshot (42 models), averages recomputed | MiniCheck-FT5 75.0; FactCG-DeBERTa-L 75.63; Bespoke-7B 77.41; nimble-v4-max 79.45; News-3: FT5 72.60, best 73.17 | `research/experiments/results/p1_aggrefact_leaderboard_2026-10-23.json` | parse of `data.tsx` @ site commit 5c43d7b5 (inline script, SOTA_TARGETS.md §1a) | b0f5489 |
+| L0019 | 2026-10-23 | 1 | MiniCheck-FT5 paper average (10 datasets, 13K test) | 74.7 | arXiv 2404.10774v2 Table 2 | WebFetch | — |
+| L0020 | 2026-10-23 | 1 | FactCG-DBT average, per-dataset dev-tuned thresholds vs fixed 0.5 | 77.2 vs 75.6 | arXiv 2501.17144v1 Table 3 / App. A.3 | WebFetch | — |
+| L0021 | 2026-10-23 | 1 | Saravanakumar 2021 best B³ F1, English Miranda subset | 94.76 (P 94.28 / R 95.25); Miranda 92.36; Staykovski 94.41 | EACL 2021 PDF Table 1, p. 7 | pypdf text extraction | — |
+| L0022 | 2026-10-23 | 1 | Clustering benchmark files exist on FTP | test 49,284,104 B; dev 57,925,165 B | ftp.priberam.pt listing | curl (listing only, no download) | — |
 
 ## Groq budget (R9: cap 4,000 calls)
 
