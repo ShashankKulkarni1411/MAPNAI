@@ -56,6 +56,9 @@ Groq calls are logged in the "Groq budget" table at the bottom (cap: 4,000 total
 | L0048 | 2026-10-24 | 3 | Suite after F5 (18 new tests) | 778 passed / 0 failed | `results/suite_2026-10-24-f5.txt` | PREFLIGHT.md §4 command | F5 commit |
 | L0049 | 2026-10-24 | 3 | CORRECTION to L0015/PREFLIGHT §4: env overrides do not override `.env` for `config.settings` (.env wins) | live collection counts unchanged vs 2026-10-23 (14 collections, read-only); live Groq calls by tests UNVERIFIED (low risk) | `research/PREFLIGHT.md` §5 | read-only `estimated_document_count` via `_common.mongo_db` | 2ee93a6 |
 | L0050 | 2026-10-24 | 3 | Suite in an isolated mirror with no `.env` | 778 passed / 0 failed | `results/suite_2026-10-24-isolated.txt` | `research/experiments/run_suite_isolated.sh <log>` | 2ee93a6 |
+| L0051 | 2026-10-24 | 3 | F6 migration dry run (read-only; plain MongoClient, no index creation) | 1,846 of 3,674 live documents; 5,192 entities typed "Product", all from BERT-finetuned; 2,838 distinct names; top: Indian 104, Office 65, Premier League 47, Formula 1 46, Asian Games 45 (nationalities, events, works: not products; descriptive, no labelled precision) | `results/f6_ner_misc_dryrun_2026-10-24.json` | `python -m scripts.migrate_ner_misc_types --report <file>` | F6 commit |
+| L0052 | 2026-10-24 | 3 | CORRECTION to L0012 scope | the 3,382 "Product" mentions were the in-scope E02 snapshot only; live total is 5,192 | same | same | F6 commit |
+| L0053 | 2026-10-24 | 3 | Suite after F6 (6 new tests), isolated mirror | 784 passed / 0 failed | `results/suite_2026-10-24-f6.txt` | `run_suite_isolated.sh` | F6 commit |
 
 ## Groq budget (R9: cap 4,000 calls)
 

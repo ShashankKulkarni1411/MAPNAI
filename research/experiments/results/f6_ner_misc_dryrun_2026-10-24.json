@@ -1,0 +1,175 @@
+{
+ "documents_scanned": 3674,
+ "documents_to_change": 1846,
+ "entities_to_relabel": 5192,
+ "entities_by_model_used": {
+  "BERT-finetuned": 5192
+ },
+ "distinct_names": 2838,
+ "top_names": [
+  [
+   "Indian",
+   104
+  ],
+  [
+   "Office",
+   65
+  ],
+  [
+   "Premier League",
+   47
+  ],
+  [
+   "Formula 1",
+   46
+  ],
+  [
+   "Asian Games",
+   45
+  ],
+  [
+   "AI",
+   42
+  ],
+  [
+   "Pinkvilla",
+   42
+  ],
+  [
+   "F1",
+   38
+  ],
+  [
+   "Chinese",
+   35
+  ],
+  [
+   "US",
+   31
+  ],
+  [
+   "Drishyam",
+   31
+  ],
+  [
+   "World Cup",
+   29
+  ],
+  [
+   "Russian",
+   27
+  ],
+  [
+   "Hindi",
+   26
+  ],
+  [
+   "Oscar",
+   24
+  ],
+  [
+   "Tamil",
+   24
+  ],
+  [
+   "Bahrain Grand Prix",
+   24
+  ],
+  [
+   "Ebola",
+   21
+  ],
+  [
+   "China Open",
+   21
+  ],
+  [
+   "American",
+   21
+  ],
+  [
+   "Jailer 2",
+   21
+  ],
+  [
+   "British",
+   20
+  ],
+  [
+   "Nations League",
+   19
+  ],
+  [
+   "European",
+   19
+  ],
+  [
+   "Ajay",
+   19
+  ],
+  [
+   "French",
+   18
+  ],
+  [
+   "Super League",
+   18
+  ],
+  [
+   "English",
+   18
+  ],
+  [
+   "Jailer",
+   18
+  ],
+  [
+   "Americans",
+   17
+  ],
+  [
+   "Telugu",
+   17
+  ],
+  [
+   "Israeli",
+   16
+  ],
+  [
+   "Grand Prix",
+   16
+  ],
+  [
+   "Australian",
+   15
+  ],
+  [
+   "COVID",
+   15
+  ],
+  [
+   "MotoGP",
+   14
+  ],
+  [
+   "Digger",
+   14
+  ],
+  [
+   "Malayalam",
+   13
+  ],
+  [
+   "World Rally Championship",
+   13
+  ],
+  [
+   "Verge",
+   12
+  ]
+ ],
+ "from_type": "Product",
+ "to_type": "Misc",
+ "neo4j": "not migrated by this script: Entity nodes are MERGEd on (name, type)",
+ "mode": "dry-run"
+}

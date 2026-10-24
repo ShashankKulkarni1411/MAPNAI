@@ -39,6 +39,11 @@ class Settings(BaseSettings):
     summarizer_backend: str = Field(default="auto", env="SUMMARIZER_BACKEND")
     openai_api_key: str = Field(default="", env="OPENAI_API_KEY")
 
+    # ── Agent 1 NER ──────────────────────────────────────────
+    # Type stored for the BERT model's CoNLL MISC label (nationalities, events, works). "Product" is the historical
+    # mapping; "Misc" is correct but only consistent with stored data after scripts/migrate_ner_misc_types.py runs.
+    ner_misc_label: str = Field(default="Product", env="NER_MISC_LABEL")
+
     # ── Agent 5 query graph (agents/query_graph.py) ──────────
     # Off, or no GROQ_API_KEY → Agent 5 runs its single-pass retrieve → generate path.
     query_graph_enabled: bool = Field(default=True, env="QUERY_GRAPH_ENABLED")

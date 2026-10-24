@@ -17,6 +17,7 @@ from transformers import AutoTokenizer, pipeline
 
 from agents.ner_utils import deduplicate_and_merge_entities
 from agents.neo4j_writer import Neo4jWriter
+from config.settings import get_settings
 from storage.mongo_store import MongoStore
 
 
@@ -28,6 +29,15 @@ LABEL_MAP = {
     "LOC": "Location",
     "MISC": "Product"
 }
+
+
+def label_map(misc_label: str = "Product") -> Dict[str, str]:
+    """
+    CoNLL labels → MAPNAI types. MISC covers nationalities, events and works of art, not products; the
+    NER_MISC_LABEL setting ("Misc") stores it honestly. "Product" (the default) keeps the existing data consistent
+    until scripts/migrate_ner_misc_types.py is approved and run.
+    """
+    return {**LABEL_MAP, "MISC": misc_label}
 
 
 class NERAgent:
@@ -45,6 +55,7 @@ class NERAgent:
     def __init__(self, model_path: str = "models/mapnai-ner-bert", mongo_store=None):
         self.mongo_store = mongo_store or MongoStore()
         self._owns_mongo_store = mongo_store is None
+        self.label_map = label_map(get_settings().ner_misc_label)
 
         # ── Neo4j ────────────────────────────────────────────
         self.neo4j_writer = Neo4jWriter()
@@ -157,7 +168,7 @@ class NERAgent:
             for ent in raw_output:
                 group = ent.get("entity_group") or ent.get("entity") or ""
                 clean_group = group.replace("B-", "").replace("I-", "")
-                mapped_type = LABEL_MAP.get(clean_group, LABEL_MAP.get(group))
+                mapped_type = self.label_map.get(clean_group, self.label_map.get(group))
                 if mapped_type:
                     raw_entities.append({
                         "text": ent.get("word", "").strip(),

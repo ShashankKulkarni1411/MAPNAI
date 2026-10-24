@@ -18,7 +18,8 @@ ENTITY_TYPES = {
     "Event",
     "Economic Indicator",
     "Product/Technology",
-    "Product"
+    "Product",
+    "Misc",              # CoNLL MISC when NER_MISC_LABEL=Misc (agents/ner_agent.label_map)
 }
 
 # Mapping spaCy default NER labels to our custom types
