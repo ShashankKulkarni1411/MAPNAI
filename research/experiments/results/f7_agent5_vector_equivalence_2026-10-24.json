@@ -1,0 +1,9 @@
+{
+ "shared_articles": 2719,
+ "cos_min": 1.0,
+ "cos_p01": 1.0,
+ "cos_p50": 1.0,
+ "share_ge_0.999": 1.0,
+ "share_lt_0.99": 0.0,
+ "note": "cosine between the stored production vector and the rebuilt vector of the same article; < 1 can come from a changed title/body since ingestion, not only the model"
+}

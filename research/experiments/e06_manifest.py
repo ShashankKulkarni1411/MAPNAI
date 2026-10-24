@@ -29,6 +29,7 @@ MODEL_DIRS = [
     ("lytang/MiniCheck-Flan-T5-Large", "96eafd01cee2d16cf81aaa2fb226b14f422a37b3", "MIT"),
     ("lytang/MiniCheck-DeBERTa-v3-Large", "2f2d01a54fa022a7ffadb76260e1ea8bc88c82bb", "MIT"),
 ]
+MINILM_REV = "1110a243fdf4706b3f48f1d95db1a4f5529b4d41"       # F7 rebuild; reproduces production vectors (cos 1.0)
 AGGREFACT = ("lytang/LLM-AggreFact", "https://huggingface.co/datasets/lytang/LLM-AggreFact",
              "981dfd0bd8e58e7238a9ab92b2e6ea44bce918e4", "CC-BY-ND-4.0, evaluation only (gated; accepted by the user)")
 ENTRIES += [(AGGREFACT[0], f"research/experiments/data/external/llm_aggrefact/data/{s}-00000-of-00001.parquet",
@@ -58,9 +59,12 @@ def item(group, rel, source, rev, licence):
 
 def main():
     files = [item(*e) for e in ENTRIES + OTHER]
-    for repo, rev, lic in MODEL_DIRS:
-        snap = ROOT / "models" / "ckpts" / f"models--{repo.replace('/', '--')}" / "snapshots" / rev
-        for f in sorted(snap.iterdir()):
+    dirs = [(repo, rev, lic, ROOT / "models" / "ckpts" / f"models--{repo.replace('/', '--')}" / "snapshots" / rev)
+            for repo, rev, lic in MODEL_DIRS]
+    dirs.append(("sentence-transformers/all-MiniLM-L6-v2", MINILM_REV, "Apache-2.0",
+                 ROOT / "models" / "minilm" / MINILM_REV))
+    for repo, rev, lic, snap in dirs:
+        for f in sorted(p for p in snap.rglob("*") if p.is_file()):
             files.append(item(repo, str(f.relative_to(ROOT)).replace("\\", "/"), f"https://huggingface.co/{repo}",
                               rev, lic))
     out = {"meta": run_metadata("research/experiments/e06_manifest.py"), "files": files, "pending": PENDING}

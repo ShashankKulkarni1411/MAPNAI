@@ -1,8 +1,8 @@
 {
  "meta": {
   "script": "research/experiments/e06_manifest.py",
-  "run_at_utc": "2026-10-24T05:04:12+00:00",
-  "git_commit": "d872cbf",
+  "run_at_utc": "2026-10-24T11:38:15+00:00",
+  "git_commit": "b363afa",
   "python": "3.11.9"
  },
  "files": [
@@ -255,6 +255,126 @@
    "source": "https://huggingface.co/lytang/MiniCheck-DeBERTa-v3-Large",
    "revision": "2f2d01a54fa022a7ffadb76260e1ea8bc88c82bb",
    "licence": "MIT"
+  },
+  {
+   "group": "sentence-transformers/all-MiniLM-L6-v2",
+   "path": "models/minilm/1110a243fdf4706b3f48f1d95db1a4f5529b4d41/1_Pooling/config.json",
+   "exists": true,
+   "bytes": 190,
+   "sha256": "4be450dde3b0273bb9787637cfbd28fe04a7ba6ab9d36ac48e92b11e350ffc23",
+   "source": "https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2",
+   "revision": "1110a243fdf4706b3f48f1d95db1a4f5529b4d41",
+   "licence": "Apache-2.0"
+  },
+  {
+   "group": "sentence-transformers/all-MiniLM-L6-v2",
+   "path": "models/minilm/1110a243fdf4706b3f48f1d95db1a4f5529b4d41/config.json",
+   "exists": true,
+   "bytes": 612,
+   "sha256": "953f9c0d463486b10a6871cc2fd59f223b2c70184f49815e7efbcab5d8908b41",
+   "source": "https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2",
+   "revision": "1110a243fdf4706b3f48f1d95db1a4f5529b4d41",
+   "licence": "Apache-2.0"
+  },
+  {
+   "group": "sentence-transformers/all-MiniLM-L6-v2",
+   "path": "models/minilm/1110a243fdf4706b3f48f1d95db1a4f5529b4d41/config_sentence_transformers.json",
+   "exists": true,
+   "bytes": 116,
+   "sha256": "061ca9d39661d6c6d6de5ba27f79a1cd5770ea247f8d46412a68a498dc5ac9f3",
+   "source": "https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2",
+   "revision": "1110a243fdf4706b3f48f1d95db1a4f5529b4d41",
+   "licence": "Apache-2.0"
+  },
+  {
+   "group": "sentence-transformers/all-MiniLM-L6-v2",
+   "path": "models/minilm/1110a243fdf4706b3f48f1d95db1a4f5529b4d41/data_config.json",
+   "exists": true,
+   "bytes": 39265,
+   "sha256": "32edcb108fc2516b920734a862ae0692bcae1c5d45d5f8d972cb0d53434a4c54",
+   "source": "https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2",
+   "revision": "1110a243fdf4706b3f48f1d95db1a4f5529b4d41",
+   "licence": "Apache-2.0"
+  },
+  {
+   "group": "sentence-transformers/all-MiniLM-L6-v2",
+   "path": "models/minilm/1110a243fdf4706b3f48f1d95db1a4f5529b4d41/model.safetensors",
+   "exists": true,
+   "bytes": 90868376,
+   "sha256": "53aa51172d142c89d9012cce15ae4d6cc0ca6895895114379cacb4fab128d9db",
+   "source": "https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2",
+   "revision": "1110a243fdf4706b3f48f1d95db1a4f5529b4d41",
+   "licence": "Apache-2.0"
+  },
+  {
+   "group": "sentence-transformers/all-MiniLM-L6-v2",
+   "path": "models/minilm/1110a243fdf4706b3f48f1d95db1a4f5529b4d41/modules.json",
+   "exists": true,
+   "bytes": 349,
+   "sha256": "84e40c8e006c9b1d6c122e02cba9b02458120b5fb0c87b746c41e0207cf642cf",
+   "source": "https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2",
+   "revision": "1110a243fdf4706b3f48f1d95db1a4f5529b4d41",
+   "licence": "Apache-2.0"
+  },
+  {
+   "group": "sentence-transformers/all-MiniLM-L6-v2",
+   "path": "models/minilm/1110a243fdf4706b3f48f1d95db1a4f5529b4d41/README.md",
+   "exists": true,
+   "bytes": 10502,
+   "sha256": "dcd602d2fd35c203a247304a06fec6654a12f7941b739f9221a064fe8dc3b7f0",
+   "source": "https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2",
+   "revision": "1110a243fdf4706b3f48f1d95db1a4f5529b4d41",
+   "licence": "Apache-2.0"
+  },
+  {
+   "group": "sentence-transformers/all-MiniLM-L6-v2",
+   "path": "models/minilm/1110a243fdf4706b3f48f1d95db1a4f5529b4d41/sentence_bert_config.json",
+   "exists": true,
+   "bytes": 53,
+   "sha256": "fc1993fde0a95c24ec6c022539d41cf6e2f7c9721e5415d6fb6897472a9cd4b7",
+   "source": "https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2",
+   "revision": "1110a243fdf4706b3f48f1d95db1a4f5529b4d41",
+   "licence": "Apache-2.0"
+  },
+  {
+   "group": "sentence-transformers/all-MiniLM-L6-v2",
+   "path": "models/minilm/1110a243fdf4706b3f48f1d95db1a4f5529b4d41/special_tokens_map.json",
+   "exists": true,
+   "bytes": 112,
+   "sha256": "303df45a03609e4ead04bc3dc1536d0ab19b5358db685b6f3da123d05ec200e3",
+   "source": "https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2",
+   "revision": "1110a243fdf4706b3f48f1d95db1a4f5529b4d41",
+   "licence": "Apache-2.0"
+  },
+  {
+   "group": "sentence-transformers/all-MiniLM-L6-v2",
+   "path": "models/minilm/1110a243fdf4706b3f48f1d95db1a4f5529b4d41/tokenizer.json",
+   "exists": true,
+   "bytes": 466247,
+   "sha256": "be50c3628f2bf5bb5e3a7f17b1f74611b2561a3a27eeab05e5aa30f411572037",
+   "source": "https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2",
+   "revision": "1110a243fdf4706b3f48f1d95db1a4f5529b4d41",
+   "licence": "Apache-2.0"
+  },
+  {
+   "group": "sentence-transformers/all-MiniLM-L6-v2",
+   "path": "models/minilm/1110a243fdf4706b3f48f1d95db1a4f5529b4d41/tokenizer_config.json",
+   "exists": true,
+   "bytes": 350,
+   "sha256": "acb92769e8195aabd29b7b2137a9e6d6e25c476a4f15aa4355c233426c61576b",
+   "source": "https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2",
+   "revision": "1110a243fdf4706b3f48f1d95db1a4f5529b4d41",
+   "licence": "Apache-2.0"
+  },
+  {
+   "group": "sentence-transformers/all-MiniLM-L6-v2",
+   "path": "models/minilm/1110a243fdf4706b3f48f1d95db1a4f5529b4d41/vocab.txt",
+   "exists": true,
+   "bytes": 231508,
+   "sha256": "07eced375cec144d27c900241f3e339478dec958f92fddbc551f295c992038a3",
+   "source": "https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2",
+   "revision": "1110a243fdf4706b3f48f1d95db1a4f5529b4d41",
+   "licence": "Apache-2.0"
   }
  ],
  "pending": {

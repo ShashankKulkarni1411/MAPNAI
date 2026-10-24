@@ -1,0 +1,12 @@
+{
+ "current_index": {
+  "live": 3674,
+  "index_rows": 3406,
+  "indexed_live": 2719,
+  "missing": 955,
+  "stale_rows": 687,
+  "duplicate_rows": 0,
+  "coverage": 0.7401
+ },
+ "mode": "dry-run"
+}

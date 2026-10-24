@@ -1,0 +1,26 @@
+{
+ "current_index": {
+  "live": 3674,
+  "index_rows": 3406,
+  "indexed_live": 2719,
+  "missing": 955,
+  "stale_rows": 687,
+  "duplicate_rows": 0,
+  "coverage": 0.7401
+ },
+ "mode": "write",
+ "new_index": {
+  "live": 3674,
+  "index_rows": 3674,
+  "indexed_live": 3674,
+  "missing": 0,
+  "stale_rows": 0,
+  "duplicate_rows": 0,
+  "coverage": 1.0
+ },
+ "added": 3674,
+ "skipped_invalid": {},
+ "out_index": "research/experiments/data/external/agent5_faiss_rebuild_2026-10-24/faiss_index",
+ "out_metadata": "research/experiments/data/external/agent5_faiss_rebuild_2026-10-24/faiss_metadata.pkl",
+ "model": "models/minilm/1110a243fdf4706b3f48f1d95db1a4f5529b4d41"
+}

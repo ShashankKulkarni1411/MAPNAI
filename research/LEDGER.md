@@ -63,6 +63,10 @@ Groq calls are logged in the "Groq budget" table at the bottom (cap: 4,000 total
 | L0055 | 2026-10-24 | 3 | F8 real-vector replay (Agent 5 index, same MiniLM recipe; 21 daily windows 2026-09-28..10-18; pool p50 2,549, max 3,406) | **0 of 1,176** window pairs with cos ≥ 0.77 missed by the legacy search (0 of 4,977 window-article checks): no measurable starvation at the current corpus size (NEGATIVE for an effect today) | `results/e08_window_search_replay_2026-10-24.json` | `python research/experiments/e08_window_search_replay.py --tag 2026-10-24` | F8 commit |
 | L0056 | 2026-10-24 | 3 | F8 rule re-selection on ≥ 500 new held-out pairs (D2-1) | BLOCKED on H1 (human pair labels) | — | — | — |
 | L0057 | 2026-10-24 | 3 | Suite after F8 (4 new tests), isolated | 788 passed / 0 failed | `results/suite_2026-10-24-f8.txt` | `run_suite_isolated.sh` | F8 commit |
+| L0058 | 2026-10-24 | 3 | Resolves L0014: Agent 5 index coverage, re-measured read-only | 2,719 / 3,674 = 0.7401; 955 missing; 687 stale rows; 0 duplicates | `results/f7_agent5_faiss_dryrun_2026-10-24.json` | `python -m scripts.rebuild_agent5_faiss --report <file>` | F7 commit |
+| L0059 | 2026-10-24 | 3 | F7 rebuilt index (NEW files under `research/experiments/data/external/agent5_faiss_rebuild_2026-10-24/`, git-ignored; live `data/faiss_index` untouched: sha256 unchanged) | coverage 1.0 (3,674 / 3,674), 0 stale, 0 skipped | `results/f7_agent5_faiss_rebuild_2026-10-24.json` | `python -m scripts.rebuild_agent5_faiss --write --out-index ... --out-metadata ... --model-path models/minilm/1110a243...` | F7 commit |
+| L0060 | 2026-10-24 | 3 | Pinned MiniLM (1110a243) reproduces production vectors | cosine 1.000 on all 2,719 shared articles (min 1.0) | `results/f7_agent5_vector_equivalence_2026-10-24.json` | inline comparison (see file note) | F7 commit |
+| L0061 | 2026-10-24 | 3 | Suite after F7 (5 new tests; includes the Agent 5 golden-file tests), isolated | 793 passed / 0 failed | `results/suite_2026-10-24-f7.txt` | `run_suite_isolated.sh` | F7 commit |
 
 ## Groq budget (R9: cap 4,000 calls)
 
