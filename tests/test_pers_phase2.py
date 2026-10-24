@@ -418,6 +418,42 @@ def unscored_m(size, first, cred=0.5):
     return (0.2 * math.log1p(size) / math.log(11) + 0.15 * first + 0.15 * cred) / 0.5
 
 
+class TestWindowSearch:
+    """F8: neighbours searched among the window's vectors only (cluster_window_search), instead of a global top-k
+    that is filtered to the window afterwards."""
+
+    def test_window_neighbours_exact_top_k_without_self(self):
+        pool = {"a": unit(8, 1.0, 1), "b": unit(8, 0.9, 2), "c": unit(8, 0.5, 3), "d": unit(8, 0.9, 4)}
+        out = clustering.window_neighbours({"a": pool["a"]}, pool, 2)
+        assert [b for b, _ in out["a"]] == ["b", "d"]                      # ties broken by id
+        assert [round(s, 4) for _, s in out["a"]] == [0.9, 0.9]
+        assert clustering.window_neighbours({"a": pool["a"]}, {"a": pool["a"]}, 3) == {"a": []}
+
+    def _starved(self, window_search):
+        cfg = CFG.model_copy(update={"cluster_nn": 2, "cluster_window_search": window_search})
+        mongo = FakeMongo()
+        mongo.db.processed_articles.insert_many([
+            doc("a1", 10, ["Acme"], "Acme recalls widgets"),
+            doc("a2", 8, ["Acme"], "Widget recall widens"),                   # cos .9 with a1 ≥ cos_strong
+            *[doc(f"o{i}", 24 * 5, ["Acme"], f"Old story {i}") for i in range(3)],
+        ])
+        vectors = FakeVectors({"a1": unit(8, 1.0, 1), "a2": unit(8, 0.9, 2)})
+        vectors.rows.update({f"o{i}": unit(8, 0.9, 2) for i in range(3)})    # out of window, identical to a2
+        s = PersonalizationService(mongo=mongo, exposures=FakeExposures([], {}), vectors=vectors, cfg=cfg,
+                                   clock=lambda: NOW)
+        s.cluster_articles()
+        return {d["article_id"]: d.get("cluster_id") for d in mongo.db.processed_articles.find({}, {"_id": 0})}
+
+    def test_global_search_is_starved_by_older_articles(self):
+        assert self._starved(False)["a2"] == "a2"                          # the legacy default: a2 misses a1
+
+    def test_window_search_finds_the_window_neighbour(self):
+        assert self._starved(True)["a2"] == "a1"
+
+    def test_the_default_is_the_global_search(self):
+        assert CFG.cluster_window_search is False
+
+
 class TestClusterJob:
     def test_every_window_article_gets_cluster_and_materiality(self, svc):
         stats = svc.cluster_articles()

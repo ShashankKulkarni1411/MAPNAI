@@ -126,6 +126,9 @@ class PersonalizationSettings(BaseSettings):
     # ── C. Clustering ────────────────────────────────────────
     cluster_window_h: int = 48
     cluster_nn: int = 20
+    # False: global top-(cluster_nn+1) FAISS search, then filtered to the window, so older near-duplicates can crowd
+    # window neighbours out as the index grows. True: exact search among the window's vectors (F8, research/).
+    cluster_window_search: bool = False
     # calibrated by scripts/calibrate_clustering.py on tests/data/cluster_pairs.jsonl (63 pairs, 2026-09-29):
     # precision .923 / recall .522; no threshold in [.70, .82] reached the .95 precision target
     cos_join: float = 0.77

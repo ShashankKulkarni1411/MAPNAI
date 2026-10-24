@@ -59,6 +59,10 @@ Groq calls are logged in the "Groq budget" table at the bottom (cap: 4,000 total
 | L0051 | 2026-10-24 | 3 | F6 migration dry run (read-only; plain MongoClient, no index creation) | 1,846 of 3,674 live documents; 5,192 entities typed "Product", all from BERT-finetuned; 2,838 distinct names; top: Indian 104, Office 65, Premier League 47, Formula 1 46, Asian Games 45 (nationalities, events, works: not products; descriptive, no labelled precision) | `results/f6_ner_misc_dryrun_2026-10-24.json` | `python -m scripts.migrate_ner_misc_types --report <file>` | F6 commit |
 | L0052 | 2026-10-24 | 3 | CORRECTION to L0012 scope | the 3,382 "Product" mentions were the in-scope E02 snapshot only; live total is 5,192 | same | same | F6 commit |
 | L0053 | 2026-10-24 | 3 | Suite after F6 (6 new tests), isolated mirror | 784 passed / 0 failed | `results/suite_2026-10-24-f6.txt` | `run_suite_isolated.sh` | F6 commit |
+| L0054 | 2026-10-24 | 3 | F8 mechanism (unit test): with out-of-window near-duplicates filling the global top-(k+1), the legacy search misses the window neighbour; window search finds it | reproduced (`TestWindowSearch`) | `tests/test_pers_phase2.py` | pytest | F8 commit |
+| L0055 | 2026-10-24 | 3 | F8 real-vector replay (Agent 5 index, same MiniLM recipe; 21 daily windows 2026-09-28..10-18; pool p50 2,549, max 3,406) | **0 of 1,176** window pairs with cos ≥ 0.77 missed by the legacy search (0 of 4,977 window-article checks): no measurable starvation at the current corpus size (NEGATIVE for an effect today) | `results/e08_window_search_replay_2026-10-24.json` | `python research/experiments/e08_window_search_replay.py --tag 2026-10-24` | F8 commit |
+| L0056 | 2026-10-24 | 3 | F8 rule re-selection on ≥ 500 new held-out pairs (D2-1) | BLOCKED on H1 (human pair labels) | — | — | — |
+| L0057 | 2026-10-24 | 3 | Suite after F8 (4 new tests), isolated | 788 passed / 0 failed | `results/suite_2026-10-24-f8.txt` | `run_suite_isolated.sh` | F8 commit |
 
 ## Groq budget (R9: cap 4,000 calls)
 

@@ -12,6 +12,8 @@ Cluster rule (`assign_clusters`): an article joins a cluster when it is linked t
 mean similarity to all members is ≥ cos_join − chain_margin (the anti-chaining guard). Among qualifying clusters
 the best max-similarity wins (ties → smaller cluster_id); otherwise the article starts a new cluster whose id is
 its own article_id. Two existing clusters are never merged; a would-be merge is reported in `merge_candidates`.
+Neighbours (`window_neighbours`, used when cluster_window_search is on): exact top-k by inner product among the
+window's own vectors, so older articles in the shared index cannot crowd the window out.
 """
 
 import re
@@ -19,6 +21,7 @@ import unicodedata
 from datetime import datetime, timezone
 from typing import Callable, Dict, List, Optional, Sequence, Tuple
 
+import numpy as np
 from rapidfuzz import fuzz
 
 from personalization.scoring import parse_ts
@@ -91,6 +94,22 @@ def evidence(left: Dict, right: Dict, cfg) -> Dict:
                                    cfg.fuzzy_entity_min)
     jac = title_jaccard(left.get("title") or "", right.get("title") or "")
     return {"entities": shared, "jaccard": round(jac, 4), "ok": bool(shared) or jac >= cfg.title_jaccard_min}
+
+
+def window_neighbours(query: Dict[str, np.ndarray], pool: Dict[str, np.ndarray],
+                      k: int) -> Dict[str, List[Tuple[str, float]]]:
+    """Each query article's k most similar pool articles by inner product (unit vectors: cosine), itself excluded;
+    ties go to the smaller article_id."""
+    ids = sorted(pool)
+    if not ids:
+        return {a: [] for a in query}
+    matrix = np.stack([pool[b] for b in ids])
+    out = {}
+    for a, vec in query.items():
+        scores = matrix @ vec
+        ranked = sorted((-float(s), b) for b, s in zip(ids, scores) if b != a)
+        out[a] = [(b, -s) for s, b in ranked[:k]]
+    return out
 
 
 def pair_joins(left: Dict, right: Dict, cosine: float, cfg, cos_join: Optional[float] = None) -> bool:

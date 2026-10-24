@@ -1,0 +1,194 @@
+{
+ "meta": {
+  "script": "research/experiments/e08_window_search_replay.py",
+  "run_at_utc": "2026-10-24T11:28:32+00:00",
+  "git_commit": "9f109a3",
+  "python": "3.11.9",
+  "tag": "2026-10-24",
+  "cluster_nn": 20,
+  "cluster_window_h": 48,
+  "cos_join": 0.77,
+  "index_rows": 3406,
+  "dated_rows": 3406,
+  "label": "read-only replay on the Agent 5 index (same embedding recipe)"
+ },
+ "totals": {
+  "window_articles": 4977,
+  "articles_with_missed_pair": 0,
+  "missed_pairs": 0,
+  "exact_pairs_ge_cos_join": 1176,
+  "share_articles_with_missed_pair": 0.0,
+  "share_pairs_missed": 0.0
+ },
+ "per_day": [
+  {
+   "day": "2026-09-28",
+   "pool": 947,
+   "window_articles": 184,
+   "articles_with_missed_pair": 0,
+   "missed_pairs": 0,
+   "exact_pairs_ge_cos_join": 24
+  },
+  {
+   "day": "2026-09-29",
+   "pool": 1251,
+   "window_articles": 484,
+   "articles_with_missed_pair": 0,
+   "missed_pairs": 0,
+   "exact_pairs_ge_cos_join": 80
+  },
+  {
+   "day": "2026-09-30",
+   "pool": 1309,
+   "window_articles": 362,
+   "articles_with_missed_pair": 0,
+   "missed_pairs": 0,
+   "exact_pairs_ge_cos_join": 58
+  },
+  {
+   "day": "2026-10-01",
+   "pool": 1473,
+   "window_articles": 222,
+   "articles_with_missed_pair": 0,
+   "missed_pairs": 0,
+   "exact_pairs_ge_cos_join": 20
+  },
+  {
+   "day": "2026-10-02",
+   "pool": 1889,
+   "window_articles": 580,
+   "articles_with_missed_pair": 0,
+   "missed_pairs": 0,
+   "exact_pairs_ge_cos_join": 70
+  },
+  {
+   "day": "2026-10-03",
+   "pool": 2208,
+   "window_articles": 735,
+   "articles_with_missed_pair": 0,
+   "missed_pairs": 0,
+   "exact_pairs_ge_cos_join": 230
+  },
+  {
+   "day": "2026-10-04",
+   "pool": 2526,
+   "window_articles": 637,
+   "articles_with_missed_pair": 0,
+   "missed_pairs": 0,
+   "exact_pairs_ge_cos_join": 380
+  },
+  {
+   "day": "2026-10-05",
+   "pool": 2530,
+   "window_articles": 322,
+   "articles_with_missed_pair": 0,
+   "missed_pairs": 0,
+   "exact_pairs_ge_cos_join": 138
+  },
+  {
+   "day": "2026-10-06",
+   "pool": 2540,
+   "window_articles": 14,
+   "articles_with_missed_pair": 0,
+   "missed_pairs": 0,
+   "exact_pairs_ge_cos_join": 0
+  },
+  {
+   "day": "2026-10-07",
+   "pool": 2543,
+   "window_articles": 13,
+   "articles_with_missed_pair": 0,
+   "missed_pairs": 0,
+   "exact_pairs_ge_cos_join": 0
+  },
+  {
+   "day": "2026-10-08",
+   "pool": 2549,
+   "window_articles": 9,
+   "articles_with_missed_pair": 0,
+   "missed_pairs": 0,
+   "exact_pairs_ge_cos_join": 0
+  },
+  {
+   "day": "2026-10-09",
+   "pool": 2555,
+   "window_articles": 12,
+   "articles_with_missed_pair": 0,
+   "missed_pairs": 0,
+   "exact_pairs_ge_cos_join": 0
+  },
+  {
+   "day": "2026-10-10",
+   "pool": 2568,
+   "window_articles": 19,
+   "articles_with_missed_pair": 0,
+   "missed_pairs": 0,
+   "exact_pairs_ge_cos_join": 0
+  },
+  {
+   "day": "2026-10-11",
+   "pool": 2586,
+   "window_articles": 31,
+   "articles_with_missed_pair": 0,
+   "missed_pairs": 0,
+   "exact_pairs_ge_cos_join": 6
+  },
+  {
+   "day": "2026-10-12",
+   "pool": 2605,
+   "window_articles": 37,
+   "articles_with_missed_pair": 0,
+   "missed_pairs": 0,
+   "exact_pairs_ge_cos_join": 4
+  },
+  {
+   "day": "2026-10-13",
+   "pool": 2641,
+   "window_articles": 55,
+   "articles_with_missed_pair": 0,
+   "missed_pairs": 0,
+   "exact_pairs_ge_cos_join": 2
+  },
+  {
+   "day": "2026-10-14",
+   "pool": 2683,
+   "window_articles": 78,
+   "articles_with_missed_pair": 0,
+   "missed_pairs": 0,
+   "exact_pairs_ge_cos_join": 2
+  },
+  {
+   "day": "2026-10-15",
+   "pool": 2782,
+   "window_articles": 141,
+   "articles_with_missed_pair": 0,
+   "missed_pairs": 0,
+   "exact_pairs_ge_cos_join": 16
+  },
+  {
+   "day": "2026-10-16",
+   "pool": 2929,
+   "window_articles": 246,
+   "articles_with_missed_pair": 0,
+   "missed_pairs": 0,
+   "exact_pairs_ge_cos_join": 56
+  },
+  {
+   "day": "2026-10-17",
+   "pool": 3101,
+   "window_articles": 319,
+   "articles_with_missed_pair": 0,
+   "missed_pairs": 0,
+   "exact_pairs_ge_cos_join": 30
+  },
+  {
+   "day": "2026-10-18",
+   "pool": 3406,
+   "window_articles": 477,
+   "articles_with_missed_pair": 0,
+   "missed_pairs": 0,
+   "exact_pairs_ge_cos_join": 60
+  }
+ ],
+ "pool_size_p50": 2549
+}

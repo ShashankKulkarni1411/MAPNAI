@@ -1969,10 +1969,13 @@ class PersonalizationService:
         known = {a: m for a, m in meta.items() if m["cluster_id"]}
         window_vecs = vectors.vectors_for(meta)
         vecs = {m["article_id"]: window_vecs[m["article_id"]] for m in new if m["article_id"] in window_vecs}
-        neighbours = {}
-        for article_id, vec in vecs.items():
-            hits = vectors.search_vector(vec, c.cluster_nn + 1)   # +1: the article itself comes back first
-            neighbours[article_id] = [(b, s) for b, s in hits if b != article_id and b in meta][: c.cluster_nn]
+        if c.cluster_window_search:
+            neighbours = clustering.window_neighbours(vecs, window_vecs, c.cluster_nn)
+        else:
+            neighbours = {}
+            for article_id, vec in vecs.items():
+                hits = vectors.search_vector(vec, c.cluster_nn + 1)   # +1: the article itself comes back first
+                neighbours[article_id] = [(b, s) for b, s in hits if b != article_id and b in meta][: c.cluster_nn]
 
         def sim(a: str, b: str) -> Optional[float]:
             if a not in window_vecs or b not in window_vecs:
