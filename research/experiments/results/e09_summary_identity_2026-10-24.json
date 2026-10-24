@@ -1,0 +1,47 @@
+{
+ "meta": {
+  "script": "research/experiments/e09_summary_identity.py",
+  "run_at_utc": "2026-10-24T11:42:10+00:00",
+  "git_commit": "a5516e9",
+  "python": "3.11.9",
+  "tag": "2026-10-24",
+  "source": "live MongoDB processed_articles (read-only)",
+  "simulated_rule": "short = max(1, n-1) sentences when n <= 3 (extractive rows only); NOT applied"
+ },
+ "total": {
+  "n": 1843,
+  "identical": 1160,
+  "identical_simulated": 741
+ },
+ "identical_rate": 0.6294,
+ "identical_rate_simulated": 0.4021,
+ "stored_pair_equals_extractive_output": 1819,
+ "identical_and_substring_of_body": 1132,
+ "by_body_sentences": {
+  "1": {
+   "n": 753,
+   "identical": 741,
+   "identical_simulated": 741
+  },
+  "2": {
+   "n": 176,
+   "identical": 171,
+   "identical_simulated": 0
+  },
+  "3": {
+   "n": 248,
+   "identical": 248,
+   "identical_simulated": 0
+  },
+  "4-7": {
+   "n": 384,
+   "identical": 0,
+   "identical_simulated": 0
+  },
+  "8+": {
+   "n": 282,
+   "identical": 0,
+   "identical_simulated": 0
+  }
+ }
+}

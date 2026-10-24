@@ -67,6 +67,9 @@ Groq calls are logged in the "Groq budget" table at the bottom (cap: 4,000 total
 | L0059 | 2026-10-24 | 3 | F7 rebuilt index (NEW files under `research/experiments/data/external/agent5_faiss_rebuild_2026-10-24/`, git-ignored; live `data/faiss_index` untouched: sha256 unchanged) | coverage 1.0 (3,674 / 3,674), 0 stale, 0 skipped | `results/f7_agent5_faiss_rebuild_2026-10-24.json` | `python -m scripts.rebuild_agent5_faiss --write --out-index ... --out-metadata ... --model-path models/minilm/1110a243...` | F7 commit |
 | L0060 | 2026-10-24 | 3 | Pinned MiniLM (1110a243) reproduces production vectors | cosine 1.000 on all 2,719 shared articles (min 1.0) | `results/f7_agent5_vector_equivalence_2026-10-24.json` | inline comparison (see file note) | F7 commit |
 | L0061 | 2026-10-24 | 3 | Suite after F7 (5 new tests; includes the Agent 5 golden-file tests), isolated | 793 passed / 0 failed | `results/suite_2026-10-24-f7.txt` | `run_suite_isolated.sh` | F7 commit |
+| L0062 | 2026-10-24 | 3 | F9 root cause: Agent 3 path in production | 1,819 / 1,843 stored summary pairs equal `extractive_summarize` output exactly (LLM path effectively unused) | `results/e09_summary_identity_2026-10-24.json` | `python research/experiments/e09_summary_identity.py --tag 2026-10-24` | F9 commit |
+| L0063 | 2026-10-24 | 3 | F9 root cause: identical short/long | 1,160 / 1,843 (0.6294); 100% of identical pairs have bodies of ≤ 3 sentences (1 → 741/753, 2 → 171/176, 3 → 248/248; ≥ 4 → 0/666): `_select_top_sentences` returns the whole body when n ≤ short_sentences (3); 1,132 are verbatim substrings of the body | same | same | F9 commit |
+| L0064 | 2026-10-24 | 3 | F9 simulated local rule (short = max(1, n−1) sentences when n ≤ 3; NOT applied: takes effect only by re-running Agent 3 on live data = H2) | identical 0.6294 → 0.4021 (the 741 one-sentence bodies cannot be shortened by selection) | same | same | F9 commit |
 
 ## Groq budget (R9: cap 4,000 calls)
 
