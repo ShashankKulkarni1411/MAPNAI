@@ -1,0 +1,41 @@
+{
+ "meta": {
+  "script": "research/experiments/f10_materiality_investigation.py",
+  "run_at_utc": "2026-10-24T11:43:12+00:00",
+  "git_commit": "f13a976",
+  "python": "3.11.9",
+  "tag": "2026-10-24",
+  "source": "live MongoDB (read-only) + data/faiss_index",
+  "cos_join": 0.77,
+  "cos_strong": 0.88,
+  "cluster_window_h": 48
+ },
+ "articles": 3674,
+ "risk": {
+  "in_scope": 1843,
+  "summarized": 1412,
+  "risk_processed_flag": 22,
+  "risk_score_present": 22,
+  "risk_processed_without_score": 0,
+  "in_scope_without_risk_processed": 1821,
+  "materiality_present": 2063,
+  "risk_score_present_but_materiality_unscored": 0
+ },
+ "job_runs_by_job": {
+  "cluster": 28,
+  "recluster": 1,
+  "pi_topk": 6,
+  "tau": 5,
+  "proposals": 8,
+  "alerts": 249,
+  "digests": 4
+ },
+ "a4_backfill_calls": null,
+ "clusters": {
+  "clustered_articles": 2063,
+  "singleton_articles": 1729,
+  "clustered_with_vector": 1535,
+  "share_with_window_neighbour_ge_cos_join": 0.1726,
+  "share_with_window_neighbour_ge_cos_strong": 0.0554
+ }
+}
