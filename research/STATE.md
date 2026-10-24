@@ -1,6 +1,6 @@
 # STATE (overwrite each step; history lives in LEDGER.md and git)
 
-**Updated:** 2026-10-24 · **Branch:** `research/sota-push` · **Phase:** 3 done (Gate 3 PASS) → 4 next
+**Updated:** 2026-10-24 · **Branch:** `research/sota-push` · **Phase:** 4 in progress (EXP-1 pilot done; S1 running) · 6 started (CAFG equivalence PASS)
 
 ## Done
 - Phase 0: `PREFLIGHT.md` (16 discrepancies), pinned venv `~/.venvs/mapnai-research` (CPython 3.11.9 + `requirements.lock`), baseline suite 720/0/0, `.gitignore` extended, E02 news-text JSONL untracked (kept on disk). Tag `pre-phase1`.
@@ -12,14 +12,22 @@
 
 - Phase 3 (2026-10-24): F1 fix (identity 1.0); F2 normalization FAILED its criterion alone (entity_sub 0.9997→0.9972), passes combined with F5 as gate `v2` (render_gate_version, default v1); F5 found a latent insights.new_names bug (opt-in fix); F6 NER_MISC_LABEL + migration dry run (5,192 entities; not applied, H2); F8 window search (no measurable effect at current scale; held-out pairs need H1); F7 new index 100% coverage (live untouched); F9/F10 root causes reported; F11 pinned envs documented. Safety correction: suite now runs via run_suite_isolated.sh (PREFLIGHT §5). Suite 793/0. Tag `pre-phase4`.
 
-## Next
-- Phase 4: e20_aggrefact_eval.py (S1: MiniCheck-FT5 on LLM-AggreFact test under P-fixed, target 75.0 ± 2.0; GPU, checker venv) and current-gate wrappers (S2); then e10/e11/e14 EXP-1 pilot (160 Groq calls).
+## In progress (background, resumable; rerun the same command to continue)
+- S1: `"$C" -W ignore research/experiments/e20_aggrefact_eval.py --checker minicheck-ft5 --split test --tag s1-2026-10-24`, then the same with `--split dev` (cache: `research/experiments/cache/e20_minicheck-ft5_*_s1-2026-10-24.jsonl`; logs `cache/run_ft5_*.log`). ≈ 1.4 rows/s on the RTX 3050.
+- EXP-3 generation: `"$V" -W ignore research/experiments/e11_generate_rewrites.py --tag main-2026-10-24 --subset all --cells short:plain:low,medium:plain:low,short:analyst:high,medium:analyst:high` (cache `cache/e11_main-2026-10-24.jsonl`, seeded with the pilot; 1,760 new calls; budget ledger `cache/groq_calls.jsonl`).
+
+## Next (in order)
+1. After the FT5 test run: Gate 4 (S1 = |avg11 − 75.0| ≤ 2.0). Then S2 NER on the GPU: `"$C" research/experiments/e21_gate_aggrefact.py --step ner --split test` (and dev), `"$V" ... --step ner-fallback`, `"$V" ... --step gate --split test --tag s2-2026-10-24`.
+2. After generation: `"$V" research/experiments/e14_score_gates.py --rewrites main-2026-10-24 --tag main-2026-10-24`, then `"$V" research/experiments/e12_export_annotation.py --tag gold-2026-10-24` → hand the sheet to annotators (H1).
+3. Silver labels (Claude, two prompts) on dev items; CAFG dev tuning (AggreFact dev FT5 probabilities + MAPNAI dev silver); freeze config + sha256 + commit; score test once (CAFG-L+M on AggreFact test reuses the cached FT5 test probabilities for escalated rows).
+4. Colab: Bespoke-7B (S5) by the user, `research/colab/README.md`.
 
 ## Blockers / pending user decisions
 - H4 (Phase 2B): RESOLVED 2026-10-24 (user HF login; token in ~/.cache/huggingface, outside the repo).
 - **Upcoming licence question (Phase 7, EXP-7):** rewriting MIND abstracts means sending them to Groq (third-party API); the MSR licence forbids distribution. Needs the user's decision before EXP-7 runs.
 - **User decision:** third-party news text (`research/experiments/data/e02_gate_sources_2026-10-23.jsonl`) is in pushed history of `origin/agent-satvik` (commit `e642c48`). Not rewritten (R4).
 - Pending user approvals (not blocking): unflagged insights.new_names possessive fix; F6 migration --apply (H2); switching Agent 5 to the rebuilt index (H2); F9 Agent 3 rule (H2).
+- **H1 (raised 2026-10-24):** gold labels need two independent human annotators (PREREG §8: 160 pilot items, 240 test items). Silver proceeds meanwhile.
 - Bespoke-MiniCheck-7B: local GPU is 6 GB → Colab script only; S5 ceiling PENDING.
 - Free RAM was ≈ 0.7 GB at check time; close other apps before checker runs on CPU (GPU path preferred).
 
