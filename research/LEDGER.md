@@ -73,6 +73,7 @@ Groq calls are logged in the "Groq budget" table at the bottom (cap: 4,000 total
 | L0065 | 2026-10-24 | 3 | F10 risk side: A4 coverage | in-scope 1,843; risk_processed 22 (all with a score); 1,821 in-scope never risk-processed; 0 articles with a risk_score but materiality.unscored (no field bug); no A4 entry in job_runs (cluster 28, alerts 249, …); no `a4_backfill_calls` collection → materiality is unscored because A4 never ran at scale | `results/f10_materiality_investigation_2026-10-24.json` | `python research/experiments/f10_materiality_investigation.py --tag 2026-10-24` | F10 commit |
 | L0066 | 2026-10-24 | 3 | F10 cluster side: upper bound on non-singletons | of 1,535 clustered articles with vectors, 17.3% have a same-window neighbour at cos ≥ 0.77 and 5.5% at ≥ 0.88; observed non-singleton share 16.2% (334/2,063) → fragmentation is bounded by MiniLM similarity on this corpus, not mainly by the rule | same | same | F10 commit |
 | L0067 | 2026-10-24 | 3 | F10 side finding | 1,843 articles have summaries but only 1,412 have `summarization_processed` set | same | same | F10 commit |
+| L0068 | 2026-10-24 | 3 | F11 environment drift resolved | suite runs in pinned CPython 3.11.9 + requirements.lock (793/0 at F7); E02 per-item decisions identical across 3.12 and 3.11.9; Docker image NOT re-verified (daemon down) | `research/experiments/README.md` (Environments), L0035, L0061 | — | F11 commit |
 
 ## Groq budget (R9: cap 4,000 calls)
 
