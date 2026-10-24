@@ -1,0 +1,15 @@
+{
+ "meta": {
+  "script": "research/faithgate/check_equivalence_e02.py",
+  "run_at_utc": "2026-10-24T12:11:36+00:00",
+  "git_commit": "8855c96",
+  "python": "3.11.9",
+  "tag": "2026-10-24",
+  "snapshot": "2026-10-23",
+  "config": "CAFGConfig() (all options off)"
+ },
+ "items": 29067,
+ "mismatches": 0,
+ "examples": [],
+ "pass": true
+}

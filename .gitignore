@@ -36,3 +36,4 @@ research/experiments/data/external/
 research/experiments/data/e02_gate_sources_*.jsonl
 research/experiments/cache/
 research/colab/outputs/
+research/annotation/export/

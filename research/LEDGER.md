@@ -78,6 +78,7 @@ Groq calls are logged in the "Groq budget" table at the bottom (cap: 4,000 total
 | L0070 | 2026-10-24 | 4 | EXP-1 pilot generation (production model openai/gpt-oss-120b, prompt r2, temp 0.2, reasoning_effort low) | 160 rewrites: 159 parsed, 1 unparseable, 0 errors; 161 Groq calls; latency p50 2.65 s | `results/e11_rewrites_pilot-2026-10-24.json` | `python research/experiments/e11_generate_rewrites.py --tag pilot-2026-10-24 --subset pilot --cells short:plain:low,medium:plain:low` | Phase 4 commit |
 | L0071 | 2026-10-24 | 4 | EXP-1 harness validity | source-hash mismatches 0; nondeterministic gate decisions 0; length compliance 80/80 short, 79/79 medium | `results/e14_scores_pilot-2026-10-24.json` | `python research/experiments/e14_score_gates.py --rewrites pilot-2026-10-24 --tag pilot-2026-10-24` | Phase 4 commit |
 | L0072 | 2026-10-24 | 4 | EXP-1 serve rate (no labels: not FRR/FAR) | v1 82/160 = 0.513 [0.436, 0.589] (short 0.475, medium 0.550); v2 91/160 = 0.569 [0.491, 0.643] (short 0.513, medium 0.625); v1 fallback reasons: missing entity 72, missing number 24, added number 3 | same | same | Phase 4 commit |
+| L0073 | 2026-10-24 | 6 | CAFG equivalence: all options off == factcheck.verify (accept, missing, added) on every E02 item, through the general stage path (no short-circuit) | 29,067 items, 0 mismatches | `results/cafg_equivalence_e02_2026-10-24.json` | `python research/faithgate/check_equivalence_e02.py --tag 2026-10-24` | CAFG commit |
 
 ## Groq budget (R9: cap 4,000 calls)
 
