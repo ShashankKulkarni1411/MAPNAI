@@ -1,32 +1,44 @@
-# Colab: Bespoke-MiniCheck-7B ceiling (S5)
+# Colab: GPU runs for LLM-AggreFact
 
-Status: **PENDING**. The project laptop has an RTX 3050 with 6 GB, and the model needs ≈ 15 GB of bf16 weights plus the vLLM KV cache. vLLM is Linux-only.
+`mapnai_gpu_runs.ipynb` runs all GPU work that does not fit on the project laptop (RTX 3050 6 GB, 11.6 GB RAM):
 
-## Requirements
+| Part | Run | Scorecard | GPU |
+|---|---|---|---|
+| 1 | MiniCheck-Flan-T5-Large, test (29,320 pairs) | S1 harness validity (target 75.0 ± 2.0) | T4 or better |
+| 2 | MiniCheck-Flan-T5-Large, dev (30,420 pairs) | CAFG tuning (S3) | T4 or better |
+| 2b | MiniCheck-DeBERTa-v3-Large, test + dev (optional) | cheaper baseline | T4 or better |
+| 3 | Bespoke-MiniCheck-7B, test | S5 ceiling (published 77.4) | **A100 only** |
 
-- A Colab runtime with **one A100 (40 or 80 GB)**. Smaller GPUs need a lower `max_model_len`, which changes the chunking and therefore the protocol. Do not do that for S5.
-- A Hugging Face account that has **accepted the LLM-AggreFact terms** (`lytang/LLM-AggreFact`, gated, CC-BY-ND-4.0, evaluation only). Bespoke-MiniCheck-7B is CC BY-NC 4.0, so non-commercial use only.
-- The dataset revision recorded in `research/experiments/data/MANIFEST.json` (Phase 2B).
+## Steps
 
-## Steps (one Colab cell each)
+1. Open https://colab.research.google.com → **File → Upload notebook** → choose `research/colab/mapnai_gpu_runs.ipynb`.
+2. **Runtime → Change runtime type → GPU**: T4 for Parts 1–2 (free tier works, slowly); **A100** for Part 3 (Colab Pro / compute units). If you have an A100 session, you can do everything in it.
+3. Run **Part 0** top to bottom (cells 0.1–0.6). Approve the Google Drive pop-up in 0.2, paste a Hugging Face **read** token in 0.4 (the account that accepted the LLM-AggreFact terms). Cell 0.5 must print `dataset OK` and `checkpoints OK`; if an `assert` fails, stop and report it.
+4. Run **Part 1**, then **Part 2** (and **2b** if you want). Each prints progress every 256 rows and a summary at the end.
+   **If Colab disconnects:** reconnect, run 0.1–0.6 again, then re-run the part you were in. Finished rows are kept on Drive and skipped.
+5. Run **Part 4**. It writes `mapnai_colab_results_colab-2026-10-24.zip` to `My Drive/mapnai_colab/`.
+6. For **Part 3**: switch to an A100, **Runtime → Restart session**, run 0.1, 0.2, 0.4, 0.5, 0.6 (skip 0.3), then 3.1–3.3, then Part 4 again.
+7. Download the zip from Google Drive and put it anywhere on this laptop; tell Claude the path.
+
+## What happens with the zip
+
+Claude unpacks `cache/*.jsonl` into `research/experiments/cache/` and produces the official, write-once result files locally (no model is loaded when the cache is complete):
 
 ```bash
-pip install -q "minicheck[llm] @ git+https://github.com/Liyan06/MiniCheck.git@b58b9fa69acbd1015ec970fa65dd752413a053d2" "datasets==3.6.0" "scikit-learn==1.7.2"
-python -c "import nltk; nltk.download('punkt_tab')"
-huggingface-cli login            # paste a read token; the account must have accepted the LLM-AggreFact terms
+C="$HOME/.venvs/mapnai-checkers/Scripts/python.exe"
+"$C" -W ignore research/experiments/e20_aggrefact_eval.py --checker minicheck-ft5 --split test --tag colab-2026-10-24 --scored-on "Colab <GPU>"
+"$C" -W ignore research/experiments/e20_aggrefact_eval.py --checker minicheck-ft5 --split dev  --tag colab-2026-10-24 --scored-on "Colab <GPU>"
+"$C" -W ignore research/experiments/e20_aggrefact_eval.py --checker bespoke-7b    --split test --tag colab-2026-10-24 --scored-on "Colab A100"
 ```
 
-```bash
-# copy research/colab/run_bespoke.py into the Colab working directory, then:
-python run_bespoke.py --tag colab-smoke --dataset-revision 981dfd0bd8e58e7238a9ab92b2e6ea44bce918e4 --limit 50   # 2-3 min sanity run
-python run_bespoke.py --tag colab-full  --dataset-revision 981dfd0bd8e58e7238a9ab92b2e6ea44bce918e4              # ≈ 1 h on an A100
-```
+The notebook's own printed numbers are a preview; the reported numbers are the ones these commands write to `research/experiments/results/`.
 
-Copy `outputs/bespoke_aggrefact_colab-full.json` and `outputs/bespoke_preds_colab-full.jsonl.gz` back into `research/experiments/results/`. The script records the vLLM, torch and transformers versions it used (`pip_freeze`).
+## Pins and checks
 
-## Security review of the remote code (R8)
-
-`trust_remote_code` is required (`InternLM2ForCausalLM`). The files at revision `1ed7786bcda3fa1dc35f7c4ed9e3f36b785d33b8` were downloaded and scanned on 2026-10-23:
+- Code: `minicheck @ b58b9fa69acbd1015ec970fa65dd752413a053d2`, `transformers 4.57.6`, `datasets 3.6.0`, `nltk 3.9.1` (punkt_tab; the pickle-based punkt is blocked).
+- Data: `lytang/LLM-AggreFact @ 981dfd0b`, parquet sha256 checked.
+- Checkpoints: MiniCheck-Flan-T5-Large @ `96eafd01` and DeBERTa @ `2f2d01a5` (the `pytorch_model.bin` sha256 is checked; minicheck loads them at `main`, so the notebook first asserts that `main` is still the pinned commit).
+- Bespoke-MiniCheck-7B @ `1ed7786b` (CC BY-NC 4.0). It needs `trust_remote_code`; the four code files were reviewed on 2026-10-23 and their sha256 is checked before loading:
 
 | File | Lines | sha256 |
 |---|---|---|
@@ -35,6 +47,6 @@ Copy `outputs/bespoke_aggrefact_colab-full.json` and `outputs/bespoke_preds_cola
 | `tokenization_internlm2.py` | 236 | `444d4c2b…5eef` |
 | `tokenization_internlm2_fast.py` | 214 | `1fe5f033…ae10` |
 
-Imports are limited to torch, transformers, einops, sentencepiece, tokenizers, the optional flash_attn, and the stdlib modules `math`, `queue`, `threading`, `os` and `shutil.copyfile`. There are no network calls, `exec`/`eval`, subprocess, pickle or `torch.load`. The only file write is the standard `save_vocabulary`. `threading`/`queue` serve the chat-streaming helper.
+  The review found only torch/transformers/einops/sentencepiece/tokenizers imports (plus optional flash_attn and the stdlib modules `math`, `queue`, `threading`, `os`, `shutil.copyfile`), no network calls, exec/eval, subprocess, pickle or `torch.load`, and the standard `save_vocabulary` as the only file write. `config.json` `auto_map["AutoModel"]` points at an unpinned third-party repository; the notebook loads through minicheck/vLLM only, never `AutoModel`.
 
-**Caveat:** `config.json` `auto_map["AutoModel"]` points to code in another, unpinned repository (`internlm/internlm2_5-7b-chat`). The script never calls `AutoModel` and verifies the four hashes above before loading.
+`run_bespoke.py` is the earlier stand-alone version of Part 3, kept for reference.

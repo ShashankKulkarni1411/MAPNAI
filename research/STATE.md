@@ -12,9 +12,10 @@
 
 - Phase 3 (2026-10-24): F1 fix (identity 1.0); F2 normalization FAILED its criterion alone (entity_sub 0.9997→0.9972), passes combined with F5 as gate `v2` (render_gate_version, default v1); F5 found a latent insights.new_names bug (opt-in fix); F6 NER_MISC_LABEL + migration dry run (5,192 entities; not applied, H2); F8 window search (no measurable effect at current scale; held-out pairs need H1); F7 new index 100% coverage (live untouched); F9/F10 root causes reported; F11 pinned envs documented. Safety correction: suite now runs via run_suite_isolated.sh (PREFLIGHT §5). Suite 793/0. Tag `pre-phase4`.
 
-## In progress (background, resumable; rerun the same command to continue)
-- S1: `"$C" -W ignore research/experiments/e20_aggrefact_eval.py --checker minicheck-ft5 --split test --tag s1-2026-10-24`, then the same with `--split dev` (cache: `research/experiments/cache/e20_minicheck-ft5_*_s1-2026-10-24.jsonl`; logs `cache/run_ft5_*.log`). ≈ 1.4 rows/s on the RTX 3050.
-- EXP-3 generation: `"$V" -W ignore research/experiments/e11_generate_rewrites.py --tag main-2026-10-24 --subset all --cells short:plain:low,medium:plain:low,short:analyst:high,medium:analyst:high` (cache `cache/e11_main-2026-10-24.jsonl`, seeded with the pilot; 1,760 new calls; budget ledger `cache/groq_calls.jsonl`).
+## Stopped / moved to Colab (2026-10-24)
+- Local FT5 run (2,560 / 29,320 test rows cached, tag s1-2026-10-24) and the main generation (628 / 1,920 rewrites, 636 Groq calls total) were stopped by Claude Code's low-memory reaper. Not restarted (user decision).
+- All GPU work moved to `research/colab/mapnai_gpu_runs.ipynb` (tag colab-2026-10-24): FT5 test (S1) + dev, optional DeBERTa, Bespoke-7B (S5). The user runs it and returns `mapnai_colab_results_colab-2026-10-24.zip`; then summarize locally with e20 `--scored-on` (README).
+- Generation can resume locally (same command, same tag) when memory allows; it is network-bound.
 
 ## Next (in order)
 1. After the FT5 test run: Gate 4 (S1 = |avg11 − 75.0| ≤ 2.0). Then S2 NER on the GPU: `"$C" research/experiments/e21_gate_aggrefact.py --step ner --split test` (and dev), `"$V" ... --step ner-fallback`, `"$V" ... --step gate --split test --tag s2-2026-10-24`.

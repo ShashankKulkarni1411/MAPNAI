@@ -6,6 +6,9 @@ Checkers:
   minicheck-ft5        MiniCheck-Flan-T5-Large @ 96eafd01 (minicheck @ b58b9fa, chunk 500, max len 2048)  [checker venv]
   minicheck-deberta    MiniCheck-DeBERTa-v3-Large @ 2f2d01a5 (chunk 400, max len 2048)                    [checker venv]
 
+Colab: research/colab/mapnai_gpu_runs.ipynb writes the same cache files; with a complete cache this script only
+summarizes (no model is loaded) — pass --scored-on to record where the scores were computed.
+
 Resumable: per-instance probabilities are appended to cache/e20_<checker>_<split>_<tag>.jsonl in shards; a rerun with
 the same tag skips scored rows. Output (write-once): results/e20_<checker>_<split>_<tag>.json (per-dataset BAcc with
 95% bootstrap CIs, News-3 mean, 11-dataset average, 10-dataset average without RAGTruth, timings) and
@@ -34,8 +37,10 @@ DATA = EXP_DIR / "data" / "external" / "llm_aggrefact" / "data"
 CACHE = EXP_DIR / "cache"
 REVISION = "981dfd0bd8e58e7238a9ab92b2e6ea44bce918e4"
 NEWS3 = ("AggreFact-CNN", "AggreFact-XSum", "TofuEval-MediaS")
-CHECKERS = {"minicheck-ft5": "flan-t5-large", "minicheck-deberta": "deberta-v3-large"}
-PUBLISHED = {"minicheck-ft5": {"avg11": 75.0, "avg10_paper": 74.7}, "minicheck-deberta": {"avg11": 73.1}}
+CHECKERS = {"minicheck-ft5": "flan-t5-large", "minicheck-deberta": "deberta-v3-large",
+            "bespoke-7b": "Bespoke-MiniCheck-7B"}              # bespoke-7b: scored on Colab only (vLLM, ≥ 40 GB GPU)
+PUBLISHED = {"minicheck-ft5": {"avg11": 75.0, "avg10_paper": 74.7}, "minicheck-deberta": {"avg11": 73.1},
+             "bespoke-7b": {"avg11": 77.4}}
 
 
 def bacc(y, p) -> float:
@@ -116,6 +121,7 @@ def main():
     ap.add_argument("--limit", type=int, default=0, help="debug: first N rows only (never for a reported result)")
     ap.add_argument("--shard", type=int, default=256)
     ap.add_argument("--batch-size", type=int, default=16)
+    ap.add_argument("--scored-on", default=None, help="where the cached scores were computed, e.g. 'Colab A100'")
     args = ap.parse_args()
     utf8_stdout()
     import pandas as pd
@@ -138,6 +144,7 @@ def main():
                              tag=args.tag, limit=args.limit, dataset_revision=REVISION, protocol="P-fixed",
                              batch_size=args.batch_size, torch=torch.__version__,
                              gpu=torch.cuda.get_device_name(0) if torch.cuda.is_available() else None,
+                             scored_on=args.scored_on or "this machine",
                              wall_seconds_this_run=round(elapsed, 1)),
         "n": len(rows),
         "published": PUBLISHED.get(args.checker),
