@@ -14,6 +14,8 @@ Gate versions (render_gate_version, default v1 = the rules above):
   v2-norm  entity names are compared after normalization (possessive, punctuation, case, a leading "the", hyphens,
            acronym dots, whitespace), so "Formula 1's" is kept by "Formula 1" and "The Beatles" by "Beatles".
            Not safe alone: a substituted mention passes when another spelling of the name survives (E02)
+  v2       v2-norm + a capitalized name the source never uses is an addition (insights.new_names), reported in
+           `added` as "name:<word>"
 """
 
 import re
@@ -133,7 +135,11 @@ def _normalized_entities(text: str, entity_names: Iterable[str]) -> List[Tuple[s
     return out
 
 
-GATE_VERSIONS: Dict[str, Dict[str, bool]] = {"v1": {}, "v2-norm": {"normalize_entities": True}}
+GATE_VERSIONS: Dict[str, Dict[str, bool]] = {
+    "v1": {},
+    "v2-norm": {"normalize_entities": True},
+    "v2": {"normalize_entities": True, "check_added_names": True},
+}
 
 
 def extract_facts(text: str, entity_names: Iterable[str]) -> Dict[str, List[str]]:
@@ -147,9 +153,10 @@ def extract_facts(text: str, entity_names: Iterable[str]) -> Dict[str, List[str]
 
 
 def verify(source: str, rewrite: str, entity_names: Iterable[str],
-           normalize_entities: bool = False) -> Tuple[bool, List[str], List[str]]:
+           normalize_entities: bool = False, check_added_names: bool = False) -> Tuple[bool, List[str], List[str]]:
     """(ok, missing facts, added numbers) — facts as "number:1200", "date:2026-09-26", "month:september",
-    "entity:Manchester City". normalize_entities: gate v2-norm (see the module docstring)."""
+    "entity:Manchester City". normalize_entities / check_added_names: gate v2-norm / v2 (module docstring);
+    with check_added_names, `added` also lists "name:<word>"."""
     entity_names = list(entity_names or [])
     facts = extract_facts(source, [] if normalize_entities else entity_names)
     got_numbers, got_months = numbers(rewrite), months(rewrite, strict=False)
@@ -165,4 +172,7 @@ def verify(source: str, rewrite: str, entity_names: Iterable[str],
     allowed = set(facts["numbers"]) | number_words(source)
     allowed |= {n for d in facts["dates"] for n in iso_parts(d)[::2]}     # the year and day of a spelled-out date
     added = sorted(n for n in got_numbers if n not in allowed and n.rstrip("%") not in allowed)
+    if check_added_names:
+        from personalization.insights import new_names      # here, not at the top: insights imports this module
+        added += [f"name:{w}" for w in new_names(source, rewrite, possessive_at_end=True)]
     return not missing and not added, missing, added

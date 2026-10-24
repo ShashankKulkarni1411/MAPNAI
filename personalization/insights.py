@@ -302,10 +302,12 @@ def _list(value) -> list:
 
 # ── Fact check ───────────────────────────────────────────────
 
-def new_names(source: str, text: str) -> List[str]:
+def new_names(source: str, text: str, possessive_at_end: bool = False) -> List[str]:
     """
     Capitalized words of the text (names, places, acronyms) the source never uses. A sentence's first word is
     skipped unless it is an acronym; "Indian" is allowed by "India" (one word is a prefix of the other, ≥ 4 letters).
+    possessive_at_end: strip "'s" only at the end of a word. The default strips it anywhere, which turns
+    "O'Sullivan" into "oullivan" and flags it as new; the default is kept for insights until that change is approved.
     """
     have = set(_WORD.findall((source or "").lower()))
     out = []
@@ -314,7 +316,9 @@ def new_names(source: str, text: str) -> List[str]:
         acronym = len(word) >= 2 and word.isupper()
         if not acronym and _SENTENCE_START.search(text[: m.start()]):
             continue
-        parts = _WORD.findall(word.lower().replace("’s", "").replace("'s", ""))
+        bare = (re.sub(r"['’]s$", "", word.lower()) if possessive_at_end
+                else word.lower().replace("’s", "").replace("'s", ""))
+        parts = _WORD.findall(bare)
         if not parts or word.lower() in _NOT_NAMES:
             continue
         for p in parts:

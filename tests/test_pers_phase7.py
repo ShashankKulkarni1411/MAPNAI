@@ -135,6 +135,82 @@ class TestEntityNormalization:
         assert render.cache_key("a1", style, v2)["gate_version"] == "v2-norm"
 
 
+class TestAddedNames:
+    """F5: gate v2 also rejects a capitalized name the source never uses (insights.new_names). v1 does not check."""
+
+    SRC = "Ravi Dubey and Sargun Mehta launched the show in Mumbai on Friday."
+    NAMES = ["Ravi Dubey", "Sargun Mehta", "Mumbai"]
+
+    def test_v1_does_not_check_added_names(self):
+        assert factcheck.verify(self.SRC, self.SRC + " Karan Johar attended.", self.NAMES) == (True, [], [])
+
+    def test_an_added_name_is_rejected(self):
+        ok, missing, added = factcheck.verify(self.SRC, self.SRC + " Karan Johar attended.", self.NAMES,
+                                              check_added_names=True)
+        assert not ok and missing == [] and added == ["name:Johar"]      # "Karan" opens a sentence: not checked
+
+    def test_a_misspelled_name_is_rejected(self):
+        rw = "On Friday, Rabi Dubey and Sargun Mehta launched the show in Mumbai."
+        ok, missing, added = factcheck.verify(self.SRC, rw, self.NAMES, **factcheck.GATE_VERSIONS["v2"])
+        assert not ok and missing == ["entity:Ravi Dubey"] and added == ["name:Rabi"]
+
+    def test_a_misspelling_that_extends_a_source_word_is_a_known_blind_spot(self):
+        """new_names allows a word that extends a source word (≥ 4 letters: "India" → "Indian"), so the audit's
+        real "Ravi" → "Ravie" misspelling is not caught (PROJECT_AUDIT.md §6.1). Kept visible here."""
+        rw = "Ravi Dubey and Sargun Mehta launched the show in Mumbai on Friday, and Ravie Dubey hosted."
+        assert factcheck.verify(self.SRC, rw, self.NAMES, check_added_names=True) == (True, [], [])
+
+    def test_a_substitution_hidden_by_another_spelling_is_caught_by_v2(self):
+        src = "The World Cup final drew crowds; the World Cup trophy toured Delhi."
+        rw = "The World Cup final drew crowds, and the Pant trophy toured Delhi."
+        names = ["the World Cup", "World Cup", "Delhi"]
+        assert factcheck.verify(src, rw, names, **factcheck.GATE_VERSIONS["v2-norm"])[0]      # the F2 blind spot
+        assert factcheck.verify(src, rw, names, **factcheck.GATE_VERSIONS["v2"]) == (False, [], ["name:Pant"])
+
+    def test_a_single_new_name_opening_a_sentence_is_a_known_blind_spot(self):
+        """insights.new_names skips sentence-initial words (after . ! ? : ;) so ordinary openers aren't flagged;
+        a one-word name there is therefore missed. Kept visible here, measured in E02."""
+        src = "The World Cup final drew crowds; the World Cup trophy toured Delhi."
+        rw = "The World Cup final drew crowds; Pant trophy toured Delhi."
+        assert factcheck.verify(src, rw, ["the World Cup", "World Cup", "Delhi"], **factcheck.GATE_VERSIONS["v2"])             == (True, [], [])
+
+    @pytest.mark.parametrize("rw", [
+        "However, Ravi Dubey and Sargun Mehta launched the show in Mumbai on Friday.",       # sentence opener
+        "On Friday, Dubey's and Mehta's show launched in Mumbai.",                           # possessives, surnames
+        "Ravi Dubey and Sargun Mehta launched the show in MUMBAI on Friday.",                # case
+        "The show opened in Mumbai in October on Friday, with Ravi Dubey and Sargun Mehta.",  # month word
+    ])
+    def test_no_false_added_name(self, rw):
+        assert factcheck.verify(self.SRC, rw, self.NAMES, check_added_names=True)[2] == []
+
+    @pytest.mark.parametrize("src", [
+        "Ronnie O'Sullivan's career began early.", "Cricket's O'Shea and Jack scored.",
+        "Genelia D'Souza and Ravi Dubey starred.", "Ronnie O’Sullivan won in Sheffield.",
+    ])
+    def test_apostrophe_names_are_not_added(self, src):
+        """insights.new_names stripped "'s" anywhere ("O'Sullivan" → "oullivan"); v2 strips it only at the end."""
+        assert factcheck.verify(src, src, [], **factcheck.GATE_VERSIONS["v2"]) == (True, [], [])
+
+    def test_a_demonym_of_a_source_place_is_allowed(self):
+        assert factcheck.verify("Teams from India met.", "Indian teams met.", ["India"], check_added_names=True)[2] \
+            == []
+
+    def test_a_new_acronym_is_rejected(self):
+        assert factcheck.verify("Leaders met in Paris.", "NATO leaders met in Paris.", ["Paris"],
+                                check_added_names=True)[2] == ["name:NATO"]
+
+    def test_added_numbers_keep_their_format(self):
+        ok, _, added = factcheck.verify("Arsenal won 2-1.", "Arsenal won 3-1 against Fulham.", ["Arsenal"],
+                                        **factcheck.GATE_VERSIONS["v2"])
+        assert not ok and added == ["3", "name:Fulham"]
+
+    def test_v2_is_normalization_plus_added_names_and_identity_passes(self):
+        assert factcheck.GATE_VERSIONS["v2"] == {"normalize_entities": True, "check_added_names": True}
+        src = "Formula 1’s chief met the U.S. team in Baku; NATO watched."
+        assert factcheck.verify(src, src, ["Formula 1’s", "U.S.", "Baku"], **factcheck.GATE_VERSIONS["v2"]) == \
+            (True, [], [])
+
+
 class TestVerify:
     SRC = ("Manchester City were fined £1,200,000 on 26 September after two hearings, a 5 per cent rise; "
            "the case opened on 2023-02-06.")
