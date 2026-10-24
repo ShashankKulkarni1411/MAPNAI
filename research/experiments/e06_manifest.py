@@ -29,13 +29,15 @@ MODEL_DIRS = [
     ("lytang/MiniCheck-Flan-T5-Large", "96eafd01cee2d16cf81aaa2fb226b14f422a37b3", "MIT"),
     ("lytang/MiniCheck-DeBERTa-v3-Large", "2f2d01a54fa022a7ffadb76260e1ea8bc88c82bb", "MIT"),
 ]
+AGGREFACT = ("lytang/LLM-AggreFact", "https://huggingface.co/datasets/lytang/LLM-AggreFact",
+             "981dfd0bd8e58e7238a9ab92b2e6ea44bce918e4", "CC-BY-ND-4.0, evaluation only (gated; accepted by the user)")
+ENTRIES += [(AGGREFACT[0], f"research/experiments/data/external/llm_aggrefact/data/{s}-00000-of-00001.parquet",
+             *AGGREFACT[1:]) for s in ("test", "dev")]
 OTHER = [
     ("NLTK data", "models/nltk_data/tokenizers/punkt_tab.zip", "nltk.download('punkt_tab') with nltk 3.9.1", "",
      "Apache-2.0 (NLTK data)"),
 ]
 PENDING = {
-    "lytang/LLM-AggreFact": "PENDING (H4): gated on Hugging Face; needs the user's login and acceptance of the "
-                            "CC-BY-ND-4.0 evaluation-only terms",
     "bespokelabs/Bespoke-MiniCheck-7B": "NOT DOWNLOADED locally (6 GB GPU); Colab script research/colab/run_bespoke.py",
 }
 

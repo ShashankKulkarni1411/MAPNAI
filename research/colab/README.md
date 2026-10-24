@@ -18,8 +18,8 @@ huggingface-cli login            # paste a read token; the account must have acc
 
 ```bash
 # copy research/colab/run_bespoke.py into the Colab working directory, then:
-python run_bespoke.py --tag colab-smoke --dataset-revision <sha from MANIFEST.json> --limit 50   # 2-3 min sanity run
-python run_bespoke.py --tag colab-full  --dataset-revision <sha from MANIFEST.json>              # ≈ 1 h on an A100
+python run_bespoke.py --tag colab-smoke --dataset-revision 981dfd0bd8e58e7238a9ab92b2e6ea44bce918e4 --limit 50   # 2-3 min sanity run
+python run_bespoke.py --tag colab-full  --dataset-revision 981dfd0bd8e58e7238a9ab92b2e6ea44bce918e4              # ≈ 1 h on an A100
 ```
 
 Copy `outputs/bespoke_aggrefact_colab-full.json` and `outputs/bespoke_preds_colab-full.jsonl.gz` back into `research/experiments/results/`. The script records the vLLM, torch and transformers versions it used (`pip_freeze`).

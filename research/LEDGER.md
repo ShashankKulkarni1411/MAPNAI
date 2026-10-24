@@ -36,6 +36,10 @@ Groq calls are logged in the "Groq budget" table at the bottom (cap: 4,000 total
 | L0028 | 2026-10-23 | 2 | Checker smoke test, first run | FAILED: unpinned transitive `pyarrow 26.0.0` requires NumPy ≥ 2 (env had 1.26.4) | `research/experiments/results/e05_checker_smoke_2026-10-23.json` | `~/.venvs/mapnai-checkers/Scripts/python.exe research/experiments/e05_checker_smoke.py --tag 2026-10-23` | 8911c4c |
 | L0029 | 2026-10-23 | 2 | Checker smoke test after pinning pyarrow 18.1.0 (10 hand-written pairs; not an accuracy estimate) | FT5@cuda 9/10, p50 385 ms/pair; DeBERTa@cuda 9/10, p50 233 ms; DeBERTa@cpu 9/10, p50 1,515 ms; gate v1 5/10, p50 0.05 ms; all deterministic | `research/experiments/results/e05_checker_smoke_2026-10-23b.json` | same, `--tag 2026-10-23b` | 8911c4c |
 | L0030 | 2026-10-23 | 2 | Checkpoint integrity | FT5 pytorch_model.bin sha256 41291881…26c0; DeBERTa 32ced784…cbdf (= HF LFS hashes at pinned commits) | `research/experiments/data/MANIFEST.json` | `python research/experiments/e06_manifest.py` | 8911c4c |
+| L0031 | 2026-10-24 | 2 | LLM-AggreFact acquired (user logged in to HF and accepted the terms) | rev 981dfd0b; test parquet sha256 ba6976c3…698c, dev ca9a5bda…d8a8 (= LFS hashes) | `research/experiments/data/MANIFEST.json` | `snapshot_download(..., revision=981dfd0b, local_dir=...)` | d872cbf |
+| L0032 | 2026-10-24 | 2 | LLM-AggreFact rows / datasets | test 29,320 (22,832 supported / 6,488 unsupported), dev 30,420; 11 datasets = leaderboard columns; test without RAGTruth = 12,949 (≈ the paper's "13K") | `research/experiments/results/e07_aggrefact_inventory_2026-10-24.json` | `~/.venvs/mapnai-checkers/Scripts/python.exe research/experiments/e07_aggrefact_inventory.py --tag 2026-10-24` | d872cbf |
+| L0033 | 2026-10-24 | 2 | News-3 test sizes (unsupported in brackets) | CNN 558 (57), XSum 558 (273), MediaS 726 (172) | same | same | d872cbf |
+| L0034 | 2026-10-24 | 2 | Upstream data properties (left unchanged; protocol scores all rows) | 202 duplicate (doc, claim) pairs in test, 50 in dev; 26 pairs in both test and dev | same | same | d872cbf |
 
 ## Groq budget (R9: cap 4,000 calls)
 

@@ -1,0 +1,238 @@
+{
+ "meta": {
+  "script": "research/experiments/e07_aggrefact_inventory.py",
+  "run_at_utc": "2026-10-24T05:03:52+00:00",
+  "git_commit": "d872cbf",
+  "python": "3.11.9",
+  "tag": "2026-10-24",
+  "dataset": "lytang/LLM-AggreFact",
+  "revision": "981dfd0bd8e58e7238a9ab92b2e6ea44bce918e4",
+  "licence": "CC-BY-ND-4.0, evaluation only (no training/fine-tuning)"
+ },
+ "splits": {
+  "test": {
+   "rows": 29320,
+   "expected_rows": 29320,
+   "rows_match": true,
+   "columns": [
+    "dataset",
+    "doc",
+    "claim",
+    "label",
+    "contamination_identifier"
+   ],
+   "datasets": [
+    "AggreFact-CNN",
+    "AggreFact-XSum",
+    "ClaimVerify",
+    "ExpertQA",
+    "FactCheck-GPT",
+    "Lfqa",
+    "RAGTruth",
+    "Reveal",
+    "TofuEval-MediaS",
+    "TofuEval-MeetB",
+    "Wice"
+   ],
+   "n_datasets": 11,
+   "per_dataset": {
+    "AggreFact-CNN": {
+     "n": 558,
+     "supported": 501,
+     "unsupported": 57,
+     "share_supported": 0.8978
+    },
+    "AggreFact-XSum": {
+     "n": 558,
+     "supported": 285,
+     "unsupported": 273,
+     "share_supported": 0.5108
+    },
+    "ClaimVerify": {
+     "n": 1088,
+     "supported": 789,
+     "unsupported": 299,
+     "share_supported": 0.7252
+    },
+    "ExpertQA": {
+     "n": 3702,
+     "supported": 2971,
+     "unsupported": 731,
+     "share_supported": 0.8025
+    },
+    "FactCheck-GPT": {
+     "n": 1566,
+     "supported": 376,
+     "unsupported": 1190,
+     "share_supported": 0.2401
+    },
+    "Lfqa": {
+     "n": 1911,
+     "supported": 1121,
+     "unsupported": 790,
+     "share_supported": 0.5866
+    },
+    "RAGTruth": {
+     "n": 16371,
+     "supported": 15102,
+     "unsupported": 1269,
+     "share_supported": 0.9225
+    },
+    "Reveal": {
+     "n": 1710,
+     "supported": 400,
+     "unsupported": 1310,
+     "share_supported": 0.2339
+    },
+    "TofuEval-MediaS": {
+     "n": 726,
+     "supported": 554,
+     "unsupported": 172,
+     "share_supported": 0.7631
+    },
+    "TofuEval-MeetB": {
+     "n": 772,
+     "supported": 622,
+     "unsupported": 150,
+     "share_supported": 0.8057
+    },
+    "Wice": {
+     "n": 358,
+     "supported": 111,
+     "unsupported": 247,
+     "share_supported": 0.3101
+    }
+   },
+   "labels": {
+    "1": 22832,
+    "0": 6488
+   },
+   "empty_doc": 0,
+   "empty_claim": 0,
+   "duplicate_doc_claim_pairs": 202,
+   "doc_chars_p50": 1981.0,
+   "claim_chars_p50": 113.0
+  },
+  "dev": {
+   "rows": 30420,
+   "expected_rows": 30420,
+   "rows_match": true,
+   "columns": [
+    "dataset",
+    "doc",
+    "claim",
+    "label",
+    "contamination_identifier"
+   ],
+   "datasets": [
+    "AggreFact-CNN",
+    "AggreFact-XSum",
+    "ClaimVerify",
+    "ExpertQA",
+    "FactCheck-GPT",
+    "Lfqa",
+    "RAGTruth",
+    "Reveal",
+    "TofuEval-MediaS",
+    "TofuEval-MeetB",
+    "Wice"
+   ],
+   "n_datasets": 11,
+   "per_dataset": {
+    "AggreFact-CNN": {
+     "n": 459,
+     "supported": 400,
+     "unsupported": 59,
+     "share_supported": 0.8715
+    },
+    "AggreFact-XSum": {
+     "n": 777,
+     "supported": 394,
+     "unsupported": 383,
+     "share_supported": 0.5071
+    },
+    "ClaimVerify": {
+     "n": 1093,
+     "supported": 821,
+     "unsupported": 272,
+     "share_supported": 0.7511
+    },
+    "ExpertQA": {
+     "n": 3773,
+     "supported": 2941,
+     "unsupported": 832,
+     "share_supported": 0.7795
+    },
+    "FactCheck-GPT": {
+     "n": 1537,
+     "supported": 266,
+     "unsupported": 1271,
+     "share_supported": 0.1731
+    },
+    "Lfqa": {
+     "n": 2029,
+     "supported": 1150,
+     "unsupported": 879,
+     "share_supported": 0.5668
+    },
+    "RAGTruth": {
+     "n": 15340,
+     "supported": 13782,
+     "unsupported": 1558,
+     "share_supported": 0.8984
+    },
+    "Reveal": {
+     "n": 1656,
+     "supported": 385,
+     "unsupported": 1271,
+     "share_supported": 0.2325
+    },
+    "TofuEval-MediaS": {
+     "n": 1800,
+     "supported": 1446,
+     "unsupported": 354,
+     "share_supported": 0.8033
+    },
+    "TofuEval-MeetB": {
+     "n": 1607,
+     "supported": 1318,
+     "unsupported": 289,
+     "share_supported": 0.8202
+    },
+    "Wice": {
+     "n": 349,
+     "supported": 115,
+     "unsupported": 234,
+     "share_supported": 0.3295
+    }
+   },
+   "labels": {
+    "1": 23018,
+    "0": 7402
+   },
+   "empty_doc": 0,
+   "empty_claim": 0,
+   "duplicate_doc_claim_pairs": 50,
+   "doc_chars_p50": 2026.0,
+   "claim_chars_p50": 112.0
+  }
+ },
+ "dataset_names_vs_leaderboard_columns": {
+  "found": [
+   "AggreFact-CNN",
+   "AggreFact-XSum",
+   "ClaimVerify",
+   "ExpertQA",
+   "FactCheck-GPT",
+   "Lfqa",
+   "RAGTruth",
+   "Reveal",
+   "TofuEval-MediaS",
+   "TofuEval-MeetB",
+   "Wice"
+  ],
+  "missing_from_expected": [],
+  "unexpected": []
+ },
+ "test_dev_doc_claim_overlap": 26
+}

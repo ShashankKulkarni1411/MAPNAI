@@ -1,8 +1,8 @@
 {
  "meta": {
   "script": "research/experiments/e06_manifest.py",
-  "run_at_utc": "2026-10-23T17:44:58+00:00",
-  "git_commit": "8911c4c",
+  "run_at_utc": "2026-10-24T05:04:12+00:00",
+  "git_commit": "d872cbf",
   "python": "3.11.9"
  },
  "files": [
@@ -55,6 +55,26 @@
    "source": "e04_mind_sources.py --tag 2026-10-23",
    "revision": "",
    "licence": "derived from MIND-small (same licence)"
+  },
+  {
+   "group": "lytang/LLM-AggreFact",
+   "path": "research/experiments/data/external/llm_aggrefact/data/test-00000-of-00001.parquet",
+   "exists": true,
+   "bytes": 17298205,
+   "sha256": "ba6976c3da990a9d7b11670efaf4e3c93c1bd0530061ec742afd6b2d5bce698c",
+   "source": "https://huggingface.co/datasets/lytang/LLM-AggreFact",
+   "revision": "981dfd0bd8e58e7238a9ab92b2e6ea44bce918e4",
+   "licence": "CC-BY-ND-4.0, evaluation only (gated; accepted by the user)"
+  },
+  {
+   "group": "lytang/LLM-AggreFact",
+   "path": "research/experiments/data/external/llm_aggrefact/data/dev-00000-of-00001.parquet",
+   "exists": true,
+   "bytes": 35453136,
+   "sha256": "ca9a5bda9561bbc6f7327ef81ab41727fa10e96f96e9dc74ef32ba3af3c1d8a8",
+   "source": "https://huggingface.co/datasets/lytang/LLM-AggreFact",
+   "revision": "981dfd0bd8e58e7238a9ab92b2e6ea44bce918e4",
+   "licence": "CC-BY-ND-4.0, evaluation only (gated; accepted by the user)"
   },
   {
    "group": "NLTK data",
@@ -238,7 +258,6 @@
   }
  ],
  "pending": {
-  "lytang/LLM-AggreFact": "PENDING (H4): gated on Hugging Face; needs the user's login and acceptance of the CC-BY-ND-4.0 evaluation-only terms",
   "bespokelabs/Bespoke-MiniCheck-7B": "NOT DOWNLOADED locally (6 GB GPU); Colab script research/colab/run_bespoke.py"
  }
 }
