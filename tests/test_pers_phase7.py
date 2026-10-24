@@ -46,6 +46,32 @@ class TestExtract:
         assert factcheck.entities_in("Cityscape", ["City"]) == []
 
 
+class TestMonthBoundary:
+    """F1: after a number, a month must be a whole word ("65 markets" is not March)."""
+
+    @pytest.mark.parametrize("text", [
+        "65 markets reopened.", "His 1981 novel sold well.", "12 junior players.", "5 decades later.",
+        "3 marathons in a row.", "2 augmented teams.", "4 octopus sightings.", "8 septic tanks.",
+    ])
+    def test_a_word_that_starts_like_a_month_is_not_a_month(self, text):
+        assert factcheck.months(text, strict=True) == set()
+
+    @pytest.mark.parametrize("text,month", [
+        ("Signed on 26 Sept.", "september"), ("Due 26 Sept. 2027.", "september"), ("On 5 Mar. he left.", "march"),
+        ("The 3rd March vote.", "march"), ("From 10 Dec, prices rise.", "december"), ("The March 3 vote.", "march"),
+        ("Back on 1 May.", "may"),
+    ])
+    def test_a_month_after_a_number_is_still_found(self, text, month):
+        assert factcheck.months(text, strict=True) == {month}
+
+    @pytest.mark.parametrize("src", [
+        "Stocks fell in 65 markets on Friday.",
+        "The 1981 novel by Anne Tyler was reissued on 3 May.",
+    ])
+    def test_an_identical_rewrite_passes(self, src):
+        assert factcheck.verify(src, src, ["Anne Tyler"]) == (True, [], [])
+
+
 class TestVerify:
     SRC = ("Manchester City were fined £1,200,000 on 26 September after two hearings, a 5 per cent rise; "
            "the case opened on 2023-02-06.")

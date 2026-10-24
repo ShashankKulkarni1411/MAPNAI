@@ -28,7 +28,9 @@ _MONTH_WORD = r"(?:" + "|".join(sorted(_MONTHS, key=len, reverse=True)) + r")\.?
 # a capitalized month; "May"/"March" also are ordinary words, so those count only next to a number
 _MONTH_ANY = re.compile(rf"\b({_MONTH_WORD})\b", re.I)
 _MONTH_SOURCE = re.compile(rf"\b([A-Z][a-z]+)\.?(?=\W|$)")
-_MONTH_BY_NUMBER = re.compile(rf"(?:\d{{1,2}}(?:st|nd|rd|th)?\s+({_MONTH_WORD}))|(?:\b({_MONTH_WORD})\s+\d)", re.I)
+# (?!\w): the month must be a whole word, so "65 markets" and "1981 novel" are not March and November
+_MONTH_BY_NUMBER = re.compile(rf"(?:\d{{1,2}}(?:st|nd|rd|th)?\s+({_MONTH_WORD})(?!\w))|(?:\b({_MONTH_WORD})\s+\d)",
+                              re.I)
 _AMBIGUOUS = {"may", "march"}
 _WORDS = {w: str(i) for i, w in enumerate(
     "zero one two three four five six seven eight nine ten eleven twelve thirteen fourteen fifteen sixteen "
