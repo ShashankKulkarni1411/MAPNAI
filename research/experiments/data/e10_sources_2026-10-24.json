@@ -1,0 +1,4840 @@
+{
+ "meta": {
+  "script": "research/experiments/e10_select_sources.py",
+  "run_at_utc": "2026-10-24T11:48:17+00:00",
+  "git_commit": "eba654d",
+  "python": "3.11.9",
+  "seed": 13,
+  "tag": "2026-10-24",
+  "snapshot": "data/e02_gate_sources_2026-10-23.jsonl",
+  "n": 480,
+  "dev_share": 0.3,
+  "pilot": 80,
+  "note": "pilot ⊂ dev; weight = stratum population / sampled per stratum"
+ },
+ "population_by_stratum": {
+  "entertainment_movies|gt50": 527,
+  "entertainment_movies|le50": 223,
+  "sports|gt50": 348,
+  "sports|le50": 745
+ },
+ "counts": {
+  "by_split": {
+   "test": 336,
+   "dev": 144
+  },
+  "pilot": 80,
+  "by_stratum_split": {
+   "entertainment_movies|le50|test": 84,
+   "sports|gt50|test": 84,
+   "sports|gt50|dev": 36,
+   "entertainment_movies|gt50|test": 84,
+   "sports|le50|test": 84,
+   "sports|le50|dev": 36,
+   "entertainment_movies|gt50|dev": 36,
+   "entertainment_movies|le50|dev": 36
+  }
+ },
+ "items": [
+  {
+   "article_id": "00ed2218-8125-436f-aba6-70106c6c2c37",
+   "stratum": "entertainment_movies|le50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 48,
+   "src_words_long": 48,
+   "weight": 1.858333
+  },
+  {
+   "article_id": "018df8af-6c90-4e24-8ebb-c58f32a69e48",
+   "stratum": "sports|gt50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 57,
+   "src_words_long": 57,
+   "weight": 2.9
+  },
+  {
+   "article_id": "0192345b-1a25-4a80-883a-cb5fca82becf",
+   "stratum": "entertainment_movies|le50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 42,
+   "src_words_long": 42,
+   "weight": 1.858333
+  },
+  {
+   "article_id": "01e85768-6ebb-40b4-9a85-6df88525271c",
+   "stratum": "sports|gt50",
+   "domain": "sports",
+   "split": "dev",
+   "pilot": false,
+   "src_words_short": 71,
+   "src_words_long": 73,
+   "weight": 2.9
+  },
+  {
+   "article_id": "01f6e658-43f8-48aa-8bb7-4364243bb455",
+   "stratum": "entertainment_movies|gt50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 52,
+   "src_words_long": 116,
+   "weight": 4.391667
+  },
+  {
+   "article_id": "0240f62c-884a-4f9a-9027-cec394b394f1",
+   "stratum": "sports|le50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 23,
+   "src_words_long": 23,
+   "weight": 6.208333
+  },
+  {
+   "article_id": "039b7e1c-7b00-4fa2-b14c-af8cd72f7513",
+   "stratum": "sports|le50",
+   "domain": "sports",
+   "split": "dev",
+   "pilot": false,
+   "src_words_short": 22,
+   "src_words_long": 22,
+   "weight": 6.208333
+  },
+  {
+   "article_id": "03eccb28-ab26-4ff6-9d74-fba940796f6b",
+   "stratum": "sports|le50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 34,
+   "src_words_long": 34,
+   "weight": 6.208333
+  },
+  {
+   "article_id": "04c72287-2568-45d5-93c1-4952a3af144e",
+   "stratum": "sports|le50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 23,
+   "src_words_long": 23,
+   "weight": 6.208333
+  },
+  {
+   "article_id": "071aa75f-c5e2-4211-a56d-f4f381229cf6",
+   "stratum": "sports|gt50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 62,
+   "src_words_long": 72,
+   "weight": 2.9
+  },
+  {
+   "article_id": "074dfbba-7ff4-4fa9-aa66-1ccc2a7dd119",
+   "stratum": "entertainment_movies|gt50",
+   "domain": "entertainment_movies",
+   "split": "dev",
+   "pilot": true,
+   "src_words_short": 52,
+   "src_words_long": 52,
+   "weight": 4.391667
+  },
+  {
+   "article_id": "07520efb-d6d2-4474-9dc9-4a4075104cfc",
+   "stratum": "sports|gt50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 102,
+   "src_words_long": 102,
+   "weight": 2.9
+  },
+  {
+   "article_id": "07a878a9-e764-4158-9ea5-c7dfb71ef67a",
+   "stratum": "sports|le50",
+   "domain": "sports",
+   "split": "dev",
+   "pilot": true,
+   "src_words_short": 22,
+   "src_words_long": 22,
+   "weight": 6.208333
+  },
+  {
+   "article_id": "092ef4f6-1331-4cec-a2a2-296b5573de32",
+   "stratum": "sports|gt50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 72,
+   "src_words_long": 74,
+   "weight": 2.9
+  },
+  {
+   "article_id": "09e90c34-34b9-46f3-aceb-94780e758dd7",
+   "stratum": "entertainment_movies|gt50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 58,
+   "src_words_long": 123,
+   "weight": 4.391667
+  },
+  {
+   "article_id": "09ee521d-f8c2-47d5-9521-2a0d92e23f7d",
+   "stratum": "sports|le50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 38,
+   "src_words_long": 52,
+   "weight": 6.208333
+  },
+  {
+   "article_id": "09fa1a0f-654e-4f85-86a3-80ccefcf1774",
+   "stratum": "entertainment_movies|le50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 36,
+   "src_words_long": 36,
+   "weight": 1.858333
+  },
+  {
+   "article_id": "09fb84c6-0c40-4a71-88f4-b08966a77272",
+   "stratum": "entertainment_movies|le50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 48,
+   "src_words_long": 48,
+   "weight": 1.858333
+  },
+  {
+   "article_id": "0a0afffd-983d-40da-ad9d-1658ba4435fc",
+   "stratum": "entertainment_movies|le50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 22,
+   "src_words_long": 22,
+   "weight": 1.858333
+  },
+  {
+   "article_id": "0a6f9135-dced-4924-ab73-c3e22416ca10",
+   "stratum": "sports|gt50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 154,
+   "src_words_long": 156,
+   "weight": 2.9
+  },
+  {
+   "article_id": "0a834676-119e-4d1b-81cd-f9787ce9d60d",
+   "stratum": "entertainment_movies|le50",
+   "domain": "entertainment_movies",
+   "split": "dev",
+   "pilot": true,
+   "src_words_short": 27,
+   "src_words_long": 27,
+   "weight": 1.858333
+  },
+  {
+   "article_id": "0aa3fbac-7435-4f7b-b761-7942e09f099a",
+   "stratum": "sports|le50",
+   "domain": "sports",
+   "split": "dev",
+   "pilot": true,
+   "src_words_short": 20,
+   "src_words_long": 20,
+   "weight": 6.208333
+  },
+  {
+   "article_id": "0c332a06-330e-43f2-aa12-a27dae24f0dc",
+   "stratum": "sports|gt50",
+   "domain": "sports",
+   "split": "dev",
+   "pilot": true,
+   "src_words_short": 70,
+   "src_words_long": 72,
+   "weight": 2.9
+  },
+  {
+   "article_id": "0c906de9-faa5-4c3d-aeff-ac068e9a939a",
+   "stratum": "entertainment_movies|le50",
+   "domain": "entertainment_movies",
+   "split": "dev",
+   "pilot": true,
+   "src_words_short": 17,
+   "src_words_long": 17,
+   "weight": 1.858333
+  },
+  {
+   "article_id": "0d818e7f-2f41-4967-860b-7adc4207fb4c",
+   "stratum": "sports|gt50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 71,
+   "src_words_long": 71,
+   "weight": 2.9
+  },
+  {
+   "article_id": "0d874e81-98c5-4257-b36a-80ad5a5aab8a",
+   "stratum": "entertainment_movies|gt50",
+   "domain": "entertainment_movies",
+   "split": "dev",
+   "pilot": true,
+   "src_words_short": 56,
+   "src_words_long": 56,
+   "weight": 4.391667
+  },
+  {
+   "article_id": "0dd8d9df-30af-4707-9791-3a4dab54cc3b",
+   "stratum": "entertainment_movies|le50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 50,
+   "src_words_long": 72,
+   "weight": 1.858333
+  },
+  {
+   "article_id": "10434a44-2a1e-460d-801a-1a3e5329c3b8",
+   "stratum": "sports|gt50",
+   "domain": "sports",
+   "split": "dev",
+   "pilot": true,
+   "src_words_short": 74,
+   "src_words_long": 74,
+   "weight": 2.9
+  },
+  {
+   "article_id": "10dd1940-5696-4d83-babf-503afa2ae39d",
+   "stratum": "sports|gt50",
+   "domain": "sports",
+   "split": "dev",
+   "pilot": false,
+   "src_words_short": 83,
+   "src_words_long": 179,
+   "weight": 2.9
+  },
+  {
+   "article_id": "118bb0ee-478d-48e3-8670-65c8f417d66e",
+   "stratum": "entertainment_movies|gt50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 56,
+   "src_words_long": 56,
+   "weight": 4.391667
+  },
+  {
+   "article_id": "11cdf4da-9973-418b-ab89-4d7cf6a757e8",
+   "stratum": "sports|gt50",
+   "domain": "sports",
+   "split": "dev",
+   "pilot": true,
+   "src_words_short": 67,
+   "src_words_long": 69,
+   "weight": 2.9
+  },
+  {
+   "article_id": "11f37ee9-8940-452b-8f17-e374497c8ef7",
+   "stratum": "sports|le50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 24,
+   "src_words_long": 24,
+   "weight": 6.208333
+  },
+  {
+   "article_id": "12c5d83c-f95e-4d76-826f-62fba39ca068",
+   "stratum": "sports|le50",
+   "domain": "sports",
+   "split": "dev",
+   "pilot": false,
+   "src_words_short": 45,
+   "src_words_long": 109,
+   "weight": 6.208333
+  },
+  {
+   "article_id": "1306c706-e882-49d0-84dd-fe92e98efd2d",
+   "stratum": "sports|gt50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 63,
+   "src_words_long": 63,
+   "weight": 2.9
+  },
+  {
+   "article_id": "132d88f0-7704-4c6c-8e81-e9bbdb10e188",
+   "stratum": "sports|le50",
+   "domain": "sports",
+   "split": "dev",
+   "pilot": true,
+   "src_words_short": 22,
+   "src_words_long": 22,
+   "weight": 6.208333
+  },
+  {
+   "article_id": "13be82c0-2377-44ab-b25e-db2f71bcefeb",
+   "stratum": "sports|le50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 31,
+   "src_words_long": 31,
+   "weight": 6.208333
+  },
+  {
+   "article_id": "13d614ed-6e62-4262-8444-b7daa0dae2d5",
+   "stratum": "sports|gt50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 68,
+   "src_words_long": 138,
+   "weight": 2.9
+  },
+  {
+   "article_id": "1428b0fb-a28b-4faa-8dc2-4116d6335343",
+   "stratum": "entertainment_movies|le50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 17,
+   "src_words_long": 17,
+   "weight": 1.858333
+  },
+  {
+   "article_id": "14bada68-422d-4415-b4f7-2ee741b4c80c",
+   "stratum": "sports|le50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 18,
+   "src_words_long": 18,
+   "weight": 6.208333
+  },
+  {
+   "article_id": "14dc961f-a5de-4591-85ae-1fcdec7549ac",
+   "stratum": "entertainment_movies|gt50",
+   "domain": "entertainment_movies",
+   "split": "dev",
+   "pilot": true,
+   "src_words_short": 91,
+   "src_words_long": 193,
+   "weight": 4.391667
+  },
+  {
+   "article_id": "15aa3aca-fdfa-43a1-b039-41c7a41f52f2",
+   "stratum": "sports|le50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 21,
+   "src_words_long": 21,
+   "weight": 6.208333
+  },
+  {
+   "article_id": "16226758-3ac8-4b96-81fa-f4ed240837ac",
+   "stratum": "entertainment_movies|le50",
+   "domain": "entertainment_movies",
+   "split": "dev",
+   "pilot": false,
+   "src_words_short": 16,
+   "src_words_long": 16,
+   "weight": 1.858333
+  },
+  {
+   "article_id": "164affaf-31b6-493e-9a92-0539e737fcb7",
+   "stratum": "entertainment_movies|le50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 21,
+   "src_words_long": 21,
+   "weight": 1.858333
+  },
+  {
+   "article_id": "16bd4d5a-7a3d-4ab2-a34c-b111d45b8cac",
+   "stratum": "entertainment_movies|le50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 16,
+   "src_words_long": 16,
+   "weight": 1.858333
+  },
+  {
+   "article_id": "16c3f314-58b0-4e0c-a8a0-9ef576506eab",
+   "stratum": "entertainment_movies|le50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 34,
+   "src_words_long": 34,
+   "weight": 1.858333
+  },
+  {
+   "article_id": "1909d0b1-7048-4c6e-bc73-3e0fd69f31d1",
+   "stratum": "sports|le50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 40,
+   "src_words_long": 40,
+   "weight": 6.208333
+  },
+  {
+   "article_id": "19692955-d96f-42f8-91ec-25520f06484b",
+   "stratum": "sports|le50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 19,
+   "src_words_long": 19,
+   "weight": 6.208333
+  },
+  {
+   "article_id": "197b71f6-0f5c-4d83-93a9-bbc44bd92cae",
+   "stratum": "sports|gt50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 60,
+   "src_words_long": 62,
+   "weight": 2.9
+  },
+  {
+   "article_id": "19900905-8e90-456d-9560-3e272b3a3822",
+   "stratum": "sports|le50",
+   "domain": "sports",
+   "split": "dev",
+   "pilot": true,
+   "src_words_short": 31,
+   "src_words_long": 31,
+   "weight": 6.208333
+  },
+  {
+   "article_id": "19ece98e-df77-4f5d-921c-7765239dcb65",
+   "stratum": "entertainment_movies|le50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 24,
+   "src_words_long": 24,
+   "weight": 1.858333
+  },
+  {
+   "article_id": "1a070e9f-07c9-4d55-9f8a-60b3d3882c56",
+   "stratum": "entertainment_movies|le50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 23,
+   "src_words_long": 23,
+   "weight": 1.858333
+  },
+  {
+   "article_id": "1b5ed0bb-85af-4ec1-bbca-1bc497b3c510",
+   "stratum": "sports|le50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 26,
+   "src_words_long": 26,
+   "weight": 6.208333
+  },
+  {
+   "article_id": "1b6f0edf-dffd-4293-b8e8-ac3e1a544b0e",
+   "stratum": "entertainment_movies|gt50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 87,
+   "src_words_long": 176,
+   "weight": 4.391667
+  },
+  {
+   "article_id": "1b833810-f5c3-42ca-ad40-34fc089eccdb",
+   "stratum": "entertainment_movies|le50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 44,
+   "src_words_long": 131,
+   "weight": 1.858333
+  },
+  {
+   "article_id": "1c5b97d7-c186-4668-a3e9-0541fe978fc0",
+   "stratum": "sports|gt50",
+   "domain": "sports",
+   "split": "dev",
+   "pilot": false,
+   "src_words_short": 68,
+   "src_words_long": 68,
+   "weight": 2.9
+  },
+  {
+   "article_id": "1ccdbb57-241a-48aa-b68a-453d488d289a",
+   "stratum": "sports|le50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 19,
+   "src_words_long": 19,
+   "weight": 6.208333
+  },
+  {
+   "article_id": "1d7baef4-00c2-48aa-8bfc-c783e2b62424",
+   "stratum": "sports|le50",
+   "domain": "sports",
+   "split": "dev",
+   "pilot": false,
+   "src_words_short": 22,
+   "src_words_long": 22,
+   "weight": 6.208333
+  },
+  {
+   "article_id": "1e0dade2-3aa3-4760-ba49-15ed0e27eda3",
+   "stratum": "entertainment_movies|le50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 45,
+   "src_words_long": 56,
+   "weight": 1.858333
+  },
+  {
+   "article_id": "1e636871-8501-4255-861b-40fa548e169f",
+   "stratum": "entertainment_movies|le50",
+   "domain": "entertainment_movies",
+   "split": "dev",
+   "pilot": false,
+   "src_words_short": 24,
+   "src_words_long": 24,
+   "weight": 1.858333
+  },
+  {
+   "article_id": "1ed10a02-8ee1-4a40-8093-ddf73276fde7",
+   "stratum": "sports|le50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 30,
+   "src_words_long": 30,
+   "weight": 6.208333
+  },
+  {
+   "article_id": "1f603fe4-33ad-458e-ac98-e5ff7cc5f68a",
+   "stratum": "entertainment_movies|gt50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 56,
+   "src_words_long": 56,
+   "weight": 4.391667
+  },
+  {
+   "article_id": "200af8eb-ca5a-4c49-a053-f0ec86963ca5",
+   "stratum": "entertainment_movies|gt50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 55,
+   "src_words_long": 143,
+   "weight": 4.391667
+  },
+  {
+   "article_id": "20575563-81ae-4fd6-ac9f-be9e9aecaaba",
+   "stratum": "sports|le50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 18,
+   "src_words_long": 18,
+   "weight": 6.208333
+  },
+  {
+   "article_id": "207eadc0-482d-4413-a2c8-5b001f1f7b9a",
+   "stratum": "sports|gt50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 66,
+   "src_words_long": 66,
+   "weight": 2.9
+  },
+  {
+   "article_id": "209af00e-ec5e-41bb-ac5f-270d6d6fd49f",
+   "stratum": "entertainment_movies|le50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 48,
+   "src_words_long": 56,
+   "weight": 1.858333
+  },
+  {
+   "article_id": "20be9090-c0d8-4cba-b4af-914aa5235216",
+   "stratum": "entertainment_movies|gt50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 69,
+   "src_words_long": 140,
+   "weight": 4.391667
+  },
+  {
+   "article_id": "2149bdb8-bc5f-4a4b-93ac-3e647b68f0d9",
+   "stratum": "entertainment_movies|le50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 22,
+   "src_words_long": 22,
+   "weight": 1.858333
+  },
+  {
+   "article_id": "214d6310-dbe4-4f06-8c65-7a2873b067d9",
+   "stratum": "entertainment_movies|gt50",
+   "domain": "entertainment_movies",
+   "split": "dev",
+   "pilot": false,
+   "src_words_short": 58,
+   "src_words_long": 92,
+   "weight": 4.391667
+  },
+  {
+   "article_id": "21b602da-8881-4157-984c-04cfcfb5ef07",
+   "stratum": "entertainment_movies|gt50",
+   "domain": "entertainment_movies",
+   "split": "dev",
+   "pilot": true,
+   "src_words_short": 66,
+   "src_words_long": 156,
+   "weight": 4.391667
+  },
+  {
+   "article_id": "238b7974-fbe9-4f58-ac04-38194b44a46a",
+   "stratum": "sports|gt50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 59,
+   "src_words_long": 59,
+   "weight": 2.9
+  },
+  {
+   "article_id": "23bae7e3-05cf-435f-8a33-64e2d659c001",
+   "stratum": "sports|gt50",
+   "domain": "sports",
+   "split": "dev",
+   "pilot": false,
+   "src_words_short": 65,
+   "src_words_long": 65,
+   "weight": 2.9
+  },
+  {
+   "article_id": "23c1fbfa-ff33-4393-b0dc-17ba23675575",
+   "stratum": "entertainment_movies|le50",
+   "domain": "entertainment_movies",
+   "split": "dev",
+   "pilot": true,
+   "src_words_short": 25,
+   "src_words_long": 25,
+   "weight": 1.858333
+  },
+  {
+   "article_id": "2474dbf3-f0d6-4177-863b-0c641f644590",
+   "stratum": "sports|gt50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 97,
+   "src_words_long": 99,
+   "weight": 2.9
+  },
+  {
+   "article_id": "24f30164-c9fc-4576-a75d-7e4b2cbc5d17",
+   "stratum": "entertainment_movies|gt50",
+   "domain": "entertainment_movies",
+   "split": "dev",
+   "pilot": true,
+   "src_words_short": 77,
+   "src_words_long": 77,
+   "weight": 4.391667
+  },
+  {
+   "article_id": "254228be-6bba-4b8e-8600-e115d6bbb198",
+   "stratum": "sports|gt50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 143,
+   "src_words_long": 156,
+   "weight": 2.9
+  },
+  {
+   "article_id": "257313de-e486-40f4-9a2b-894381e7f1d8",
+   "stratum": "sports|gt50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 53,
+   "src_words_long": 53,
+   "weight": 2.9
+  },
+  {
+   "article_id": "267adb47-de1a-4063-bcf6-c35a7739731c",
+   "stratum": "sports|le50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 34,
+   "src_words_long": 34,
+   "weight": 6.208333
+  },
+  {
+   "article_id": "26e2755d-5de0-4fe6-ad1c-393ff4da85a1",
+   "stratum": "entertainment_movies|le50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 44,
+   "src_words_long": 56,
+   "weight": 1.858333
+  },
+  {
+   "article_id": "26e6938f-30ca-4791-93c7-07e2c5899cdf",
+   "stratum": "entertainment_movies|le50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 16,
+   "src_words_long": 16,
+   "weight": 1.858333
+  },
+  {
+   "article_id": "277233bb-849c-4999-ac82-d29f0b6936f9",
+   "stratum": "entertainment_movies|le50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 19,
+   "src_words_long": 19,
+   "weight": 1.858333
+  },
+  {
+   "article_id": "2781454a-84fb-41d8-b099-283e45c0d1be",
+   "stratum": "sports|le50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 20,
+   "src_words_long": 20,
+   "weight": 6.208333
+  },
+  {
+   "article_id": "2786b872-3d03-4678-9d6b-bf2b51ebe976",
+   "stratum": "entertainment_movies|le50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 45,
+   "src_words_long": 57,
+   "weight": 1.858333
+  },
+  {
+   "article_id": "285e3e7c-7fde-44b0-98ca-e95d13bbd504",
+   "stratum": "entertainment_movies|le50",
+   "domain": "entertainment_movies",
+   "split": "dev",
+   "pilot": false,
+   "src_words_short": 43,
+   "src_words_long": 55,
+   "weight": 1.858333
+  },
+  {
+   "article_id": "2a593209-59e4-41b7-b5a6-2bbc3a89e5fa",
+   "stratum": "sports|gt50",
+   "domain": "sports",
+   "split": "dev",
+   "pilot": true,
+   "src_words_short": 64,
+   "src_words_long": 66,
+   "weight": 2.9
+  },
+  {
+   "article_id": "2a7e8ffa-8ba5-44fc-9892-466f6678efbf",
+   "stratum": "entertainment_movies|gt50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 95,
+   "src_words_long": 205,
+   "weight": 4.391667
+  },
+  {
+   "article_id": "2cbff7f4-2e6b-4b55-aaf8-eafac0f160e4",
+   "stratum": "sports|gt50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 65,
+   "src_words_long": 118,
+   "weight": 2.9
+  },
+  {
+   "article_id": "2d11198e-9c23-40f0-82b5-191ad5484963",
+   "stratum": "sports|le50",
+   "domain": "sports",
+   "split": "dev",
+   "pilot": true,
+   "src_words_short": 22,
+   "src_words_long": 22,
+   "weight": 6.208333
+  },
+  {
+   "article_id": "2d5d0eb9-a07f-40d7-bfed-c637597245d6",
+   "stratum": "entertainment_movies|le50",
+   "domain": "entertainment_movies",
+   "split": "dev",
+   "pilot": false,
+   "src_words_short": 29,
+   "src_words_long": 29,
+   "weight": 1.858333
+  },
+  {
+   "article_id": "2dd46095-5935-447e-9884-4cc49e7109f7",
+   "stratum": "sports|gt50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 69,
+   "src_words_long": 69,
+   "weight": 2.9
+  },
+  {
+   "article_id": "2de7924b-e75b-4083-abfa-35436b6a1e53",
+   "stratum": "entertainment_movies|le50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 27,
+   "src_words_long": 27,
+   "weight": 1.858333
+  },
+  {
+   "article_id": "3199cc41-db5d-4ea5-bbc0-40938a611730",
+   "stratum": "sports|gt50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 67,
+   "src_words_long": 69,
+   "weight": 2.9
+  },
+  {
+   "article_id": "31ab4d2e-98d3-4afb-abac-6eb2ea9abab0",
+   "stratum": "sports|le50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 49,
+   "src_words_long": 78,
+   "weight": 6.208333
+  },
+  {
+   "article_id": "32203634-10f3-494a-98e7-2d1b6973e627",
+   "stratum": "sports|le50",
+   "domain": "sports",
+   "split": "dev",
+   "pilot": true,
+   "src_words_short": 24,
+   "src_words_long": 24,
+   "weight": 6.208333
+  },
+  {
+   "article_id": "3220bbef-30d1-44c5-a76a-26d1942e0245",
+   "stratum": "entertainment_movies|le50",
+   "domain": "entertainment_movies",
+   "split": "dev",
+   "pilot": false,
+   "src_words_short": 24,
+   "src_words_long": 24,
+   "weight": 1.858333
+  },
+  {
+   "article_id": "32367208-16eb-4322-9989-eaa74a19e5d0",
+   "stratum": "entertainment_movies|gt50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 99,
+   "src_words_long": 210,
+   "weight": 4.391667
+  },
+  {
+   "article_id": "32c08af7-c083-425a-8724-41cad83be771",
+   "stratum": "entertainment_movies|le50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 25,
+   "src_words_long": 25,
+   "weight": 1.858333
+  },
+  {
+   "article_id": "32efbfb4-2156-47d9-b009-d50cfe4c87a8",
+   "stratum": "sports|le50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 18,
+   "src_words_long": 18,
+   "weight": 6.208333
+  },
+  {
+   "article_id": "333ea321-644f-4e0c-b08e-c491273d7443",
+   "stratum": "entertainment_movies|gt50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 93,
+   "src_words_long": 216,
+   "weight": 4.391667
+  },
+  {
+   "article_id": "338257b5-be0e-498e-87eb-fbfa4752f8ae",
+   "stratum": "sports|le50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 29,
+   "src_words_long": 29,
+   "weight": 6.208333
+  },
+  {
+   "article_id": "33d523e3-b009-4886-afc6-62883be4d8c6",
+   "stratum": "sports|gt50",
+   "domain": "sports",
+   "split": "dev",
+   "pilot": false,
+   "src_words_short": 56,
+   "src_words_long": 56,
+   "weight": 2.9
+  },
+  {
+   "article_id": "33e5ca83-4fc1-415b-a240-aed3f3ccd79f",
+   "stratum": "sports|gt50",
+   "domain": "sports",
+   "split": "dev",
+   "pilot": true,
+   "src_words_short": 70,
+   "src_words_long": 72,
+   "weight": 2.9
+  },
+  {
+   "article_id": "3484226a-3713-4532-9ed0-cb16edf94851",
+   "stratum": "sports|le50",
+   "domain": "sports",
+   "split": "dev",
+   "pilot": false,
+   "src_words_short": 17,
+   "src_words_long": 17,
+   "weight": 6.208333
+  },
+  {
+   "article_id": "353838e4-14d0-4b57-bb93-e5f2263885c4",
+   "stratum": "entertainment_movies|le50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 50,
+   "src_words_long": 50,
+   "weight": 1.858333
+  },
+  {
+   "article_id": "3576683a-f819-4e65-b6b7-8a307cf46b77",
+   "stratum": "sports|gt50",
+   "domain": "sports",
+   "split": "dev",
+   "pilot": true,
+   "src_words_short": 126,
+   "src_words_long": 160,
+   "weight": 2.9
+  },
+  {
+   "article_id": "36b865e0-704a-42ae-964c-690ee9fb02c8",
+   "stratum": "entertainment_movies|gt50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 56,
+   "src_words_long": 56,
+   "weight": 4.391667
+  },
+  {
+   "article_id": "382c2a06-a0f4-48f5-a2e3-e19103bdf1f7",
+   "stratum": "entertainment_movies|le50",
+   "domain": "entertainment_movies",
+   "split": "dev",
+   "pilot": true,
+   "src_words_short": 28,
+   "src_words_long": 28,
+   "weight": 1.858333
+  },
+  {
+   "article_id": "383e9bea-83ba-4eb7-b870-fd2601499853",
+   "stratum": "entertainment_movies|le50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 38,
+   "src_words_long": 111,
+   "weight": 1.858333
+  },
+  {
+   "article_id": "399a56f5-1e62-4b31-8884-c95568b3f038",
+   "stratum": "entertainment_movies|gt50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 150,
+   "src_words_long": 247,
+   "weight": 4.391667
+  },
+  {
+   "article_id": "3c15c361-be7f-4c37-93aa-a559184c0bf9",
+   "stratum": "sports|gt50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 53,
+   "src_words_long": 53,
+   "weight": 2.9
+  },
+  {
+   "article_id": "3cba855c-5179-4ba8-bafc-f79239ac5abc",
+   "stratum": "entertainment_movies|le50",
+   "domain": "entertainment_movies",
+   "split": "dev",
+   "pilot": false,
+   "src_words_short": 46,
+   "src_words_long": 59,
+   "weight": 1.858333
+  },
+  {
+   "article_id": "3e00954e-9843-4a2a-8041-7abb19e9727e",
+   "stratum": "sports|le50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 15,
+   "src_words_long": 15,
+   "weight": 6.208333
+  },
+  {
+   "article_id": "3ec154dd-b25a-4a95-b280-d8545735d2ea",
+   "stratum": "entertainment_movies|gt50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 52,
+   "src_words_long": 52,
+   "weight": 4.391667
+  },
+  {
+   "article_id": "40429b46-42d0-4c38-a192-1e3cc3bea46b",
+   "stratum": "entertainment_movies|le50",
+   "domain": "entertainment_movies",
+   "split": "dev",
+   "pilot": true,
+   "src_words_short": 26,
+   "src_words_long": 26,
+   "weight": 1.858333
+  },
+  {
+   "article_id": "40e3ade1-a162-4495-a23c-96d37db49de8",
+   "stratum": "entertainment_movies|gt50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 69,
+   "src_words_long": 144,
+   "weight": 4.391667
+  },
+  {
+   "article_id": "40fc6159-f029-4e47-bcd0-c56a4e9f6ead",
+   "stratum": "sports|gt50",
+   "domain": "sports",
+   "split": "dev",
+   "pilot": false,
+   "src_words_short": 83,
+   "src_words_long": 83,
+   "weight": 2.9
+  },
+  {
+   "article_id": "410072bd-84ae-4339-af28-0d0e4300af75",
+   "stratum": "entertainment_movies|gt50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 56,
+   "src_words_long": 56,
+   "weight": 4.391667
+  },
+  {
+   "article_id": "413cdb95-3462-430c-9ec4-464ae9b03a99",
+   "stratum": "sports|gt50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 62,
+   "src_words_long": 64,
+   "weight": 2.9
+  },
+  {
+   "article_id": "41e210a6-4025-429f-98be-af03989b853d",
+   "stratum": "entertainment_movies|le50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 45,
+   "src_words_long": 56,
+   "weight": 1.858333
+  },
+  {
+   "article_id": "42147b90-b01d-4f83-ba99-2b4ad70ee741",
+   "stratum": "entertainment_movies|le50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 19,
+   "src_words_long": 19,
+   "weight": 1.858333
+  },
+  {
+   "article_id": "426ac195-37a7-4b16-a91f-f121dd2df539",
+   "stratum": "sports|gt50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 64,
+   "src_words_long": 69,
+   "weight": 2.9
+  },
+  {
+   "article_id": "43e2d839-da0d-4110-9294-444875dab0f0",
+   "stratum": "entertainment_movies|le50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 17,
+   "src_words_long": 17,
+   "weight": 1.858333
+  },
+  {
+   "article_id": "4446b238-5414-4ca3-b4a5-a1e278504219",
+   "stratum": "sports|le50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 23,
+   "src_words_long": 23,
+   "weight": 6.208333
+  },
+  {
+   "article_id": "444ea92b-c965-49e9-8f85-ded117833991",
+   "stratum": "sports|gt50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 118,
+   "src_words_long": 120,
+   "weight": 2.9
+  },
+  {
+   "article_id": "44748a6a-6d37-449d-a070-3f7fd9d939b5",
+   "stratum": "entertainment_movies|le50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 39,
+   "src_words_long": 39,
+   "weight": 1.858333
+  },
+  {
+   "article_id": "44b6e65a-0eec-49eb-9761-8a8768a7fc8d",
+   "stratum": "entertainment_movies|le50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 23,
+   "src_words_long": 23,
+   "weight": 1.858333
+  },
+  {
+   "article_id": "4544829a-699a-43fd-a026-ce980ff91ccc",
+   "stratum": "sports|le50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 44,
+   "src_words_long": 44,
+   "weight": 6.208333
+  },
+  {
+   "article_id": "45567e81-2635-44e8-9b32-fc4c995fd7b0",
+   "stratum": "sports|le50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 32,
+   "src_words_long": 32,
+   "weight": 6.208333
+  },
+  {
+   "article_id": "46e7f1ea-1d77-44d4-97bb-386ff6786133",
+   "stratum": "sports|gt50",
+   "domain": "sports",
+   "split": "dev",
+   "pilot": false,
+   "src_words_short": 90,
+   "src_words_long": 110,
+   "weight": 2.9
+  },
+  {
+   "article_id": "472e72ed-8153-4ef1-b90e-ad6fd33b096b",
+   "stratum": "entertainment_movies|le50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 21,
+   "src_words_long": 21,
+   "weight": 1.858333
+  },
+  {
+   "article_id": "47453d6a-82c6-4695-94b9-16d54307efb0",
+   "stratum": "sports|le50",
+   "domain": "sports",
+   "split": "dev",
+   "pilot": true,
+   "src_words_short": 18,
+   "src_words_long": 18,
+   "weight": 6.208333
+  },
+  {
+   "article_id": "48019530-40c7-4981-9540-9d7f2cedd662",
+   "stratum": "sports|le50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 27,
+   "src_words_long": 27,
+   "weight": 6.208333
+  },
+  {
+   "article_id": "48094e86-4659-445d-88bd-d676bd603645",
+   "stratum": "entertainment_movies|le50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 44,
+   "src_words_long": 56,
+   "weight": 1.858333
+  },
+  {
+   "article_id": "491581fa-5fb7-4f07-be2f-2c054a0e90ab",
+   "stratum": "entertainment_movies|le50",
+   "domain": "entertainment_movies",
+   "split": "dev",
+   "pilot": false,
+   "src_words_short": 40,
+   "src_words_long": 57,
+   "weight": 1.858333
+  },
+  {
+   "article_id": "496f47b0-bbde-4a50-92a4-f4a96ea4ebee",
+   "stratum": "entertainment_movies|gt50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 60,
+   "src_words_long": 60,
+   "weight": 4.391667
+  },
+  {
+   "article_id": "49b6da93-bcae-40a0-a734-f0bca92bb86f",
+   "stratum": "entertainment_movies|gt50",
+   "domain": "entertainment_movies",
+   "split": "dev",
+   "pilot": true,
+   "src_words_short": 119,
+   "src_words_long": 284,
+   "weight": 4.391667
+  },
+  {
+   "article_id": "4a3ee076-c6d7-457f-853c-7f2c640df30c",
+   "stratum": "entertainment_movies|gt50",
+   "domain": "entertainment_movies",
+   "split": "dev",
+   "pilot": false,
+   "src_words_short": 57,
+   "src_words_long": 128,
+   "weight": 4.391667
+  },
+  {
+   "article_id": "4a474538-7fa4-43cb-b1bd-07bcdfc81615",
+   "stratum": "entertainment_movies|le50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 25,
+   "src_words_long": 25,
+   "weight": 1.858333
+  },
+  {
+   "article_id": "4b060c83-03f2-4498-97a1-e55034caf69d",
+   "stratum": "entertainment_movies|le50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 29,
+   "src_words_long": 29,
+   "weight": 1.858333
+  },
+  {
+   "article_id": "4b07615f-1582-4f51-a717-aa03ffa1627f",
+   "stratum": "entertainment_movies|gt50",
+   "domain": "entertainment_movies",
+   "split": "dev",
+   "pilot": true,
+   "src_words_short": 113,
+   "src_words_long": 221,
+   "weight": 4.391667
+  },
+  {
+   "article_id": "4b2a677e-789b-43a6-b3b4-0ca4a1a0e16c",
+   "stratum": "sports|le50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 29,
+   "src_words_long": 29,
+   "weight": 6.208333
+  },
+  {
+   "article_id": "4b941a54-2fdd-46f8-b3e6-04220c6b1b78",
+   "stratum": "entertainment_movies|gt50",
+   "domain": "entertainment_movies",
+   "split": "dev",
+   "pilot": false,
+   "src_words_short": 63,
+   "src_words_long": 153,
+   "weight": 4.391667
+  },
+  {
+   "article_id": "4ca9da7e-39af-4395-8a96-8d48543a8376",
+   "stratum": "sports|le50",
+   "domain": "sports",
+   "split": "dev",
+   "pilot": false,
+   "src_words_short": 22,
+   "src_words_long": 22,
+   "weight": 6.208333
+  },
+  {
+   "article_id": "4caa5958-1f50-409e-a3f0-e7f20b822d92",
+   "stratum": "sports|le50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 22,
+   "src_words_long": 22,
+   "weight": 6.208333
+  },
+  {
+   "article_id": "4e8864b8-4c98-4787-833c-d7ff2e8dc7d6",
+   "stratum": "sports|gt50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 190,
+   "src_words_long": 221,
+   "weight": 2.9
+  },
+  {
+   "article_id": "4f4529aa-f256-4763-8851-500a3a5432a8",
+   "stratum": "entertainment_movies|le50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 19,
+   "src_words_long": 19,
+   "weight": 1.858333
+  },
+  {
+   "article_id": "4fd0e056-fb91-445d-880f-19f80dc13a43",
+   "stratum": "sports|gt50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 85,
+   "src_words_long": 148,
+   "weight": 2.9
+  },
+  {
+   "article_id": "5095f852-3144-4934-b1ae-7435bbfc952f",
+   "stratum": "entertainment_movies|le50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 16,
+   "src_words_long": 16,
+   "weight": 1.858333
+  },
+  {
+   "article_id": "511832e8-6ae8-4ffb-b8c7-755ecc30fb7f",
+   "stratum": "entertainment_movies|gt50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 52,
+   "src_words_long": 145,
+   "weight": 4.391667
+  },
+  {
+   "article_id": "513d1240-222b-4fcd-95f7-01b8e8025bda",
+   "stratum": "sports|le50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 20,
+   "src_words_long": 20,
+   "weight": 6.208333
+  },
+  {
+   "article_id": "52f07478-c486-4bbe-abde-41ddc5dd2e7c",
+   "stratum": "sports|le50",
+   "domain": "sports",
+   "split": "dev",
+   "pilot": false,
+   "src_words_short": 18,
+   "src_words_long": 18,
+   "weight": 6.208333
+  },
+  {
+   "article_id": "54c73e77-4d31-4454-a2a8-d6fb60f1c298",
+   "stratum": "entertainment_movies|gt50",
+   "domain": "entertainment_movies",
+   "split": "dev",
+   "pilot": true,
+   "src_words_short": 111,
+   "src_words_long": 181,
+   "weight": 4.391667
+  },
+  {
+   "article_id": "552ad17f-e35d-4f77-853a-d25703c5fc6f",
+   "stratum": "entertainment_movies|le50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 19,
+   "src_words_long": 19,
+   "weight": 1.858333
+  },
+  {
+   "article_id": "55f43604-cdba-4101-b014-85dfc7414b7f",
+   "stratum": "sports|le50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 43,
+   "src_words_long": 43,
+   "weight": 6.208333
+  },
+  {
+   "article_id": "571945b8-2b70-43d6-924b-abcc3c57eb1c",
+   "stratum": "sports|gt50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 68,
+   "src_words_long": 70,
+   "weight": 2.9
+  },
+  {
+   "article_id": "58c1f3e5-b8f3-41c5-af0d-e4491042a035",
+   "stratum": "sports|le50",
+   "domain": "sports",
+   "split": "dev",
+   "pilot": false,
+   "src_words_short": 9,
+   "src_words_long": 130,
+   "weight": 6.208333
+  },
+  {
+   "article_id": "58e6d572-550d-4bff-b222-77ab66f4456b",
+   "stratum": "entertainment_movies|le50",
+   "domain": "entertainment_movies",
+   "split": "dev",
+   "pilot": false,
+   "src_words_short": 24,
+   "src_words_long": 24,
+   "weight": 1.858333
+  },
+  {
+   "article_id": "5af55ef5-fa04-40b2-a957-cbdb55401ab3",
+   "stratum": "entertainment_movies|gt50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 68,
+   "src_words_long": 128,
+   "weight": 4.391667
+  },
+  {
+   "article_id": "5b10bcc9-cb43-48d7-80f5-85108ad909c9",
+   "stratum": "sports|gt50",
+   "domain": "sports",
+   "split": "dev",
+   "pilot": false,
+   "src_words_short": 57,
+   "src_words_long": 59,
+   "weight": 2.9
+  },
+  {
+   "article_id": "5bcff8e0-23b0-424e-b272-c7314809315d",
+   "stratum": "entertainment_movies|le50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 27,
+   "src_words_long": 27,
+   "weight": 1.858333
+  },
+  {
+   "article_id": "5c43c62d-b31a-41ec-8a16-b463cfc3b8b5",
+   "stratum": "entertainment_movies|le50",
+   "domain": "entertainment_movies",
+   "split": "dev",
+   "pilot": true,
+   "src_words_short": 29,
+   "src_words_long": 29,
+   "weight": 1.858333
+  },
+  {
+   "article_id": "5df7e4d6-7283-4628-883d-21aaef2c30cc",
+   "stratum": "entertainment_movies|le50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 30,
+   "src_words_long": 30,
+   "weight": 1.858333
+  },
+  {
+   "article_id": "5ef484b9-25b7-4b92-94f3-cb77efef0c73",
+   "stratum": "entertainment_movies|le50",
+   "domain": "entertainment_movies",
+   "split": "dev",
+   "pilot": true,
+   "src_words_short": 45,
+   "src_words_long": 45,
+   "weight": 1.858333
+  },
+  {
+   "article_id": "5fecf21f-5de6-4d1b-9cba-ce13aab21310",
+   "stratum": "entertainment_movies|le50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 18,
+   "src_words_long": 18,
+   "weight": 1.858333
+  },
+  {
+   "article_id": "611298b9-073a-496d-926b-2ef338626dc0",
+   "stratum": "sports|gt50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 135,
+   "src_words_long": 170,
+   "weight": 2.9
+  },
+  {
+   "article_id": "61a3bdd3-3542-42b9-a1ac-7d9e1757df16",
+   "stratum": "entertainment_movies|gt50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 68,
+   "src_words_long": 174,
+   "weight": 4.391667
+  },
+  {
+   "article_id": "624efcac-7a34-4c89-a1cf-f6a023aec4ca",
+   "stratum": "entertainment_movies|le50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 45,
+   "src_words_long": 68,
+   "weight": 1.858333
+  },
+  {
+   "article_id": "62eead75-2ab4-41dc-8bc0-6167732686d1",
+   "stratum": "sports|le50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 25,
+   "src_words_long": 25,
+   "weight": 6.208333
+  },
+  {
+   "article_id": "62f4d15a-3e12-435c-9072-765b2a22ea9f",
+   "stratum": "entertainment_movies|gt50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 55,
+   "src_words_long": 129,
+   "weight": 4.391667
+  },
+  {
+   "article_id": "636012d6-2326-4546-9fef-dfd764554f16",
+   "stratum": "sports|le50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 22,
+   "src_words_long": 22,
+   "weight": 6.208333
+  },
+  {
+   "article_id": "642d4e28-7ba4-4cb5-af4c-3fb5c337fe33",
+   "stratum": "entertainment_movies|le50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 27,
+   "src_words_long": 27,
+   "weight": 1.858333
+  },
+  {
+   "article_id": "6455929c-5422-4e77-8138-d052b8cd5715",
+   "stratum": "sports|gt50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 69,
+   "src_words_long": 69,
+   "weight": 2.9
+  },
+  {
+   "article_id": "64e9d787-e25d-4a68-ba6a-f5dbdce61b0f",
+   "stratum": "entertainment_movies|gt50",
+   "domain": "entertainment_movies",
+   "split": "dev",
+   "pilot": false,
+   "src_words_short": 52,
+   "src_words_long": 149,
+   "weight": 4.391667
+  },
+  {
+   "article_id": "651f0ff8-4738-422d-baa1-9c0115826bfd",
+   "stratum": "entertainment_movies|gt50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 90,
+   "src_words_long": 153,
+   "weight": 4.391667
+  },
+  {
+   "article_id": "6539363c-8384-41dd-81b2-8e00924fd795",
+   "stratum": "entertainment_movies|gt50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 83,
+   "src_words_long": 174,
+   "weight": 4.391667
+  },
+  {
+   "article_id": "6573aef0-29f9-4516-8884-04b6a0609712",
+   "stratum": "sports|gt50",
+   "domain": "sports",
+   "split": "dev",
+   "pilot": false,
+   "src_words_short": 63,
+   "src_words_long": 65,
+   "weight": 2.9
+  },
+  {
+   "article_id": "660fc8e7-132b-4629-b805-548cc119c749",
+   "stratum": "sports|gt50",
+   "domain": "sports",
+   "split": "dev",
+   "pilot": false,
+   "src_words_short": 145,
+   "src_words_long": 185,
+   "weight": 2.9
+  },
+  {
+   "article_id": "660ff600-cb39-486a-a7c0-e186091b069a",
+   "stratum": "sports|le50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 33,
+   "src_words_long": 33,
+   "weight": 6.208333
+  },
+  {
+   "article_id": "66a8243b-061c-46ea-9ddf-047031e04b53",
+   "stratum": "sports|gt50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 57,
+   "src_words_long": 57,
+   "weight": 2.9
+  },
+  {
+   "article_id": "66dcda4b-a3e2-4ed7-b9d2-66787f3a16c8",
+   "stratum": "sports|le50",
+   "domain": "sports",
+   "split": "dev",
+   "pilot": true,
+   "src_words_short": 26,
+   "src_words_long": 26,
+   "weight": 6.208333
+  },
+  {
+   "article_id": "6730ac1b-81ee-45bd-a072-e21d8022df0e",
+   "stratum": "sports|le50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 18,
+   "src_words_long": 18,
+   "weight": 6.208333
+  },
+  {
+   "article_id": "6791d8b1-1045-4950-a137-a69aa43d773e",
+   "stratum": "entertainment_movies|gt50",
+   "domain": "entertainment_movies",
+   "split": "dev",
+   "pilot": true,
+   "src_words_short": 99,
+   "src_words_long": 284,
+   "weight": 4.391667
+  },
+  {
+   "article_id": "685e8b58-d57a-42b9-ab61-60bd226a56e8",
+   "stratum": "sports|gt50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 70,
+   "src_words_long": 72,
+   "weight": 2.9
+  },
+  {
+   "article_id": "68d25d4f-f7d7-4ffb-8884-9d9f893a85e9",
+   "stratum": "sports|gt50",
+   "domain": "sports",
+   "split": "dev",
+   "pilot": false,
+   "src_words_short": 77,
+   "src_words_long": 182,
+   "weight": 2.9
+  },
+  {
+   "article_id": "68dd0574-7ffc-4771-90a8-9d2363ca3cf7",
+   "stratum": "entertainment_movies|gt50",
+   "domain": "entertainment_movies",
+   "split": "dev",
+   "pilot": true,
+   "src_words_short": 60,
+   "src_words_long": 131,
+   "weight": 4.391667
+  },
+  {
+   "article_id": "698f0cd3-bc46-46a3-b746-aa59039be17e",
+   "stratum": "sports|gt50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 67,
+   "src_words_long": 67,
+   "weight": 2.9
+  },
+  {
+   "article_id": "6a0cac21-e4e5-4999-a849-e3973c744f25",
+   "stratum": "entertainment_movies|le50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 49,
+   "src_words_long": 56,
+   "weight": 1.858333
+  },
+  {
+   "article_id": "6a1224b2-045c-4ba7-875f-d805dfd66587",
+   "stratum": "sports|le50",
+   "domain": "sports",
+   "split": "dev",
+   "pilot": true,
+   "src_words_short": 17,
+   "src_words_long": 17,
+   "weight": 6.208333
+  },
+  {
+   "article_id": "6d2c796e-e540-4b98-9042-2a89055d59f9",
+   "stratum": "entertainment_movies|le50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 17,
+   "src_words_long": 17,
+   "weight": 1.858333
+  },
+  {
+   "article_id": "6d3b1ce7-6a84-45da-8527-3d4086e655e7",
+   "stratum": "sports|le50",
+   "domain": "sports",
+   "split": "dev",
+   "pilot": false,
+   "src_words_short": 41,
+   "src_words_long": 41,
+   "weight": 6.208333
+  },
+  {
+   "article_id": "6ec0b6fb-88e4-41ac-9375-9f40b957bb0d",
+   "stratum": "entertainment_movies|gt50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 65,
+   "src_words_long": 136,
+   "weight": 4.391667
+  },
+  {
+   "article_id": "6ed99a5f-1ce3-47fc-a9a2-3d373b199201",
+   "stratum": "sports|gt50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 105,
+   "src_words_long": 125,
+   "weight": 2.9
+  },
+  {
+   "article_id": "6ee40791-a228-44c6-b757-ee05e9a78a94",
+   "stratum": "sports|gt50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 98,
+   "src_words_long": 127,
+   "weight": 2.9
+  },
+  {
+   "article_id": "6f320adb-5120-4c23-bb5b-568db06d2f45",
+   "stratum": "entertainment_movies|gt50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 218,
+   "src_words_long": 230,
+   "weight": 4.391667
+  },
+  {
+   "article_id": "7068924f-b6c0-4784-b383-ccc45ef89105",
+   "stratum": "entertainment_movies|le50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 42,
+   "src_words_long": 69,
+   "weight": 1.858333
+  },
+  {
+   "article_id": "716f61ae-1bf3-4f06-97ff-b822a3de1f2e",
+   "stratum": "entertainment_movies|le50",
+   "domain": "entertainment_movies",
+   "split": "dev",
+   "pilot": false,
+   "src_words_short": 49,
+   "src_words_long": 67,
+   "weight": 1.858333
+  },
+  {
+   "article_id": "71da44e1-a8fe-4a14-9e60-037cffea662b",
+   "stratum": "entertainment_movies|le50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 28,
+   "src_words_long": 28,
+   "weight": 1.858333
+  },
+  {
+   "article_id": "72596ec9-ca68-4b91-9b4e-06bdf6f3e260",
+   "stratum": "entertainment_movies|gt50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 147,
+   "src_words_long": 256,
+   "weight": 4.391667
+  },
+  {
+   "article_id": "72c57216-f1a0-4ac1-ab36-edcc16573703",
+   "stratum": "sports|le50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 25,
+   "src_words_long": 25,
+   "weight": 6.208333
+  },
+  {
+   "article_id": "72d1769e-e421-4bad-b5c5-728dd2d1acbd",
+   "stratum": "sports|gt50",
+   "domain": "sports",
+   "split": "dev",
+   "pilot": false,
+   "src_words_short": 73,
+   "src_words_long": 75,
+   "weight": 2.9
+  },
+  {
+   "article_id": "7342b2ef-ddce-4ee1-bf59-860f24afa69d",
+   "stratum": "sports|gt50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 54,
+   "src_words_long": 66,
+   "weight": 2.9
+  },
+  {
+   "article_id": "73439a88-0369-43bc-a70e-bf5b767221bb",
+   "stratum": "entertainment_movies|le50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 20,
+   "src_words_long": 20,
+   "weight": 1.858333
+  },
+  {
+   "article_id": "736a505c-9377-4780-a22b-c3c48bb66319",
+   "stratum": "sports|le50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 22,
+   "src_words_long": 22,
+   "weight": 6.208333
+  },
+  {
+   "article_id": "740840fc-5787-4ec3-9907-ffbf10c365a0",
+   "stratum": "sports|gt50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 87,
+   "src_words_long": 161,
+   "weight": 2.9
+  },
+  {
+   "article_id": "7454f086-786d-4d6f-9d85-afa7c92076cc",
+   "stratum": "entertainment_movies|gt50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 156,
+   "src_words_long": 255,
+   "weight": 4.391667
+  },
+  {
+   "article_id": "74f4be3b-546d-47fd-b3c5-a769719997f2",
+   "stratum": "sports|gt50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 62,
+   "src_words_long": 64,
+   "weight": 2.9
+  },
+  {
+   "article_id": "752309fe-0ae6-48b5-b838-949270669011",
+   "stratum": "entertainment_movies|gt50",
+   "domain": "entertainment_movies",
+   "split": "dev",
+   "pilot": true,
+   "src_words_short": 76,
+   "src_words_long": 179,
+   "weight": 4.391667
+  },
+  {
+   "article_id": "7590d861-e379-4d97-8f66-68062aee98e1",
+   "stratum": "entertainment_movies|gt50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 80,
+   "src_words_long": 168,
+   "weight": 4.391667
+  },
+  {
+   "article_id": "75dd9588-0b04-49bc-8a6f-e689d82c8f75",
+   "stratum": "sports|gt50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 67,
+   "src_words_long": 67,
+   "weight": 2.9
+  },
+  {
+   "article_id": "75ffe01f-34a9-419c-a892-8c26861c6567",
+   "stratum": "entertainment_movies|gt50",
+   "domain": "entertainment_movies",
+   "split": "dev",
+   "pilot": false,
+   "src_words_short": 119,
+   "src_words_long": 152,
+   "weight": 4.391667
+  },
+  {
+   "article_id": "7663ca1b-2cf8-4540-a48e-91db70c298e4",
+   "stratum": "entertainment_movies|gt50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 74,
+   "src_words_long": 163,
+   "weight": 4.391667
+  },
+  {
+   "article_id": "76bbcf7a-aa00-4d0e-85f5-a2ec7acaf891",
+   "stratum": "sports|le50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 14,
+   "src_words_long": 14,
+   "weight": 6.208333
+  },
+  {
+   "article_id": "76f867be-267a-4923-a1a1-7729c8ba321c",
+   "stratum": "entertainment_movies|gt50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 66,
+   "src_words_long": 108,
+   "weight": 4.391667
+  },
+  {
+   "article_id": "778344b5-7564-4c2c-9de7-1690984476d7",
+   "stratum": "sports|gt50",
+   "domain": "sports",
+   "split": "dev",
+   "pilot": true,
+   "src_words_short": 68,
+   "src_words_long": 70,
+   "weight": 2.9
+  },
+  {
+   "article_id": "77b7d178-93d9-4f78-b4b0-9b475b93aabb",
+   "stratum": "sports|le50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 20,
+   "src_words_long": 20,
+   "weight": 6.208333
+  },
+  {
+   "article_id": "7856cd28-84f9-42db-abff-7fd326b7afe4",
+   "stratum": "entertainment_movies|gt50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 61,
+   "src_words_long": 120,
+   "weight": 4.391667
+  },
+  {
+   "article_id": "78d719d6-d811-438c-add5-4c11ae6e0086",
+   "stratum": "entertainment_movies|gt50",
+   "domain": "entertainment_movies",
+   "split": "dev",
+   "pilot": true,
+   "src_words_short": 56,
+   "src_words_long": 56,
+   "weight": 4.391667
+  },
+  {
+   "article_id": "79b0e462-7d69-4197-8948-4c1d6005f95d",
+   "stratum": "sports|le50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 32,
+   "src_words_long": 32,
+   "weight": 6.208333
+  },
+  {
+   "article_id": "7a63cf26-c5b5-4963-932b-26bd690dbcd2",
+   "stratum": "sports|gt50",
+   "domain": "sports",
+   "split": "dev",
+   "pilot": true,
+   "src_words_short": 71,
+   "src_words_long": 71,
+   "weight": 2.9
+  },
+  {
+   "article_id": "7aa795e0-af75-47cb-9711-cbe7ab7349dc",
+   "stratum": "entertainment_movies|gt50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 84,
+   "src_words_long": 131,
+   "weight": 4.391667
+  },
+  {
+   "article_id": "7abb0f7e-9e57-4e28-bc9a-009a62742389",
+   "stratum": "sports|gt50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 102,
+   "src_words_long": 145,
+   "weight": 2.9
+  },
+  {
+   "article_id": "7b180de9-4563-4d4b-969a-998ae013672d",
+   "stratum": "sports|gt50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 71,
+   "src_words_long": 73,
+   "weight": 2.9
+  },
+  {
+   "article_id": "7b7a0e2c-9994-482f-b770-169cfae45f3c",
+   "stratum": "entertainment_movies|gt50",
+   "domain": "entertainment_movies",
+   "split": "dev",
+   "pilot": true,
+   "src_words_short": 59,
+   "src_words_long": 135,
+   "weight": 4.391667
+  },
+  {
+   "article_id": "7b912b70-fdd2-451d-b9a7-8c8833626d66",
+   "stratum": "entertainment_movies|gt50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 79,
+   "src_words_long": 160,
+   "weight": 4.391667
+  },
+  {
+   "article_id": "7bd5ccec-e9b4-4768-9b5f-f2a1973b8dfc",
+   "stratum": "sports|gt50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 99,
+   "src_words_long": 101,
+   "weight": 2.9
+  },
+  {
+   "article_id": "7cd6b17c-96b8-4ecc-8f89-42cbfec8f078",
+   "stratum": "sports|le50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 34,
+   "src_words_long": 34,
+   "weight": 6.208333
+  },
+  {
+   "article_id": "7d47d672-6560-4a04-ba34-02760011345f",
+   "stratum": "sports|gt50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 60,
+   "src_words_long": 138,
+   "weight": 2.9
+  },
+  {
+   "article_id": "7db02caf-f3c5-499d-a3fe-41f8e0bba7f9",
+   "stratum": "sports|le50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 35,
+   "src_words_long": 35,
+   "weight": 6.208333
+  },
+  {
+   "article_id": "7feaabbc-0a3a-4c46-8db9-2a9c5b377698",
+   "stratum": "sports|gt50",
+   "domain": "sports",
+   "split": "dev",
+   "pilot": true,
+   "src_words_short": 107,
+   "src_words_long": 131,
+   "weight": 2.9
+  },
+  {
+   "article_id": "808957d2-5fd3-47c4-adaa-bdf624a672fc",
+   "stratum": "entertainment_movies|gt50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 56,
+   "src_words_long": 56,
+   "weight": 4.391667
+  },
+  {
+   "article_id": "80f9add6-bfba-4609-91a5-e8075fcba5bb",
+   "stratum": "entertainment_movies|le50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 17,
+   "src_words_long": 17,
+   "weight": 1.858333
+  },
+  {
+   "article_id": "81967060-d6c1-4e7c-9ad2-7dc532635cab",
+   "stratum": "entertainment_movies|gt50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 175,
+   "src_words_long": 253,
+   "weight": 4.391667
+  },
+  {
+   "article_id": "82150dfc-22fe-4bd9-a0fa-0f3b614b23a0",
+   "stratum": "entertainment_movies|gt50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 145,
+   "src_words_long": 222,
+   "weight": 4.391667
+  },
+  {
+   "article_id": "834095ab-d170-4083-81bb-2f50e78af272",
+   "stratum": "sports|gt50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 123,
+   "src_words_long": 190,
+   "weight": 2.9
+  },
+  {
+   "article_id": "83677f49-92ea-4fae-8284-8dad98d64082",
+   "stratum": "sports|gt50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 68,
+   "src_words_long": 70,
+   "weight": 2.9
+  },
+  {
+   "article_id": "83dc7389-26d0-4f1e-a2ef-754abf830d82",
+   "stratum": "entertainment_movies|le50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 23,
+   "src_words_long": 23,
+   "weight": 1.858333
+  },
+  {
+   "article_id": "842154b7-267c-4f0c-b415-6dd58a1b355d",
+   "stratum": "sports|le50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 24,
+   "src_words_long": 24,
+   "weight": 6.208333
+  },
+  {
+   "article_id": "85553123-d3a5-4e8c-8aca-23b913ed6672",
+   "stratum": "entertainment_movies|le50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 45,
+   "src_words_long": 121,
+   "weight": 1.858333
+  },
+  {
+   "article_id": "8713d49e-5697-43cf-8970-07da906af34f",
+   "stratum": "sports|le50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 27,
+   "src_words_long": 27,
+   "weight": 6.208333
+  },
+  {
+   "article_id": "877c9757-5eca-4231-93ec-889be584d72a",
+   "stratum": "sports|gt50",
+   "domain": "sports",
+   "split": "dev",
+   "pilot": false,
+   "src_words_short": 105,
+   "src_words_long": 105,
+   "weight": 2.9
+  },
+  {
+   "article_id": "87e785cd-01a4-45e8-b664-5e35c7ce92e4",
+   "stratum": "sports|gt50",
+   "domain": "sports",
+   "split": "dev",
+   "pilot": true,
+   "src_words_short": 81,
+   "src_words_long": 110,
+   "weight": 2.9
+  },
+  {
+   "article_id": "885aa886-e668-4f24-8000-865f1820a65d",
+   "stratum": "entertainment_movies|gt50",
+   "domain": "entertainment_movies",
+   "split": "dev",
+   "pilot": true,
+   "src_words_short": 52,
+   "src_words_long": 65,
+   "weight": 4.391667
+  },
+  {
+   "article_id": "88cbf189-96a5-44af-99e3-e00cd3687647",
+   "stratum": "sports|le50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 22,
+   "src_words_long": 22,
+   "weight": 6.208333
+  },
+  {
+   "article_id": "8937d7c6-bb63-4b9d-b029-26e3ff48301f",
+   "stratum": "entertainment_movies|gt50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 78,
+   "src_words_long": 78,
+   "weight": 4.391667
+  },
+  {
+   "article_id": "894f2a4f-3852-48db-82e9-8a2354cb7a66",
+   "stratum": "sports|le50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 19,
+   "src_words_long": 19,
+   "weight": 6.208333
+  },
+  {
+   "article_id": "8963117d-0252-41d7-bf87-ff9fa7437c64",
+   "stratum": "entertainment_movies|le50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 50,
+   "src_words_long": 65,
+   "weight": 1.858333
+  },
+  {
+   "article_id": "89f9cb0e-3042-4e1e-985b-6ba0c66255bf",
+   "stratum": "sports|gt50",
+   "domain": "sports",
+   "split": "dev",
+   "pilot": true,
+   "src_words_short": 66,
+   "src_words_long": 68,
+   "weight": 2.9
+  },
+  {
+   "article_id": "8b808b7a-5518-4706-a205-26e13f3611dd",
+   "stratum": "sports|gt50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 90,
+   "src_words_long": 98,
+   "weight": 2.9
+  },
+  {
+   "article_id": "8bc98cf1-12af-46af-90ff-c438d3701df6",
+   "stratum": "sports|le50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 41,
+   "src_words_long": 41,
+   "weight": 6.208333
+  },
+  {
+   "article_id": "8e3fdec6-4c8f-40c5-b9ff-5ff67cc618b0",
+   "stratum": "entertainment_movies|le50",
+   "domain": "entertainment_movies",
+   "split": "dev",
+   "pilot": true,
+   "src_words_short": 39,
+   "src_words_long": 79,
+   "weight": 1.858333
+  },
+  {
+   "article_id": "8e70cb0f-5526-446d-8e72-5a84190d8d6e",
+   "stratum": "entertainment_movies|gt50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 69,
+   "src_words_long": 140,
+   "weight": 4.391667
+  },
+  {
+   "article_id": "8ecaa2ad-4202-47f4-98b9-0f05f2c8fccd",
+   "stratum": "sports|gt50",
+   "domain": "sports",
+   "split": "dev",
+   "pilot": true,
+   "src_words_short": 86,
+   "src_words_long": 118,
+   "weight": 2.9
+  },
+  {
+   "article_id": "8fb5b6c8-84eb-4c24-9537-17b0535cd9c3",
+   "stratum": "entertainment_movies|le50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 44,
+   "src_words_long": 59,
+   "weight": 1.858333
+  },
+  {
+   "article_id": "90b30362-df16-4813-803b-74b22e777fa1",
+   "stratum": "entertainment_movies|le50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 32,
+   "src_words_long": 32,
+   "weight": 1.858333
+  },
+  {
+   "article_id": "90f1db8a-3846-4784-8cd0-d1240885fecd",
+   "stratum": "entertainment_movies|gt50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 104,
+   "src_words_long": 178,
+   "weight": 4.391667
+  },
+  {
+   "article_id": "91670a2f-5ad4-4046-ab9b-f41c53498bc5",
+   "stratum": "entertainment_movies|gt50",
+   "domain": "entertainment_movies",
+   "split": "dev",
+   "pilot": true,
+   "src_words_short": 115,
+   "src_words_long": 226,
+   "weight": 4.391667
+  },
+  {
+   "article_id": "91c323fe-8550-41ca-b300-fe792c71d171",
+   "stratum": "entertainment_movies|gt50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 66,
+   "src_words_long": 90,
+   "weight": 4.391667
+  },
+  {
+   "article_id": "91f02da5-e15c-478a-8b20-d7085cfbe5b2",
+   "stratum": "sports|le50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 34,
+   "src_words_long": 34,
+   "weight": 6.208333
+  },
+  {
+   "article_id": "92e07d24-3e27-4820-80eb-e2c41dc9b5f6",
+   "stratum": "sports|gt50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 93,
+   "src_words_long": 142,
+   "weight": 2.9
+  },
+  {
+   "article_id": "92fde0ca-ac43-45c6-97be-342f2492a02d",
+   "stratum": "sports|le50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 21,
+   "src_words_long": 21,
+   "weight": 6.208333
+  },
+  {
+   "article_id": "93261716-d6db-4b8f-b015-c0aa5a01ef49",
+   "stratum": "entertainment_movies|gt50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 84,
+   "src_words_long": 84,
+   "weight": 4.391667
+  },
+  {
+   "article_id": "93539e1d-76b3-46f5-ad58-93d0e7fc4809",
+   "stratum": "entertainment_movies|gt50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 87,
+   "src_words_long": 176,
+   "weight": 4.391667
+  },
+  {
+   "article_id": "935b88aa-43a5-4829-9453-2179a772afb2",
+   "stratum": "sports|le50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 26,
+   "src_words_long": 26,
+   "weight": 6.208333
+  },
+  {
+   "article_id": "9426c06d-5277-45d1-95e3-ce5e887418d9",
+   "stratum": "entertainment_movies|le50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 49,
+   "src_words_long": 49,
+   "weight": 1.858333
+  },
+  {
+   "article_id": "943b02b4-c4ea-46c7-93ee-e19eaec645b6",
+   "stratum": "entertainment_movies|le50",
+   "domain": "entertainment_movies",
+   "split": "dev",
+   "pilot": true,
+   "src_words_short": 33,
+   "src_words_long": 33,
+   "weight": 1.858333
+  },
+  {
+   "article_id": "94b386c7-8e9b-4f64-91f4-942cd128caf4",
+   "stratum": "sports|gt50",
+   "domain": "sports",
+   "split": "dev",
+   "pilot": false,
+   "src_words_short": 68,
+   "src_words_long": 70,
+   "weight": 2.9
+  },
+  {
+   "article_id": "95123803-41b4-4c43-8916-d19f0d888fac",
+   "stratum": "entertainment_movies|le50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 29,
+   "src_words_long": 29,
+   "weight": 1.858333
+  },
+  {
+   "article_id": "952511fb-bc48-4e50-a552-72eae6e59f1d",
+   "stratum": "sports|gt50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 65,
+   "src_words_long": 67,
+   "weight": 2.9
+  },
+  {
+   "article_id": "9563bf9f-bc29-4559-9760-d0b42087d148",
+   "stratum": "entertainment_movies|gt50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 59,
+   "src_words_long": 145,
+   "weight": 4.391667
+  },
+  {
+   "article_id": "96021e77-150c-4ab5-b5b7-b5172fba6fbc",
+   "stratum": "entertainment_movies|gt50",
+   "domain": "entertainment_movies",
+   "split": "dev",
+   "pilot": true,
+   "src_words_short": 56,
+   "src_words_long": 56,
+   "weight": 4.391667
+  },
+  {
+   "article_id": "96b0ce6c-0633-4d03-818c-c73681bf2129",
+   "stratum": "entertainment_movies|gt50",
+   "domain": "entertainment_movies",
+   "split": "dev",
+   "pilot": true,
+   "src_words_short": 64,
+   "src_words_long": 172,
+   "weight": 4.391667
+  },
+  {
+   "article_id": "970dcb65-be4f-4627-8920-0be7a42fb8c4",
+   "stratum": "sports|le50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 25,
+   "src_words_long": 25,
+   "weight": 6.208333
+  },
+  {
+   "article_id": "970f3e1d-5c7c-4218-8b83-312189bea4cd",
+   "stratum": "sports|le50",
+   "domain": "sports",
+   "split": "dev",
+   "pilot": true,
+   "src_words_short": 23,
+   "src_words_long": 23,
+   "weight": 6.208333
+  },
+  {
+   "article_id": "97aa7d69-ef3a-4c98-a367-a51dcad2dc6a",
+   "stratum": "entertainment_movies|gt50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 76,
+   "src_words_long": 107,
+   "weight": 4.391667
+  },
+  {
+   "article_id": "982ddb30-45ab-4b11-a626-037df306f7ac",
+   "stratum": "sports|le50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 31,
+   "src_words_long": 31,
+   "weight": 6.208333
+  },
+  {
+   "article_id": "99641a7e-ad2c-4690-aaec-0d7c53d922c8",
+   "stratum": "entertainment_movies|le50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 22,
+   "src_words_long": 22,
+   "weight": 1.858333
+  },
+  {
+   "article_id": "9a08ff63-af4b-4062-afd3-11f6b0b39a64",
+   "stratum": "sports|gt50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 69,
+   "src_words_long": 71,
+   "weight": 2.9
+  },
+  {
+   "article_id": "9a64ed8e-4865-42a2-9e73-b989d5bc35f3",
+   "stratum": "sports|gt50",
+   "domain": "sports",
+   "split": "dev",
+   "pilot": true,
+   "src_words_short": 93,
+   "src_words_long": 157,
+   "weight": 2.9
+  },
+  {
+   "article_id": "9af2c265-c184-4172-a91f-fd5e8c65003d",
+   "stratum": "sports|gt50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 103,
+   "src_words_long": 208,
+   "weight": 2.9
+  },
+  {
+   "article_id": "9b04f499-8d99-46b4-a197-63d21e79a1ee",
+   "stratum": "entertainment_movies|gt50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 79,
+   "src_words_long": 140,
+   "weight": 4.391667
+  },
+  {
+   "article_id": "9c55eb77-3b2d-41a9-b46e-7d086572e2bb",
+   "stratum": "entertainment_movies|gt50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 69,
+   "src_words_long": 69,
+   "weight": 4.391667
+  },
+  {
+   "article_id": "9d691174-2dc3-46df-b179-2e3e931bc96b",
+   "stratum": "entertainment_movies|le50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 35,
+   "src_words_long": 136,
+   "weight": 1.858333
+  },
+  {
+   "article_id": "9e8a267d-e841-49e4-be34-233aff0e8974",
+   "stratum": "sports|gt50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 94,
+   "src_words_long": 117,
+   "weight": 2.9
+  },
+  {
+   "article_id": "9ebc23a8-a665-4358-88ee-30ecac0aa0c6",
+   "stratum": "sports|le50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 43,
+   "src_words_long": 43,
+   "weight": 6.208333
+  },
+  {
+   "article_id": "9fc773f7-7e5d-4df6-8357-cbb4d70586f4",
+   "stratum": "sports|le50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 28,
+   "src_words_long": 28,
+   "weight": 6.208333
+  },
+  {
+   "article_id": "a040cfad-f9c4-49b2-b4d9-ce0a24f15f68",
+   "stratum": "sports|le50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 29,
+   "src_words_long": 29,
+   "weight": 6.208333
+  },
+  {
+   "article_id": "a1e95ffd-5e4e-43be-90f5-1d545ec19944",
+   "stratum": "entertainment_movies|gt50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 118,
+   "src_words_long": 200,
+   "weight": 4.391667
+  },
+  {
+   "article_id": "a1f66da8-6adf-47c6-8e8f-4e8b52308f34",
+   "stratum": "entertainment_movies|le50",
+   "domain": "entertainment_movies",
+   "split": "dev",
+   "pilot": false,
+   "src_words_short": 49,
+   "src_words_long": 56,
+   "weight": 1.858333
+  },
+  {
+   "article_id": "a27ab8f1-ab61-4f3e-a441-1cb60f9d730f",
+   "stratum": "sports|gt50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 58,
+   "src_words_long": 58,
+   "weight": 2.9
+  },
+  {
+   "article_id": "a2e1f3cb-005c-4a65-9a14-20e8cd393dcf",
+   "stratum": "entertainment_movies|gt50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 63,
+   "src_words_long": 63,
+   "weight": 4.391667
+  },
+  {
+   "article_id": "a331a4d4-4a3a-4f9c-9cc3-2f3b910592f1",
+   "stratum": "sports|gt50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 91,
+   "src_words_long": 140,
+   "weight": 2.9
+  },
+  {
+   "article_id": "a3728ada-e03b-4c53-904a-9e3aa6de99f2",
+   "stratum": "entertainment_movies|gt50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 177,
+   "src_words_long": 313,
+   "weight": 4.391667
+  },
+  {
+   "article_id": "a3f04a17-0989-4393-9585-92b3a44085e2",
+   "stratum": "entertainment_movies|le50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 20,
+   "src_words_long": 20,
+   "weight": 1.858333
+  },
+  {
+   "article_id": "a43958a1-49b4-4d32-aae8-e544e627deac",
+   "stratum": "entertainment_movies|gt50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 106,
+   "src_words_long": 185,
+   "weight": 4.391667
+  },
+  {
+   "article_id": "a5756bb4-5706-4ecf-a2b0-3732a4987f6d",
+   "stratum": "sports|le50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 28,
+   "src_words_long": 28,
+   "weight": 6.208333
+  },
+  {
+   "article_id": "a585fa64-ad2b-425d-a82c-9f27817e0aed",
+   "stratum": "sports|gt50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 66,
+   "src_words_long": 68,
+   "weight": 2.9
+  },
+  {
+   "article_id": "a58b935c-4851-4ad8-9361-bc263d999584",
+   "stratum": "entertainment_movies|le50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 27,
+   "src_words_long": 27,
+   "weight": 1.858333
+  },
+  {
+   "article_id": "a5fdf65e-4946-4b11-a152-e43a2486727c",
+   "stratum": "entertainment_movies|le50",
+   "domain": "entertainment_movies",
+   "split": "dev",
+   "pilot": false,
+   "src_words_short": 15,
+   "src_words_long": 15,
+   "weight": 1.858333
+  },
+  {
+   "article_id": "a65aa1be-3044-4e6d-b91d-074c9f49376d",
+   "stratum": "sports|gt50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 55,
+   "src_words_long": 55,
+   "weight": 2.9
+  },
+  {
+   "article_id": "a76ce797-f03f-47c4-8db3-93b84c200eee",
+   "stratum": "sports|gt50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 71,
+   "src_words_long": 73,
+   "weight": 2.9
+  },
+  {
+   "article_id": "a7a77abf-4242-4d4c-8f02-37968bed93ea",
+   "stratum": "sports|le50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 9,
+   "src_words_long": 134,
+   "weight": 6.208333
+  },
+  {
+   "article_id": "a8236589-250d-4c7f-a42c-464ae2fc0dfd",
+   "stratum": "entertainment_movies|le50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 22,
+   "src_words_long": 22,
+   "weight": 1.858333
+  },
+  {
+   "article_id": "a831a215-8b74-457a-9cc5-2977c3396151",
+   "stratum": "entertainment_movies|gt50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 69,
+   "src_words_long": 69,
+   "weight": 4.391667
+  },
+  {
+   "article_id": "a86864bf-249e-4f6a-9c81-933b2258eec5",
+   "stratum": "entertainment_movies|le50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 19,
+   "src_words_long": 19,
+   "weight": 1.858333
+  },
+  {
+   "article_id": "a8798387-336a-46ee-b198-a23b6f5dccf7",
+   "stratum": "entertainment_movies|le50",
+   "domain": "entertainment_movies",
+   "split": "dev",
+   "pilot": true,
+   "src_words_short": 18,
+   "src_words_long": 18,
+   "weight": 1.858333
+  },
+  {
+   "article_id": "a9763dc7-980a-4079-9467-f0f50ccdda0f",
+   "stratum": "entertainment_movies|gt50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 67,
+   "src_words_long": 151,
+   "weight": 4.391667
+  },
+  {
+   "article_id": "a9adaba2-0baa-4ff4-bd67-77452622d622",
+   "stratum": "sports|gt50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 101,
+   "src_words_long": 103,
+   "weight": 2.9
+  },
+  {
+   "article_id": "aaac2b5c-10d5-42e8-827c-cf1ec676993d",
+   "stratum": "sports|le50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 20,
+   "src_words_long": 20,
+   "weight": 6.208333
+  },
+  {
+   "article_id": "ab4406af-4671-4dee-bfb9-21fe5c210c1e",
+   "stratum": "entertainment_movies|le50",
+   "domain": "entertainment_movies",
+   "split": "dev",
+   "pilot": true,
+   "src_words_short": 45,
+   "src_words_long": 63,
+   "weight": 1.858333
+  },
+  {
+   "article_id": "abbf29e4-e6f8-4517-ad54-1e77b7b3fff1",
+   "stratum": "entertainment_movies|le50",
+   "domain": "entertainment_movies",
+   "split": "dev",
+   "pilot": true,
+   "src_words_short": 45,
+   "src_words_long": 45,
+   "weight": 1.858333
+  },
+  {
+   "article_id": "ac418d59-2bd7-4b1d-819b-25d216912221",
+   "stratum": "sports|le50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 30,
+   "src_words_long": 30,
+   "weight": 6.208333
+  },
+  {
+   "article_id": "ac43cd2d-1d5e-41a0-97da-6e2622498a2f",
+   "stratum": "sports|gt50",
+   "domain": "sports",
+   "split": "dev",
+   "pilot": true,
+   "src_words_short": 68,
+   "src_words_long": 70,
+   "weight": 2.9
+  },
+  {
+   "article_id": "ad809170-a5b2-4162-87e5-d7786883baf8",
+   "stratum": "sports|le50",
+   "domain": "sports",
+   "split": "dev",
+   "pilot": false,
+   "src_words_short": 24,
+   "src_words_long": 24,
+   "weight": 6.208333
+  },
+  {
+   "article_id": "add5bb05-fd53-4e06-adc6-18ad150df2c9",
+   "stratum": "entertainment_movies|gt50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 75,
+   "src_words_long": 170,
+   "weight": 4.391667
+  },
+  {
+   "article_id": "ae88941b-2be3-4c5e-aba0-6c0447a21114",
+   "stratum": "entertainment_movies|gt50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 89,
+   "src_words_long": 176,
+   "weight": 4.391667
+  },
+  {
+   "article_id": "b00a9cd0-cc76-487e-962a-c4d4123e7f6e",
+   "stratum": "entertainment_movies|le50",
+   "domain": "entertainment_movies",
+   "split": "dev",
+   "pilot": false,
+   "src_words_short": 27,
+   "src_words_long": 27,
+   "weight": 1.858333
+  },
+  {
+   "article_id": "b08e7c59-e68d-488b-8f2e-6e2eb7697180",
+   "stratum": "sports|gt50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 64,
+   "src_words_long": 66,
+   "weight": 2.9
+  },
+  {
+   "article_id": "b13439c4-9e19-467c-af14-f2bb632c3a57",
+   "stratum": "sports|le50",
+   "domain": "sports",
+   "split": "dev",
+   "pilot": true,
+   "src_words_short": 17,
+   "src_words_long": 17,
+   "weight": 6.208333
+  },
+  {
+   "article_id": "b1abb1a6-219e-49f2-a9ca-1241f74e1b35",
+   "stratum": "sports|gt50",
+   "domain": "sports",
+   "split": "dev",
+   "pilot": true,
+   "src_words_short": 113,
+   "src_words_long": 154,
+   "weight": 2.9
+  },
+  {
+   "article_id": "b1ee3a10-0862-4977-8c24-91b67c5c3d55",
+   "stratum": "sports|le50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 22,
+   "src_words_long": 22,
+   "weight": 6.208333
+  },
+  {
+   "article_id": "b2710957-4c14-4dbf-b41b-82ce204fb460",
+   "stratum": "entertainment_movies|le50",
+   "domain": "entertainment_movies",
+   "split": "dev",
+   "pilot": true,
+   "src_words_short": 42,
+   "src_words_long": 143,
+   "weight": 1.858333
+  },
+  {
+   "article_id": "b278fd07-43fd-42d0-a310-8c6c0ba0710b",
+   "stratum": "entertainment_movies|le50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 35,
+   "src_words_long": 35,
+   "weight": 1.858333
+  },
+  {
+   "article_id": "b310aa52-bf0e-4274-bf0a-2c0d42961276",
+   "stratum": "sports|gt50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 64,
+   "src_words_long": 64,
+   "weight": 2.9
+  },
+  {
+   "article_id": "b329c6e9-ae88-4236-8991-aed033c70cac",
+   "stratum": "entertainment_movies|gt50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 64,
+   "src_words_long": 115,
+   "weight": 4.391667
+  },
+  {
+   "article_id": "b34927f8-ca1f-4602-ae8b-0862e2fe05a6",
+   "stratum": "sports|le50",
+   "domain": "sports",
+   "split": "dev",
+   "pilot": false,
+   "src_words_short": 16,
+   "src_words_long": 16,
+   "weight": 6.208333
+  },
+  {
+   "article_id": "b3c96c7a-48d1-4926-9017-ff525ce6cb8f",
+   "stratum": "sports|gt50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 64,
+   "src_words_long": 66,
+   "weight": 2.9
+  },
+  {
+   "article_id": "b3ee2cd2-b071-406b-ba6a-62390a7adbcb",
+   "stratum": "entertainment_movies|gt50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 81,
+   "src_words_long": 105,
+   "weight": 4.391667
+  },
+  {
+   "article_id": "b454a186-0e61-423f-9ec3-b235bc10bc39",
+   "stratum": "entertainment_movies|le50",
+   "domain": "entertainment_movies",
+   "split": "dev",
+   "pilot": true,
+   "src_words_short": 20,
+   "src_words_long": 20,
+   "weight": 1.858333
+  },
+  {
+   "article_id": "b4657394-a0a5-48e2-a724-d558f7989b9d",
+   "stratum": "entertainment_movies|le50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 18,
+   "src_words_long": 18,
+   "weight": 1.858333
+  },
+  {
+   "article_id": "b5200d39-8c27-42e5-9d6e-69b4dc24fa06",
+   "stratum": "entertainment_movies|gt50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 93,
+   "src_words_long": 205,
+   "weight": 4.391667
+  },
+  {
+   "article_id": "b52433c9-ad93-44cd-9b05-dc161e5acd3f",
+   "stratum": "sports|le50",
+   "domain": "sports",
+   "split": "dev",
+   "pilot": false,
+   "src_words_short": 40,
+   "src_words_long": 40,
+   "weight": 6.208333
+  },
+  {
+   "article_id": "b701c969-51f1-418e-a046-79a1cb38e6c9",
+   "stratum": "entertainment_movies|gt50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 94,
+   "src_words_long": 170,
+   "weight": 4.391667
+  },
+  {
+   "article_id": "b8397017-50ae-4f19-bb87-fd86e724a72f",
+   "stratum": "sports|le50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 15,
+   "src_words_long": 15,
+   "weight": 6.208333
+  },
+  {
+   "article_id": "b8a0d771-c610-4496-98ca-e30cbbe80f7a",
+   "stratum": "sports|le50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 24,
+   "src_words_long": 24,
+   "weight": 6.208333
+  },
+  {
+   "article_id": "b92a0bbd-c422-450b-ba3a-169dd477f5c5",
+   "stratum": "sports|gt50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 85,
+   "src_words_long": 130,
+   "weight": 2.9
+  },
+  {
+   "article_id": "b93c4923-3fbf-4b91-b18f-7096d7b29d5a",
+   "stratum": "sports|le50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 26,
+   "src_words_long": 26,
+   "weight": 6.208333
+  },
+  {
+   "article_id": "b999e5b4-665e-4cbd-ac4c-e3160d1357b8",
+   "stratum": "entertainment_movies|gt50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 78,
+   "src_words_long": 172,
+   "weight": 4.391667
+  },
+  {
+   "article_id": "bb32752c-4a65-453a-8057-d644e15db50a",
+   "stratum": "entertainment_movies|le50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 23,
+   "src_words_long": 23,
+   "weight": 1.858333
+  },
+  {
+   "article_id": "bb3ffc20-d78d-4803-8338-1256a421a44e",
+   "stratum": "entertainment_movies|gt50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 56,
+   "src_words_long": 56,
+   "weight": 4.391667
+  },
+  {
+   "article_id": "bb65d2f6-1a8f-4925-8351-56703ad304aa",
+   "stratum": "sports|le50",
+   "domain": "sports",
+   "split": "dev",
+   "pilot": true,
+   "src_words_short": 34,
+   "src_words_long": 34,
+   "weight": 6.208333
+  },
+  {
+   "article_id": "bbfd341d-c0ea-4fea-a066-2f59c64bf6f2",
+   "stratum": "sports|le50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 17,
+   "src_words_long": 17,
+   "weight": 6.208333
+  },
+  {
+   "article_id": "bc8db8b3-7e3a-4cfb-bc90-8ea53cfc0a2a",
+   "stratum": "entertainment_movies|le50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 22,
+   "src_words_long": 22,
+   "weight": 1.858333
+  },
+  {
+   "article_id": "bca3e1a5-9aa9-485e-a1ab-e8844297cf6c",
+   "stratum": "entertainment_movies|le50",
+   "domain": "entertainment_movies",
+   "split": "dev",
+   "pilot": false,
+   "src_words_short": 50,
+   "src_words_long": 67,
+   "weight": 1.858333
+  },
+  {
+   "article_id": "bd5b4802-3b72-4193-ab8c-02527a26db1a",
+   "stratum": "sports|gt50",
+   "domain": "sports",
+   "split": "dev",
+   "pilot": false,
+   "src_words_short": 94,
+   "src_words_long": 94,
+   "weight": 2.9
+  },
+  {
+   "article_id": "bd8ffc65-ac02-41f7-b94e-4116c11ee247",
+   "stratum": "entertainment_movies|gt50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 54,
+   "src_words_long": 69,
+   "weight": 4.391667
+  },
+  {
+   "article_id": "bd9859a1-5397-4336-a21b-96b1bd59192f",
+   "stratum": "entertainment_movies|gt50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 57,
+   "src_words_long": 109,
+   "weight": 4.391667
+  },
+  {
+   "article_id": "bdc6154a-8c9e-4a5c-ac81-efa2e0cdd41d",
+   "stratum": "entertainment_movies|le50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 49,
+   "src_words_long": 82,
+   "weight": 1.858333
+  },
+  {
+   "article_id": "be199dfe-d281-4e17-973f-e14a30893cc2",
+   "stratum": "sports|le50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 20,
+   "src_words_long": 20,
+   "weight": 6.208333
+  },
+  {
+   "article_id": "be3c38b5-2084-487a-ab92-fce0ea9a5e1e",
+   "stratum": "sports|gt50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 59,
+   "src_words_long": 59,
+   "weight": 2.9
+  },
+  {
+   "article_id": "bf557a52-34e7-4036-89ca-aabdd6fac322",
+   "stratum": "entertainment_movies|gt50",
+   "domain": "entertainment_movies",
+   "split": "dev",
+   "pilot": false,
+   "src_words_short": 103,
+   "src_words_long": 191,
+   "weight": 4.391667
+  },
+  {
+   "article_id": "bfaee24f-8c3d-4ea5-9193-788c319a1f13",
+   "stratum": "sports|le50",
+   "domain": "sports",
+   "split": "dev",
+   "pilot": false,
+   "src_words_short": 27,
+   "src_words_long": 27,
+   "weight": 6.208333
+  },
+  {
+   "article_id": "bfaefed0-2295-4d40-977a-fbb29de4fb3d",
+   "stratum": "sports|le50",
+   "domain": "sports",
+   "split": "dev",
+   "pilot": true,
+   "src_words_short": 21,
+   "src_words_long": 21,
+   "weight": 6.208333
+  },
+  {
+   "article_id": "bfb563f3-9b60-498f-9852-0b7e2675051f",
+   "stratum": "sports|le50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 20,
+   "src_words_long": 20,
+   "weight": 6.208333
+  },
+  {
+   "article_id": "c01042e4-d7ce-4a00-b990-04acb162e13c",
+   "stratum": "entertainment_movies|gt50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 61,
+   "src_words_long": 63,
+   "weight": 4.391667
+  },
+  {
+   "article_id": "c0e9a037-cc63-4305-b92b-1c9f54db784c",
+   "stratum": "entertainment_movies|gt50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 89,
+   "src_words_long": 173,
+   "weight": 4.391667
+  },
+  {
+   "article_id": "c1626092-a2b1-41e8-afe3-e652615c6366",
+   "stratum": "entertainment_movies|gt50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 56,
+   "src_words_long": 56,
+   "weight": 4.391667
+  },
+  {
+   "article_id": "c1afa775-0aef-445f-9f34-096c23c9ff51",
+   "stratum": "entertainment_movies|le50",
+   "domain": "entertainment_movies",
+   "split": "dev",
+   "pilot": true,
+   "src_words_short": 36,
+   "src_words_long": 36,
+   "weight": 1.858333
+  },
+  {
+   "article_id": "c3ce5058-4ed1-481f-b5c0-cc02a8a5b597",
+   "stratum": "sports|gt50",
+   "domain": "sports",
+   "split": "dev",
+   "pilot": true,
+   "src_words_short": 95,
+   "src_words_long": 122,
+   "weight": 2.9
+  },
+  {
+   "article_id": "c47d07e5-d953-4a14-a3d2-bd580eaec4a0",
+   "stratum": "sports|le50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 16,
+   "src_words_long": 16,
+   "weight": 6.208333
+  },
+  {
+   "article_id": "c7dbf407-8f42-46ce-b79f-f8d0cd1e6cf6",
+   "stratum": "entertainment_movies|le50",
+   "domain": "entertainment_movies",
+   "split": "dev",
+   "pilot": false,
+   "src_words_short": 31,
+   "src_words_long": 108,
+   "weight": 1.858333
+  },
+  {
+   "article_id": "c81e26ba-8b3e-4609-b64a-1bc40250f732",
+   "stratum": "entertainment_movies|gt50",
+   "domain": "entertainment_movies",
+   "split": "dev",
+   "pilot": false,
+   "src_words_short": 62,
+   "src_words_long": 97,
+   "weight": 4.391667
+  },
+  {
+   "article_id": "c831a0df-51f0-4f23-990b-93ea5d95b749",
+   "stratum": "sports|le50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 42,
+   "src_words_long": 57,
+   "weight": 6.208333
+  },
+  {
+   "article_id": "c8ca8edd-304d-435f-9853-d6ee3037ec95",
+   "stratum": "sports|le50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 26,
+   "src_words_long": 26,
+   "weight": 6.208333
+  },
+  {
+   "article_id": "c8cbf16b-42c6-44cb-9ab9-5a38be0b4a09",
+   "stratum": "entertainment_movies|gt50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 56,
+   "src_words_long": 56,
+   "weight": 4.391667
+  },
+  {
+   "article_id": "c99ef31c-6568-44fa-b0da-7b60d9f7faa8",
+   "stratum": "sports|gt50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 91,
+   "src_words_long": 93,
+   "weight": 2.9
+  },
+  {
+   "article_id": "c9d9d56e-18e6-48d0-9e78-a4c573695cdd",
+   "stratum": "entertainment_movies|gt50",
+   "domain": "entertainment_movies",
+   "split": "dev",
+   "pilot": false,
+   "src_words_short": 64,
+   "src_words_long": 150,
+   "weight": 4.391667
+  },
+  {
+   "article_id": "ca53cea5-c0cb-4afe-a0cb-1d370254fff3",
+   "stratum": "sports|gt50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 68,
+   "src_words_long": 70,
+   "weight": 2.9
+  },
+  {
+   "article_id": "ca6c8305-968b-4451-8448-e963a7ac7a0b",
+   "stratum": "entertainment_movies|gt50",
+   "domain": "entertainment_movies",
+   "split": "dev",
+   "pilot": false,
+   "src_words_short": 57,
+   "src_words_long": 70,
+   "weight": 4.391667
+  },
+  {
+   "article_id": "ca95923a-2363-45f6-8ae2-ae371dcd906e",
+   "stratum": "sports|le50",
+   "domain": "sports",
+   "split": "dev",
+   "pilot": true,
+   "src_words_short": 21,
+   "src_words_long": 21,
+   "weight": 6.208333
+  },
+  {
+   "article_id": "ca9bf976-b43c-4ca0-b373-48dc3c1cea8a",
+   "stratum": "sports|le50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 22,
+   "src_words_long": 22,
+   "weight": 6.208333
+  },
+  {
+   "article_id": "cb63f62e-b2c2-4f00-ab0b-61433236fc1d",
+   "stratum": "sports|gt50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 58,
+   "src_words_long": 58,
+   "weight": 2.9
+  },
+  {
+   "article_id": "cbcce54d-147f-4cd0-a9a2-f07adf18160c",
+   "stratum": "sports|le50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 32,
+   "src_words_long": 32,
+   "weight": 6.208333
+  },
+  {
+   "article_id": "cc651e40-f3df-439a-aa53-ceafbee8eb22",
+   "stratum": "sports|gt50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 61,
+   "src_words_long": 61,
+   "weight": 2.9
+  },
+  {
+   "article_id": "ccf80fa8-746c-4b48-a12a-77bfe8be1869",
+   "stratum": "entertainment_movies|gt50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 56,
+   "src_words_long": 56,
+   "weight": 4.391667
+  },
+  {
+   "article_id": "cd29658e-6a6e-4e09-bd5a-0a164dfb00d0",
+   "stratum": "sports|le50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 27,
+   "src_words_long": 27,
+   "weight": 6.208333
+  },
+  {
+   "article_id": "cdb9b5f6-6683-49d5-8b6b-bfaa34813c22",
+   "stratum": "sports|gt50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 51,
+   "src_words_long": 68,
+   "weight": 2.9
+  },
+  {
+   "article_id": "cddf5f94-0da8-4e9d-8a54-a98d8fef6369",
+   "stratum": "entertainment_movies|le50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 26,
+   "src_words_long": 26,
+   "weight": 1.858333
+  },
+  {
+   "article_id": "cebf19f6-f0fe-4ec4-975b-68c77e409c8b",
+   "stratum": "entertainment_movies|le50",
+   "domain": "entertainment_movies",
+   "split": "dev",
+   "pilot": true,
+   "src_words_short": 47,
+   "src_words_long": 68,
+   "weight": 1.858333
+  },
+  {
+   "article_id": "cece225a-1f56-4b9d-b1ed-3d5921446327",
+   "stratum": "entertainment_movies|gt50",
+   "domain": "entertainment_movies",
+   "split": "dev",
+   "pilot": false,
+   "src_words_short": 100,
+   "src_words_long": 149,
+   "weight": 4.391667
+  },
+  {
+   "article_id": "ced6310a-7a10-480d-9961-a582ad692146",
+   "stratum": "sports|gt50",
+   "domain": "sports",
+   "split": "dev",
+   "pilot": true,
+   "src_words_short": 61,
+   "src_words_long": 63,
+   "weight": 2.9
+  },
+  {
+   "article_id": "d02d4548-1233-427e-9d8a-fcbdaa1a8dd7",
+   "stratum": "sports|gt50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 95,
+   "src_words_long": 97,
+   "weight": 2.9
+  },
+  {
+   "article_id": "d0aa33ea-c1cc-4257-ad21-27190ac74c85",
+   "stratum": "entertainment_movies|gt50",
+   "domain": "entertainment_movies",
+   "split": "dev",
+   "pilot": true,
+   "src_words_short": 54,
+   "src_words_long": 69,
+   "weight": 4.391667
+  },
+  {
+   "article_id": "d0fc3ea6-1590-4f5f-9745-3a41ea780e3a",
+   "stratum": "sports|le50",
+   "domain": "sports",
+   "split": "dev",
+   "pilot": true,
+   "src_words_short": 16,
+   "src_words_long": 16,
+   "weight": 6.208333
+  },
+  {
+   "article_id": "d1513b67-a0d8-4099-8a59-d73277e46ea1",
+   "stratum": "sports|le50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 22,
+   "src_words_long": 22,
+   "weight": 6.208333
+  },
+  {
+   "article_id": "d1a5ebee-5258-4e0c-8d0a-0d486d00bed4",
+   "stratum": "entertainment_movies|gt50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 83,
+   "src_words_long": 215,
+   "weight": 4.391667
+  },
+  {
+   "article_id": "d21a772e-3e6d-4a98-90a2-0ef1cc5820b0",
+   "stratum": "entertainment_movies|gt50",
+   "domain": "entertainment_movies",
+   "split": "dev",
+   "pilot": false,
+   "src_words_short": 88,
+   "src_words_long": 185,
+   "weight": 4.391667
+  },
+  {
+   "article_id": "d22fd235-ad25-4701-863f-fc9c6d43e441",
+   "stratum": "entertainment_movies|le50",
+   "domain": "entertainment_movies",
+   "split": "dev",
+   "pilot": true,
+   "src_words_short": 42,
+   "src_words_long": 42,
+   "weight": 1.858333
+  },
+  {
+   "article_id": "d29517fe-3d58-4059-921f-7c1e1fcd5ce1",
+   "stratum": "sports|gt50",
+   "domain": "sports",
+   "split": "dev",
+   "pilot": false,
+   "src_words_short": 142,
+   "src_words_long": 217,
+   "weight": 2.9
+  },
+  {
+   "article_id": "d29536aa-e158-4a25-99ae-203d56bba52f",
+   "stratum": "entertainment_movies|le50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 47,
+   "src_words_long": 47,
+   "weight": 1.858333
+  },
+  {
+   "article_id": "d4a25778-6e8d-49e8-8507-f25ae69f669c",
+   "stratum": "entertainment_movies|gt50",
+   "domain": "entertainment_movies",
+   "split": "dev",
+   "pilot": true,
+   "src_words_short": 53,
+   "src_words_long": 138,
+   "weight": 4.391667
+  },
+  {
+   "article_id": "d4b88441-7294-4dfd-b89e-5f2ee51b3d7d",
+   "stratum": "sports|le50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 16,
+   "src_words_long": 16,
+   "weight": 6.208333
+  },
+  {
+   "article_id": "d6c2e904-b5f3-46ba-94e0-0e292f68abca",
+   "stratum": "sports|gt50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 51,
+   "src_words_long": 65,
+   "weight": 2.9
+  },
+  {
+   "article_id": "d6e145d8-8565-4d77-b6b2-d5c5eb9f1131",
+   "stratum": "entertainment_movies|le50",
+   "domain": "entertainment_movies",
+   "split": "dev",
+   "pilot": true,
+   "src_words_short": 44,
+   "src_words_long": 57,
+   "weight": 1.858333
+  },
+  {
+   "article_id": "d7a16397-ffe9-4e37-9379-bbc7ab2aa8a6",
+   "stratum": "entertainment_movies|le50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 48,
+   "src_words_long": 70,
+   "weight": 1.858333
+  },
+  {
+   "article_id": "d7c04a04-1a23-4892-b59c-2bccaae5a2e5",
+   "stratum": "entertainment_movies|le50",
+   "domain": "entertainment_movies",
+   "split": "dev",
+   "pilot": true,
+   "src_words_short": 48,
+   "src_words_long": 48,
+   "weight": 1.858333
+  },
+  {
+   "article_id": "d868d9cd-8a15-42dd-9c1b-a3a08294c36e",
+   "stratum": "entertainment_movies|gt50",
+   "domain": "entertainment_movies",
+   "split": "dev",
+   "pilot": true,
+   "src_words_short": 62,
+   "src_words_long": 62,
+   "weight": 4.391667
+  },
+  {
+   "article_id": "d91061e2-bc69-4a86-99d3-644a30fcf000",
+   "stratum": "entertainment_movies|le50",
+   "domain": "entertainment_movies",
+   "split": "dev",
+   "pilot": true,
+   "src_words_short": 19,
+   "src_words_long": 19,
+   "weight": 1.858333
+  },
+  {
+   "article_id": "d9b58cdd-ef03-4e77-ae08-7779941677b7",
+   "stratum": "sports|gt50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 79,
+   "src_words_long": 134,
+   "weight": 2.9
+  },
+  {
+   "article_id": "da65300d-9e8b-43b5-9d7e-a2057058d6e4",
+   "stratum": "entertainment_movies|le50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 39,
+   "src_words_long": 56,
+   "weight": 1.858333
+  },
+  {
+   "article_id": "da7a7161-ce50-4bdf-a966-9832aa8eec1f",
+   "stratum": "entertainment_movies|gt50",
+   "domain": "entertainment_movies",
+   "split": "dev",
+   "pilot": false,
+   "src_words_short": 68,
+   "src_words_long": 154,
+   "weight": 4.391667
+  },
+  {
+   "article_id": "dae9e526-335f-4ea2-992c-611b651a9f43",
+   "stratum": "entertainment_movies|le50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 44,
+   "src_words_long": 117,
+   "weight": 1.858333
+  },
+  {
+   "article_id": "db0f699e-5773-4513-9dcc-ead6227293ff",
+   "stratum": "entertainment_movies|gt50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 149,
+   "src_words_long": 176,
+   "weight": 4.391667
+  },
+  {
+   "article_id": "db17941e-adfc-4006-802d-8ed6bffe4c83",
+   "stratum": "sports|le50",
+   "domain": "sports",
+   "split": "dev",
+   "pilot": false,
+   "src_words_short": 15,
+   "src_words_long": 15,
+   "weight": 6.208333
+  },
+  {
+   "article_id": "db25b734-b118-43fe-88a3-152cc83574bb",
+   "stratum": "sports|gt50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 70,
+   "src_words_long": 70,
+   "weight": 2.9
+  },
+  {
+   "article_id": "db2ed946-0da2-44c6-ba60-f59d33978a06",
+   "stratum": "entertainment_movies|le50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 27,
+   "src_words_long": 27,
+   "weight": 1.858333
+  },
+  {
+   "article_id": "dbbde1aa-0a50-43c3-805a-295afe83bd79",
+   "stratum": "entertainment_movies|gt50",
+   "domain": "entertainment_movies",
+   "split": "dev",
+   "pilot": false,
+   "src_words_short": 59,
+   "src_words_long": 59,
+   "weight": 4.391667
+  },
+  {
+   "article_id": "dbce4823-1909-4d79-a40b-42e821cf654a",
+   "stratum": "sports|le50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 23,
+   "src_words_long": 23,
+   "weight": 6.208333
+  },
+  {
+   "article_id": "dc6f3ec5-6265-4950-aba2-7bdf7a0fd219",
+   "stratum": "entertainment_movies|gt50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 75,
+   "src_words_long": 75,
+   "weight": 4.391667
+  },
+  {
+   "article_id": "dc88599e-a92a-40c6-acd2-44ac3c15960b",
+   "stratum": "sports|gt50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 88,
+   "src_words_long": 90,
+   "weight": 2.9
+  },
+  {
+   "article_id": "dd173255-9cd6-403a-802e-bb06692bc0b7",
+   "stratum": "entertainment_movies|gt50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 52,
+   "src_words_long": 146,
+   "weight": 4.391667
+  },
+  {
+   "article_id": "dd4704ee-b7e8-4431-869f-0f91fbfb3ff6",
+   "stratum": "sports|le50",
+   "domain": "sports",
+   "split": "dev",
+   "pilot": true,
+   "src_words_short": 29,
+   "src_words_long": 29,
+   "weight": 6.208333
+  },
+  {
+   "article_id": "dd70aec2-9c4a-4cc1-8f3c-507ef4138477",
+   "stratum": "entertainment_movies|gt50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 63,
+   "src_words_long": 153,
+   "weight": 4.391667
+  },
+  {
+   "article_id": "dda66f01-af1c-4207-b21a-f7230421c9d9",
+   "stratum": "entertainment_movies|le50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 28,
+   "src_words_long": 28,
+   "weight": 1.858333
+  },
+  {
+   "article_id": "dda691ea-f4c7-4cf5-a9a1-a5593c5899d3",
+   "stratum": "entertainment_movies|le50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 45,
+   "src_words_long": 45,
+   "weight": 1.858333
+  },
+  {
+   "article_id": "de343ff8-b46a-4a00-b26c-1796c1420ad7",
+   "stratum": "sports|gt50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 73,
+   "src_words_long": 137,
+   "weight": 2.9
+  },
+  {
+   "article_id": "de68f61e-a291-4f68-b2bd-8496f698b94e",
+   "stratum": "entertainment_movies|le50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 27,
+   "src_words_long": 27,
+   "weight": 1.858333
+  },
+  {
+   "article_id": "de6f69b2-cfb6-48ae-ae2e-6cb3f5584454",
+   "stratum": "sports|gt50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 99,
+   "src_words_long": 99,
+   "weight": 2.9
+  },
+  {
+   "article_id": "ded1ee46-7cc2-4856-b65c-1c01856ecb31",
+   "stratum": "entertainment_movies|le50",
+   "domain": "entertainment_movies",
+   "split": "dev",
+   "pilot": false,
+   "src_words_short": 26,
+   "src_words_long": 26,
+   "weight": 1.858333
+  },
+  {
+   "article_id": "df7edab6-0023-4cbf-a307-5de9b629ec49",
+   "stratum": "entertainment_movies|le50",
+   "domain": "entertainment_movies",
+   "split": "dev",
+   "pilot": false,
+   "src_words_short": 24,
+   "src_words_long": 24,
+   "weight": 1.858333
+  },
+  {
+   "article_id": "dff54266-c988-45be-b480-c51ffcd52c7e",
+   "stratum": "sports|gt50",
+   "domain": "sports",
+   "split": "dev",
+   "pilot": true,
+   "src_words_short": 67,
+   "src_words_long": 67,
+   "weight": 2.9
+  },
+  {
+   "article_id": "e112f2fc-c439-486c-a25c-9ac96b3034ae",
+   "stratum": "entertainment_movies|le50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 21,
+   "src_words_long": 21,
+   "weight": 1.858333
+  },
+  {
+   "article_id": "e13a7143-443a-4bc0-9108-911044644c27",
+   "stratum": "entertainment_movies|le50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 49,
+   "src_words_long": 49,
+   "weight": 1.858333
+  },
+  {
+   "article_id": "e1443fe0-9103-4034-a49e-37b207ce203a",
+   "stratum": "sports|gt50",
+   "domain": "sports",
+   "split": "dev",
+   "pilot": true,
+   "src_words_short": 76,
+   "src_words_long": 76,
+   "weight": 2.9
+  },
+  {
+   "article_id": "e211fc1b-1f46-4cfc-8650-ed24fda0e52b",
+   "stratum": "sports|gt50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 66,
+   "src_words_long": 68,
+   "weight": 2.9
+  },
+  {
+   "article_id": "e2437fdf-2fcd-45db-a134-acd20d3be8f0",
+   "stratum": "sports|le50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 15,
+   "src_words_long": 15,
+   "weight": 6.208333
+  },
+  {
+   "article_id": "e34edbd3-ecc4-4a2e-9402-a1ccc0399184",
+   "stratum": "entertainment_movies|le50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 40,
+   "src_words_long": 107,
+   "weight": 1.858333
+  },
+  {
+   "article_id": "e3991427-9c1f-42e8-b6f6-9d6a6168a39d",
+   "stratum": "entertainment_movies|le50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 29,
+   "src_words_long": 29,
+   "weight": 1.858333
+  },
+  {
+   "article_id": "e405cab9-7bf5-4c25-9227-c2706778d061",
+   "stratum": "sports|gt50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 70,
+   "src_words_long": 133,
+   "weight": 2.9
+  },
+  {
+   "article_id": "e440a058-04ef-4ef4-9f8f-0a3634f0f77e",
+   "stratum": "entertainment_movies|gt50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 55,
+   "src_words_long": 65,
+   "weight": 4.391667
+  },
+  {
+   "article_id": "e55fc5c1-3652-43c3-97c1-80f9a27c86ed",
+   "stratum": "sports|le50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 17,
+   "src_words_long": 17,
+   "weight": 6.208333
+  },
+  {
+   "article_id": "e7579a58-0dbb-4270-8044-be303e3f52e3",
+   "stratum": "sports|le50",
+   "domain": "sports",
+   "split": "dev",
+   "pilot": true,
+   "src_words_short": 37,
+   "src_words_long": 37,
+   "weight": 6.208333
+  },
+  {
+   "article_id": "e75b5a10-3892-432b-b831-cb300d1e08e0",
+   "stratum": "sports|le50",
+   "domain": "sports",
+   "split": "dev",
+   "pilot": false,
+   "src_words_short": 19,
+   "src_words_long": 19,
+   "weight": 6.208333
+  },
+  {
+   "article_id": "e7692e8a-36b1-4a4b-ab31-b875a139ba56",
+   "stratum": "sports|gt50",
+   "domain": "sports",
+   "split": "dev",
+   "pilot": true,
+   "src_words_short": 72,
+   "src_words_long": 72,
+   "weight": 2.9
+  },
+  {
+   "article_id": "e8d2df75-24ea-4927-b699-f87c9ccf4646",
+   "stratum": "sports|le50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 29,
+   "src_words_long": 29,
+   "weight": 6.208333
+  },
+  {
+   "article_id": "e989baf0-e6b6-41f5-9cc1-ac057c57b6d6",
+   "stratum": "sports|le50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 29,
+   "src_words_long": 29,
+   "weight": 6.208333
+  },
+  {
+   "article_id": "e9f3d61b-2517-40a8-8021-2c3302fae2d0",
+   "stratum": "sports|gt50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 71,
+   "src_words_long": 71,
+   "weight": 2.9
+  },
+  {
+   "article_id": "e9f59b44-6723-4999-bb0c-bbddcd585f0c",
+   "stratum": "entertainment_movies|le50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 20,
+   "src_words_long": 20,
+   "weight": 1.858333
+  },
+  {
+   "article_id": "ea4248fa-d8c9-4fbc-a04b-e4546fc532ae",
+   "stratum": "entertainment_movies|gt50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 91,
+   "src_words_long": 151,
+   "weight": 4.391667
+  },
+  {
+   "article_id": "eb3bfcf5-e21b-40b3-a044-27dac108a573",
+   "stratum": "entertainment_movies|le50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 22,
+   "src_words_long": 22,
+   "weight": 1.858333
+  },
+  {
+   "article_id": "ec583532-db3b-4e85-abb2-31a775a2398d",
+   "stratum": "sports|le50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 25,
+   "src_words_long": 25,
+   "weight": 6.208333
+  },
+  {
+   "article_id": "ed4b1ebf-2d2c-495e-bcef-3364d99d2a30",
+   "stratum": "sports|gt50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 125,
+   "src_words_long": 188,
+   "weight": 2.9
+  },
+  {
+   "article_id": "ee09cf6b-f4c8-4dc0-88b0-783ee1cf7ad8",
+   "stratum": "sports|gt50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 74,
+   "src_words_long": 74,
+   "weight": 2.9
+  },
+  {
+   "article_id": "ee7406ec-6bf0-431f-9987-b64817edf94d",
+   "stratum": "sports|le50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 31,
+   "src_words_long": 31,
+   "weight": 6.208333
+  },
+  {
+   "article_id": "ef226094-b9e6-4961-b08c-b984e947ed3b",
+   "stratum": "entertainment_movies|gt50",
+   "domain": "entertainment_movies",
+   "split": "dev",
+   "pilot": false,
+   "src_words_short": 67,
+   "src_words_long": 67,
+   "weight": 4.391667
+  },
+  {
+   "article_id": "ef236f7c-3762-4639-943b-042ebf79afc1",
+   "stratum": "sports|gt50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 61,
+   "src_words_long": 61,
+   "weight": 2.9
+  },
+  {
+   "article_id": "ef3aa163-2720-40f3-99fe-32099a890a45",
+   "stratum": "entertainment_movies|le50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 32,
+   "src_words_long": 32,
+   "weight": 1.858333
+  },
+  {
+   "article_id": "f05bf016-d8bd-4600-a6da-84f5d219cb62",
+   "stratum": "sports|gt50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 64,
+   "src_words_long": 66,
+   "weight": 2.9
+  },
+  {
+   "article_id": "f154ba59-2e7e-481f-9dfe-d92ffc0f7eef",
+   "stratum": "sports|le50",
+   "domain": "sports",
+   "split": "dev",
+   "pilot": true,
+   "src_words_short": 50,
+   "src_words_long": 50,
+   "weight": 6.208333
+  },
+  {
+   "article_id": "f2490c81-0f43-443d-a05f-64c5e84193fb",
+   "stratum": "entertainment_movies|le50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 49,
+   "src_words_long": 71,
+   "weight": 1.858333
+  },
+  {
+   "article_id": "f2fdbbfb-025a-4fab-b73e-b0d1884c8ab4",
+   "stratum": "entertainment_movies|gt50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 109,
+   "src_words_long": 141,
+   "weight": 4.391667
+  },
+  {
+   "article_id": "f3dd1df2-2826-449c-a5f1-d1f29bcb8809",
+   "stratum": "sports|gt50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 66,
+   "src_words_long": 68,
+   "weight": 2.9
+  },
+  {
+   "article_id": "f44f221a-31d0-48b3-bc8c-d9f44c27b48e",
+   "stratum": "entertainment_movies|gt50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 66,
+   "src_words_long": 157,
+   "weight": 4.391667
+  },
+  {
+   "article_id": "f4778fec-bfda-4689-b5de-cad865d4c0c4",
+   "stratum": "sports|le50",
+   "domain": "sports",
+   "split": "dev",
+   "pilot": true,
+   "src_words_short": 22,
+   "src_words_long": 22,
+   "weight": 6.208333
+  },
+  {
+   "article_id": "f47ade59-d691-4bc2-9c58-c70816db7dd8",
+   "stratum": "sports|le50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 46,
+   "src_words_long": 62,
+   "weight": 6.208333
+  },
+  {
+   "article_id": "f4eb7a1b-d4c7-4595-88b8-615c4a8971be",
+   "stratum": "sports|gt50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 100,
+   "src_words_long": 100,
+   "weight": 2.9
+  },
+  {
+   "article_id": "f5998934-9417-4f20-973c-1b8c0762cec7",
+   "stratum": "entertainment_movies|le50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 45,
+   "src_words_long": 135,
+   "weight": 1.858333
+  },
+  {
+   "article_id": "f5d2dbf4-4019-4f97-a210-9775b559d535",
+   "stratum": "sports|le50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 34,
+   "src_words_long": 34,
+   "weight": 6.208333
+  },
+  {
+   "article_id": "f623f7ce-718d-49ba-8b69-09b31f6a9fbe",
+   "stratum": "entertainment_movies|gt50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 118,
+   "src_words_long": 224,
+   "weight": 4.391667
+  },
+  {
+   "article_id": "f625a34b-358a-40fa-a9e9-6aaa521e2623",
+   "stratum": "entertainment_movies|gt50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 127,
+   "src_words_long": 193,
+   "weight": 4.391667
+  },
+  {
+   "article_id": "f6f0de7c-5577-4cd4-9b74-ece39e974eb1",
+   "stratum": "entertainment_movies|gt50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 63,
+   "src_words_long": 197,
+   "weight": 4.391667
+  },
+  {
+   "article_id": "f789a292-ddbf-46db-98e5-a625f47efcff",
+   "stratum": "sports|gt50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 61,
+   "src_words_long": 63,
+   "weight": 2.9
+  },
+  {
+   "article_id": "f7960d71-9790-4156-b5d8-1a9b400317ca",
+   "stratum": "sports|le50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 37,
+   "src_words_long": 37,
+   "weight": 6.208333
+  },
+  {
+   "article_id": "f7a33806-9391-4898-a3af-f0543ebad221",
+   "stratum": "entertainment_movies|gt50",
+   "domain": "entertainment_movies",
+   "split": "dev",
+   "pilot": false,
+   "src_words_short": 71,
+   "src_words_long": 94,
+   "weight": 4.391667
+  },
+  {
+   "article_id": "f850bb3e-861a-4c00-9586-cca3938cd58f",
+   "stratum": "sports|gt50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 92,
+   "src_words_long": 172,
+   "weight": 2.9
+  },
+  {
+   "article_id": "f85a23a0-abb6-4135-8533-ffc39172f03f",
+   "stratum": "sports|le50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 27,
+   "src_words_long": 27,
+   "weight": 6.208333
+  },
+  {
+   "article_id": "f9d1ed7a-f9ab-4ffb-8f91-ace5764ff7a8",
+   "stratum": "sports|le50",
+   "domain": "sports",
+   "split": "dev",
+   "pilot": true,
+   "src_words_short": 42,
+   "src_words_long": 42,
+   "weight": 6.208333
+  },
+  {
+   "article_id": "fae5fe9b-cc2a-47ae-94b2-c0413fba9bae",
+   "stratum": "entertainment_movies|gt50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 84,
+   "src_words_long": 166,
+   "weight": 4.391667
+  },
+  {
+   "article_id": "fb667a77-6d60-4e3e-8f93-8603ccfd77e3",
+   "stratum": "entertainment_movies|gt50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 63,
+   "src_words_long": 63,
+   "weight": 4.391667
+  },
+  {
+   "article_id": "fbfdfefd-e2b5-4d4b-813a-bde799cb587e",
+   "stratum": "sports|gt50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 71,
+   "src_words_long": 71,
+   "weight": 2.9
+  },
+  {
+   "article_id": "fc394b1c-495f-46d4-90c6-1794fac66305",
+   "stratum": "entertainment_movies|gt50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 101,
+   "src_words_long": 360,
+   "weight": 4.391667
+  },
+  {
+   "article_id": "fc446059-f32d-40a4-88a6-0799fb26ce6e",
+   "stratum": "sports|le50",
+   "domain": "sports",
+   "split": "dev",
+   "pilot": false,
+   "src_words_short": 19,
+   "src_words_long": 19,
+   "weight": 6.208333
+  },
+  {
+   "article_id": "fcba1d6e-0b2b-46d9-90cd-52f4a32120ff",
+   "stratum": "sports|le50",
+   "domain": "sports",
+   "split": "dev",
+   "pilot": false,
+   "src_words_short": 17,
+   "src_words_long": 17,
+   "weight": 6.208333
+  },
+  {
+   "article_id": "fcc38069-3622-4236-a1a8-2bc4ab49701e",
+   "stratum": "entertainment_movies|gt50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 61,
+   "src_words_long": 131,
+   "weight": 4.391667
+  },
+  {
+   "article_id": "fd016a02-f67a-4cc6-a396-972326c74acc",
+   "stratum": "entertainment_movies|gt50",
+   "domain": "entertainment_movies",
+   "split": "dev",
+   "pilot": false,
+   "src_words_short": 61,
+   "src_words_long": 61,
+   "weight": 4.391667
+  },
+  {
+   "article_id": "fd5a3811-3f08-47c6-a981-7a3d9053a1ab",
+   "stratum": "entertainment_movies|gt50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 56,
+   "src_words_long": 56,
+   "weight": 4.391667
+  },
+  {
+   "article_id": "fe3fb423-2184-456e-8a01-d4c43daf02cd",
+   "stratum": "sports|le50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 19,
+   "src_words_long": 19,
+   "weight": 6.208333
+  },
+  {
+   "article_id": "fe588bc1-e3d9-4de4-9fc8-280845ffc3ba",
+   "stratum": "entertainment_movies|gt50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 166,
+   "src_words_long": 235,
+   "weight": 4.391667
+  },
+  {
+   "article_id": "ff236374-ef71-4b98-9bed-1136b2b906d2",
+   "stratum": "entertainment_movies|le50",
+   "domain": "entertainment_movies",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 19,
+   "src_words_long": 19,
+   "weight": 1.858333
+  },
+  {
+   "article_id": "ff3aa29d-c18c-4421-b544-9e14badcce9a",
+   "stratum": "sports|le50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 30,
+   "src_words_long": 30,
+   "weight": 6.208333
+  },
+  {
+   "article_id": "ffad016a-ef8f-4878-87c7-63f2b254005f",
+   "stratum": "sports|gt50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 70,
+   "src_words_long": 70,
+   "weight": 2.9
+  },
+  {
+   "article_id": "ffda97b5-828c-41d9-9a78-4b97c3ff62fb",
+   "stratum": "sports|gt50",
+   "domain": "sports",
+   "split": "test",
+   "pilot": false,
+   "src_words_short": 63,
+   "src_words_long": 65,
+   "weight": 2.9
+  }
+ ]
+}

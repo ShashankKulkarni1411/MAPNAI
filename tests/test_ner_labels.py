@@ -76,3 +76,10 @@ def test_misc_entities_survive_deduplication():
     ents = [{"text": "Taiwanese", "label": "Misc", "start": 12, "end": 21}]
     out = deduplicate_and_merge_entities(ents, 60, "entertainment_movies")
     assert [(e["name"], e["type"]) for e in out] == [("Taiwanese", "Misc")]
+
+
+def test_research_inline_label_map_matches_production():
+    sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "research",
+                                    "experiments"))
+    from e21_gate_aggrefact import LABEL_MAP
+    assert LABEL_MAP == ner_agent.label_map()

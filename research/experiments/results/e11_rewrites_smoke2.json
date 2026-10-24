@@ -1,0 +1,36 @@
+{
+ "meta": {
+  "script": "research/experiments/e11_generate_rewrites.py",
+  "run_at_utc": "2026-10-24T11:49:09+00:00",
+  "git_commit": "eba654d",
+  "python": "3.11.9",
+  "tag": "smoke2",
+  "model": "openai/gpt-oss-120b",
+  "prompt_version": "r2",
+  "temperature": 0.2,
+  "max_tokens": 800,
+  "extra_body": {
+   "reasoning_effort": "low"
+  },
+  "subset": "pilot",
+  "cells": "short:plain:low,medium:plain:low",
+  "sources": "e10_sources_2026-10-24.json"
+ },
+ "rows": 2,
+ "new_this_run": 2,
+ "groq_calls_this_run": 2,
+ "groq_calls_total_all_runs": 2,
+ "parsed": 2,
+ "unparseable": 0,
+ "errors": 0,
+ "latency_ms": {
+  "p50": 2215.7,
+  "p95": 3632.21
+ },
+ "tokens": {
+  "prompt": 680,
+  "completion": 175
+ },
+ "rewrites_file": "cache/e11_smoke2.jsonl",
+ "rewrites_file_sha256": "00e132b1e7c7b74fbfa3c16eeaffcc7a12cc44de714b6827ef733d7eab0d5d0d"
+}

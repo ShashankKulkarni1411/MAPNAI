@@ -1,0 +1,36 @@
+{
+ "meta": {
+  "script": "research/experiments/e11_generate_rewrites.py",
+  "run_at_utc": "2026-10-24T11:56:06+00:00",
+  "git_commit": "eba654d",
+  "python": "3.11.9",
+  "tag": "pilot-2026-10-24",
+  "model": "openai/gpt-oss-120b",
+  "prompt_version": "r2",
+  "temperature": 0.2,
+  "max_tokens": 800,
+  "extra_body": {
+   "reasoning_effort": "low"
+  },
+  "subset": "pilot",
+  "cells": "short:plain:low,medium:plain:low",
+  "sources": "e10_sources_2026-10-24.json"
+ },
+ "rows": 160,
+ "new_this_run": 160,
+ "groq_calls_this_run": 161,
+ "groq_calls_total_all_runs": 163,
+ "parsed": 159,
+ "unparseable": 1,
+ "errors": 0,
+ "latency_ms": {
+  "p50": 2651.5,
+  "p95": 4768.084999999999
+ },
+ "tokens": {
+  "prompt": 58136,
+  "completion": 23781
+ },
+ "rewrites_file": "cache/e11_pilot-2026-10-24.jsonl",
+ "rewrites_file_sha256": "eeac7cdb449bf1339836e88a1f90948bb968fa68c2188eec34c397fea7f63a4e"
+}

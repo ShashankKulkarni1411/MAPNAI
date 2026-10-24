@@ -1,0 +1,63 @@
+{
+ "meta": {
+  "script": "research/experiments/e20_aggrefact_eval.py",
+  "run_at_utc": "2026-10-24T11:46:52+00:00",
+  "git_commit": "eba654d",
+  "python": "3.11.9",
+  "checker": "minicheck-ft5",
+  "split": "test",
+  "tag": "debug200",
+  "limit": 200,
+  "dataset_revision": "981dfd0bd8e58e7238a9ab92b2e6ea44bce918e4",
+  "protocol": "P-fixed",
+  "batch_size": 16,
+  "torch": "2.6.0+cu124",
+  "gpu": "NVIDIA GeForce RTX 3050 6GB Laptop GPU",
+  "wall_seconds_this_run": 101.1
+ },
+ "n": 200,
+ "published": {
+  "avg11": 75.0,
+  "avg10_paper": 74.7
+ },
+ "per_dataset": {
+  "AggreFact-CNN": {
+   "n": 200,
+   "bacc": 70.96,
+   "ci95": [
+    44.72,
+    97.22
+   ]
+  }
+ },
+ "avg_all": {
+  "bacc": 70.96,
+  "ci95": [
+   44.72,
+   97.22
+  ],
+  "datasets": [
+   "AggreFact-CNN"
+  ]
+ },
+ "avg_without_ragtruth": {
+  "bacc": 70.96,
+  "ci95": [
+   44.72,
+   97.22
+  ],
+  "datasets": [
+   "AggreFact-CNN"
+  ]
+ },
+ "news3": {
+  "bacc": 70.96,
+  "ci95": [
+   44.72,
+   97.22
+  ],
+  "datasets": [
+   "AggreFact-CNN"
+  ]
+ }
+}

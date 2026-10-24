@@ -74,9 +74,15 @@ Groq calls are logged in the "Groq budget" table at the bottom (cap: 4,000 total
 | L0066 | 2026-10-24 | 3 | F10 cluster side: upper bound on non-singletons | of 1,535 clustered articles with vectors, 17.3% have a same-window neighbour at cos ≥ 0.77 and 5.5% at ≥ 0.88; observed non-singleton share 16.2% (334/2,063) → fragmentation is bounded by MiniLM similarity on this corpus, not mainly by the rule | same | same | F10 commit |
 | L0067 | 2026-10-24 | 3 | F10 side finding | 1,843 articles have summaries but only 1,412 have `summarization_processed` set | same | same | F10 commit |
 | L0068 | 2026-10-24 | 3 | F11 environment drift resolved | suite runs in pinned CPython 3.11.9 + requirements.lock (793/0 at F7); E02 per-item decisions identical across 3.12 and 3.11.9; Docker image NOT re-verified (daemon down) | `research/experiments/README.md` (Environments), L0035, L0061 | — | F11 commit |
+| L0069 | 2026-10-24 | 4 | Source pool and grouped split (fixed before any tuning, R2) | 480 sources (120 per domain × length stratum), dev 144 / test 336, pilot 80 ⊂ dev; LF-normalized sha256 8035c342f584584f638b7d549f53fd487be27d47f004b787fead935b41c0ca97 (Windows CRLF working copy: 1c471521…67ae) | `research/experiments/data/e10_sources_2026-10-24.json` | `python research/experiments/e10_select_sources.py --tag 2026-10-24` | Phase 4 commit |
+| L0070 | 2026-10-24 | 4 | EXP-1 pilot generation (production model openai/gpt-oss-120b, prompt r2, temp 0.2, reasoning_effort low) | 160 rewrites: 159 parsed, 1 unparseable, 0 errors; 161 Groq calls; latency p50 2.65 s | `results/e11_rewrites_pilot-2026-10-24.json` | `python research/experiments/e11_generate_rewrites.py --tag pilot-2026-10-24 --subset pilot --cells short:plain:low,medium:plain:low` | Phase 4 commit |
+| L0071 | 2026-10-24 | 4 | EXP-1 harness validity | source-hash mismatches 0; nondeterministic gate decisions 0; length compliance 80/80 short, 79/79 medium | `results/e14_scores_pilot-2026-10-24.json` | `python research/experiments/e14_score_gates.py --rewrites pilot-2026-10-24 --tag pilot-2026-10-24` | Phase 4 commit |
+| L0072 | 2026-10-24 | 4 | EXP-1 serve rate (no labels: not FRR/FAR) | v1 82/160 = 0.513 [0.436, 0.589] (short 0.475, medium 0.550); v2 91/160 = 0.569 [0.491, 0.643] (short 0.513, medium 0.625); v1 fallback reasons: missing entity 72, missing number 24, added number 3 | same | same | Phase 4 commit |
 
 ## Groq budget (R9: cap 4,000 calls)
 
 | Date | Phase | Script / tag | Calls this run | Cumulative |
 |---|---|---|---|---|
 | 2026-10-23 | 0 | — | 0 | 0 |
+| 2026-10-24 | 4 | e11 smoke2 (2 rewrites) | 2 | 2 |
+| 2026-10-24 | 4 | e11 pilot-2026-10-24 (160 rewrites, 1 retry) | 161 | 163 |
