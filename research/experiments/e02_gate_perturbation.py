@@ -212,6 +212,8 @@ def main() -> int:
     ap.add_argument("--snapshot", required=True)
     ap.add_argument("--tag", required=True)
     ap.add_argument("--seed", type=int, default=13)
+    ap.add_argument("--gate", default="v1", choices=sorted(factcheck.GATE_VERSIONS),
+                    help="gate version (factcheck.GATE_VERSIONS); v1 = production default")
     args = ap.parse_args()
 
     rows = [json.loads(line) for line in (DATA / f"e02_gate_sources_{args.snapshot}.jsonl").open(encoding="utf-8")]
@@ -233,7 +235,7 @@ def main() -> int:
                 if rewrite is None or (rewrite == src and edit != "identity"):
                     continue
                 t0 = time.perf_counter()
-                ok, missing, added = factcheck.verify(src, rewrite, names)
+                ok, missing, added = factcheck.verify(src, rewrite, names, **factcheck.GATE_VERSIONS[args.gate])
                 timings.append((time.perf_counter() - t0) * 1e6)
                 items.append({"article_id": r["article_id"], "field": field, "domain": r.get("domain"),
                               "edit": edit, "expected": EXPECT[edit], "gate_pass": ok,
@@ -274,7 +276,8 @@ def main() -> int:
     result = {
         "meta": run_metadata("research/experiments/e02_gate_perturbation.py", seed=args.seed,
                              snapshot=f"data/e02_gate_sources_{args.snapshot}.jsonl", source_rows=len(rows),
-                             gate="personalization/factcheck.py:verify (unchanged)",
+                             gate=f"personalization/factcheck.py:verify, gate version {args.gate} "
+                                  f"{factcheck.GATE_VERSIONS[args.gate]}",
                              label="SYNTHETIC perturbations — sensitivity diagnostic, not a real-world error rate"),
         "pooled": pooled,
         "per_field": per_field,

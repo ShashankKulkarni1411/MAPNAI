@@ -237,6 +237,9 @@ class PersonalizationSettings(BaseSettings):
     render_temperature: float = 0.2
     render_max_tokens: int = 800
     render_source_chars: int = 600
+    # the fact gate (personalization/factcheck.GATE_VERSIONS): v1 = the original rules; v2-norm normalizes entity
+    # names first. Research comparison only (research/PREREG.md); a non-v1 version is part of the render cache key
+    render_gate_version: str = "v1"
 
     # ── M. App views ─────────────────────────────────────────
     feed_page_max: int = 30

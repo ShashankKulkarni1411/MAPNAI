@@ -59,8 +59,11 @@ def style_key(style: Dict[str, str]) -> Tuple[str, str, str]:
 
 def cache_key(article_id: str, style: Dict[str, str], cfg) -> Dict:
     tone, length, jargon = style_key(style)
-    return {"article_id": article_id, "tone": tone, "length": length, "jargon": jargon,
-            "prompt_version": cfg.render_prompt_version}
+    key = {"article_id": article_id, "tone": tone, "length": length, "jargon": jargon,
+           "prompt_version": cfg.render_prompt_version}
+    if cfg.render_gate_version != "v1":              # v1 keeps the existing keys, so its cache stays valid
+        key["gate_version"] = cfg.render_gate_version
+    return key
 
 
 def _cut(body: str, limit: int) -> str:
@@ -154,7 +157,8 @@ class Renderer:
         if rewrite is None:
             ok, missing, added, reason = False, [], [], "unparseable_response"
         else:
-            ok, missing, added = factcheck.verify(source, rewrite, entity_names)
+            ok, missing, added = factcheck.verify(source, rewrite, entity_names,
+                                                  **factcheck.GATE_VERSIONS[c.render_gate_version])
             reason = None if ok else "fact_check"
         if not ok:
             logger.warning(f"[Render] {article_id} {style_key(style)} falls back to the source: {reason} "

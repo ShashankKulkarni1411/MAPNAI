@@ -72,6 +72,69 @@ class TestMonthBoundary:
         assert factcheck.verify(src, src, ["Anne Tyler"]) == (True, [], [])
 
 
+class TestEntityNormalization:
+    """F2: gate v2-norm compares entity names after normalizing possessives, punctuation, case, a leading "the" and
+    whitespace. v1 (the default) is unchanged."""
+
+    @pytest.mark.parametrize("name,norm", [
+        ("Formula 1's", "formula 1"), ("Formula 1’s", "formula 1"), ("Saints'", "saints"),
+        ("Arsenal's.", "arsenal"), ("The Beatles", "beatles"), ("the  Premier   League", "premier league"),
+        ("U.S.", "us"), ("U.S", "us"), ("  Arsenal, ", "arsenal"), ("Rolls-Royce", "rolls royce"),
+        ('"Barbie"', "barbie"), ("The Who", "the who"), ("...", ""), ("", ""),
+    ])
+    def test_normalize_name(self, name, norm):
+        assert factcheck.normalize_name(name) == norm
+
+    def test_possessive_fragment_v1_rejects_v2_norm_accepts(self):
+        src, rw = "Formula 1's new rules start in Baku.", "New Formula 1 rules start in Baku."
+        names = ["Formula 1's", "Baku"]
+        assert factcheck.verify(src, rw, names) == (False, ["entity:Formula 1's"], [])
+        assert factcheck.verify(src, rw, names, **factcheck.GATE_VERSIONS["v2-norm"]) == (True, [], [])
+
+    def test_leading_the_and_acronym_dots(self):
+        src, rw = "The Beatles toured the U.S. in 1964.", "In 1964 Beatles toured the US."
+        names = ["The Beatles", "U.S."]
+        assert not factcheck.verify(src, rw, names)[0]
+        assert factcheck.verify(src, rw, names, normalize_entities=True) == (True, [], [])
+
+    def test_v2_norm_still_rejects_a_missing_entity(self):
+        src = "Bukayo Saka's goal beat Chelsea."
+        ok, missing, _ = factcheck.verify(src, "A late goal beat Chelsea.", ["Bukayo Saka's", "Chelsea"],
+                                          normalize_entities=True)
+        assert not ok and missing == ["entity:Bukayo Saka's"]
+
+    def test_v2_norm_still_rejects_a_substituted_entity(self):
+        src = "Arsenal beat Chelsea 2-1."
+        ok, missing, _ = factcheck.verify(src, "Arsenal beat Spurs 2-1.", ["Arsenal", "Chelsea"],
+                                          normalize_entities=True)
+        assert not ok and missing == ["entity:Chelsea"]
+
+    def test_v2_norm_reports_a_duplicate_name_once(self):
+        src = "Saka scored. Saka's run won it."
+        ok, missing, _ = factcheck.verify(src, "A run won it.", ["Saka", "Saka's"], normalize_entities=True)
+        assert not ok and missing == ["entity:Saka"]
+
+    def test_v2_norm_ignores_names_not_in_the_source_and_empty_names(self):
+        assert factcheck.verify("Arsenal won.", "Arsenal won.", ["Chelsea", "...", ""], normalize_entities=True) \
+            == (True, [], [])
+
+    def test_v2_norm_identity_passes(self):
+        src = "Formula 1’s chief met the U.S. team; Saints' fans cheered."
+        assert factcheck.verify(src, src, ["Formula 1’s", "U.S.", "Saints'"], normalize_entities=True) == \
+            (True, [], [])
+
+    def test_the_default_is_v1(self):
+        src, rw, names = "Formula 1's rules.", "Formula 1 rules.", ["Formula 1's"]
+        assert factcheck.verify(src, rw, names) == factcheck.verify(src, rw, names, **factcheck.GATE_VERSIONS["v1"])
+        assert CFG.render_gate_version == "v1"
+
+    def test_cache_key_is_unchanged_for_v1_and_versioned_otherwise(self):
+        style = {"tone": "plain", "length": "short", "jargon": "low"}
+        assert "gate_version" not in render.cache_key("a1", style, CFG)
+        v2 = CFG.model_copy(update={"render_gate_version": "v2-norm"})
+        assert render.cache_key("a1", style, v2)["gate_version"] == "v2-norm"
+
+
 class TestVerify:
     SRC = ("Manchester City were fined £1,200,000 on 26 September after two hearings, a 5 per cent rise; "
            "the case opened on 2023-02-06.")
