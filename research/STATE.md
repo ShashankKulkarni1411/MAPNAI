@@ -28,5 +28,5 @@ V="$HOME/.venvs/mapnai-research/Scripts/python.exe"; "$V" --version   # 3.11.9 (
 C="$HOME/.venvs/mapnai-checkers/Scripts/python.exe"; "$C" --version   # 3.11.9 (checkers, CUDA)
 "$C" research/experiments/e05_checker_smoke.py --tag <new-tag>         # offline; uses models/ckpts + models/nltk_data
 "$V" research/experiments/e06_manifest.py                              # refresh data/MANIFEST.json
-# baseline suite: see PREFLIGHT.md §4 (env overrides are mandatory)
+bash research/experiments/run_suite_isolated.sh <log>                    # full suite in a mirror without .env (PREFLIGHT §5)
 ```

@@ -54,6 +54,8 @@ Groq calls are logged in the "Groq budget" table at the bottom (cap: 4,000 total
 | L0046 | 2026-10-24 | 3 | F5 false-reject cost on E02 benign edits (v2 vs v2-norm) | 0 additional rejects (benign macro 0.9974 both); real-rewrite cost to be measured in EXP-1 | same | same | F5 commit |
 | L0047 | 2026-10-24 | 3 | F5 known blind spots (pinned by tests) | one-word new name opening a sentence (after . ! ? : ;) is not checked; a misspelling that extends a source word by suffix ("Ravi" → "Ravie", the audit's real case) is allowed by the prefix rule | `tests/test_pers_phase7.py::TestAddedNames` | — | F5 commit |
 | L0048 | 2026-10-24 | 3 | Suite after F5 (18 new tests) | 778 passed / 0 failed | `results/suite_2026-10-24-f5.txt` | PREFLIGHT.md §4 command | F5 commit |
+| L0049 | 2026-10-24 | 3 | CORRECTION to L0015/PREFLIGHT §4: env overrides do not override `.env` for `config.settings` (.env wins) | live collection counts unchanged vs 2026-10-23 (14 collections, read-only); live Groq calls by tests UNVERIFIED (low risk) | `research/PREFLIGHT.md` §5 | read-only `estimated_document_count` via `_common.mongo_db` | 2ee93a6 |
+| L0050 | 2026-10-24 | 3 | Suite in an isolated mirror with no `.env` | 778 passed / 0 failed | `results/suite_2026-10-24-isolated.txt` | `research/experiments/run_suite_isolated.sh <log>` | 2ee93a6 |
 
 ## Groq budget (R9: cap 4,000 calls)
 

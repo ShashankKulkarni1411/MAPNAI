@@ -94,3 +94,13 @@ Result: **720 passed, 0 failed, 0 skipped, 0 errors** in 196.6 s. Per file: agen
 `sha256` of `data/faiss_index` and `data/faiss_metadata.pkl` identical before and after the run (no index write).
 
 Pre-existing failures: **none**. Gate 3 therefore requires ≥ 720 passing and 0 failing.
+
+## 5. Correction (2026-10-24)
+
+§4 said the environment overrides meant "`.env` cannot reach live services". **That was wrong for `config.settings`**: its `settings_customise_sources` puts `.env` **before** OS environment variables (`config/settings.py:139–146`), so the overrides did not apply to modules reading `config.settings`. Evidence that no earlier run touched live data:
+
+- Every storage test patches `MongoClient` / `GraphDatabase`; LLM tests use fakes.
+- Read-only live counts on 2026-10-24 equal the 2026-10-23 audit exactly (processed_articles 3,674 · personas 13 · feedback 105 · impressions 1,043 · digests 11 · clusters 1,864 · alerts 10 · proposals 2 · thresholds 1 · render_cache 12 · insights_cache 2 · recaps 2 · job_runs 301 · accounts 1); the newest `job_runs` entry is 2026-10-23 09:45 UTC, before this work began. Neo4j was unreachable (DNS).
+- Whether any test made a live Groq call cannot be checked after the fact: **UNVERIFIED** (low risk: all LLM paths in tests use fakes).
+
+From now on the suite runs through `research/experiments/run_suite_isolated.sh`, which copies tracked and new files (no `.env`, no ignored files) to a scratch mirror and runs pytest there. First isolated run: 778 passed / 0 failed (`results/suite_2026-10-24-isolated.txt`).
