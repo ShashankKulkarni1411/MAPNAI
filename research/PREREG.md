@@ -57,8 +57,19 @@ LLM-AggreFact claims are not compressions of their documents, so **Stage 2 (core
 
 MAPNAI split file (grouped by source article, seed 13) and its sha256; RQ1/H1 margins for the style factorial; S4 dev/test sizes; annotation sample design and weights.
 
+## 8. MAPNAI rewrites: design fixed before generation and labelling (v1, 2026-10-24)
+
+**State when added:** the EXP-1 pilot (160 rewrites, serve rates only) exists; no faithfulness label exists; no gate or checker has been tuned on MAPNAI data; no test-split rewrite exists.
+
+- **Split file:** `research/experiments/data/e10_sources_2026-10-24.json`, LF-normalized sha256 `8035c342f584584f638b7d549f53fd487be27d47f004b787fead935b41c0ca97` (git blob content). 480 sources, 120 per domain × source-length stratum, grouped by article: dev 144 / test 336; pilot 80 ⊂ dev; seed 13.
+- **Generation (budget-forced deviation from EXPERIMENT_BACKLOG EXP-3):** the Groq cap (R9: 4,000 calls; 163 used) does not allow 480 × 8 cells × 2 models. Design: production model `openai/gpt-oss-120b`, prompt r2, temperature 0.2, all 480 sources × **4 cells** = {short, medium} × {plain/low, analyst/high}. Tone and jargon are therefore confounded in one "register" factor; RQ1 is reduced to length × register. A second seed on a random 20% of test sources (seed 13) estimates generation variance if budget remains. No second model.
+- **Gold labels (S4), H1:** two annotators, guideline `research/annotation/GUIDELINES_D3.md` v1. Batch A (EXP-2 agreement pilot) = the 80 pilot sources × the 2 pilot cells = 160 dev items, of which 80 are double-annotated for κ. Batch B (evaluation) = 240 **test** items: 60 per cell; within each cell, gate-v1 rejects are sampled to 50% of the items (or all of them if fewer), the rest from passes; every item carries its inverse-probability weight. Primary label `faithful` (no addition, no distortion, no salient omission). Fallback if κ(faithful) < 0.6 after one revision: secondary label = addition ∨ distortion only.
+- **S4 operationalization:** FRR = P(reject | faithful), FAR = P(accept | unfaithful), weighted by the batch-B weights, test split only; 95% CIs by bootstrap over source articles (2,000, seed 13). FAR non-inferiority on lexical error types (number, entity, addition of a number or name): lower bound of FAR_v1 − FAR_new > −2 points.
+- **Silver labels:** two independent judge passes by Claude (cross-family to gpt-oss) with different prompts, on dev items only; tagged `silver`; used only for dev tuning of CAFG on MAPNAI and for trend analysis. Never reported as human, never used for S4.
+
 ## Changelog
 
 | Date | Version | Change |
 |---|---|---|
 | 2026-10-23 | v0 | Initial registration (scorecard, protocols, CAFG configuration space for LLM-AggreFact) |
+| 2026-10-24 | v1 | §8 added before any generation beyond the pilot and before any label: split hash, budget-forced 4-cell design (deviation from the backlog's 8 cells × 2 models, R9), gold sampling design and weights, S4 operationalization, silver-label rules |
