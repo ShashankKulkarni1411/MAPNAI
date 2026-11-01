@@ -67,9 +67,22 @@ MAPNAI split file (grouped by source article, seed 13) and its sha256; RQ1/H1 ma
 - **S4 operationalization:** FRR = P(reject | faithful), FAR = P(accept | unfaithful), weighted by the batch-B weights, test split only; 95% CIs by bootstrap over source articles (2,000, seed 13). FAR non-inferiority on lexical error types (number, entity, addition of a number or name): lower bound of FAR_v1 − FAR_new > −2 points.
 - **Silver labels:** two independent judge passes by Claude (cross-family to gpt-oss) with different prompts, on dev items only; tagged `silver`; used only for dev tuning of CAFG on MAPNAI and for trend analysis. Never reported as human, never used for S4.
 
+## 9. S3 operational details (v2, 2026-11-01)
+
+**State when added:** FT5 P-fixed probabilities exist for AggreFact dev and test (S1, L0074–L0077, the per-dataset FT5 BAcc only). No CAFG stage has been evaluated on any AggreFact row (no features, no grid point, no BAcc); S2 has not been run. These points only make §3 S3 and §4 executable; no criterion changes.
+
+- **Stages on AggreFact (as §4):** Stage 0 normalization ON (`normalize_entities=True`); Stage 1 added numbers always, added names = the tuned on/off switch, added months OFF (not in §4); Stage 1b lexical accept at τ_acc; Stage 2 retention OFF (`require_retention=False`); NER names are not needed by any stage used (empty list). Implemented with `research/faithgate/cafg.decide` (`learned=False`); a row that passes Stage 1 and is not lexically accepted is **escalated**.
+- **Stage 3 on AggreFact = the S1 FT5 prediction for the whole claim** (`prob > 0.5`, cached probabilities from `cache/e20_minicheck-ft5_{dev,test}_kaggle-2026-10-31.jsonl`), not `cafg.decide`'s per-sentence minimum; this keeps Stage 3 identical to the FT5-alone baseline it is compared with. One escalated row = one learned call.
+- **Call rate:** escalated rows / rows, computed on the News-3 rows (the subset of the primary criterion; the ≤ 50% condition applies there), and also reported on all 11 datasets. The same definition is used in the dev selection rule.
+- **Paired difference:** BAcc(CAFG) − BAcc(FT5), point estimate and 95% percentile interval from 2,000 bootstrap replicates (seed 13), rows resampled within each dataset with the same indices for both systems; the News-3 (and 11-dataset) difference is the unweighted mean of per-dataset differences per replicate. S3 passes iff the News-3 lower bound > −2.0 **and** the News-3 call rate ≤ 0.50.
+- **Random-escalation control:** for each of 20 seeds (13..32), escalate, within each dataset, a uniformly random set of rows of the same size as CAFG's escalated set in that dataset; escalated rows get the FT5 prediction, all other rows the cheap-tier decision without any learned call (reject iff Stage 1 reports an addition under the frozen configuration, else accept). Reported: mean BAcc and the 2.5–97.5 percentile over the 20 seeds (News-3 and all 11). It is descriptive (no pass/fail).
+- **Multiplicity:** the test-split inferential family is the single S3 comparison above (S2 has no target and no test), so the Holm adjustment leaves it unchanged; this is stated in the report.
+- **Freeze:** the dev step writes the selected configuration to `research/faithgate/configs/`; its sha256 and the git commit that contains it are recorded in `LEDGER.md` before the test step, which refuses to run otherwise and writes its output once.
+
 ## Changelog
 
 | Date | Version | Change |
 |---|---|---|
 | 2026-10-23 | v0 | Initial registration (scorecard, protocols, CAFG configuration space for LLM-AggreFact) |
 | 2026-10-24 | v1 | §8 added before any generation beyond the pilot and before any label: split hash, budget-forced 4-cell design (deviation from the backlog's 8 cells × 2 models, R9), gold sampling design and weights, S4 operationalization, silver-label rules |
+| 2026-11-01 | v2 | §9 added before any CAFG evaluation on AggreFact: stage switches on this benchmark, Stage 3 = cached whole-claim FT5 P-fixed prediction, call-rate subset (News-3), paired-bootstrap definition, random-escalation control definition (20 seeds, per-dataset matched counts, cheap-tier decision elsewhere), Holm family, freeze mechanics. No criterion changed |

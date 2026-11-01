@@ -1,6 +1,6 @@
 # STATE (overwrite each step; history lives in LEDGER.md and git)
 
-**Updated:** 2026-10-24 · **Branch:** `research/sota-push` · **Phase:** 4 in progress (EXP-1 pilot done; S1 running) · 6 started (CAFG equivalence PASS)
+**Updated:** 2026-11-01 · **Branch:** `research/sota-push` · **Phase:** 4 in progress (EXP-1 pilot done; **S1 PASS**, FT5 dev scored) · 6 started (CAFG equivalence PASS)
 
 ## Done
 - Phase 0: `PREFLIGHT.md` (16 discrepancies), pinned venv `~/.venvs/mapnai-research` (CPython 3.11.9 + `requirements.lock`), baseline suite 720/0/0, `.gitignore` extended, E02 news-text JSONL untracked (kept on disk). Tag `pre-phase1`.
@@ -12,16 +12,18 @@
 
 - Phase 3 (2026-10-24): F1 fix (identity 1.0); F2 normalization FAILED its criterion alone (entity_sub 0.9997→0.9972), passes combined with F5 as gate `v2` (render_gate_version, default v1); F5 found a latent insights.new_names bug (opt-in fix); F6 NER_MISC_LABEL + migration dry run (5,192 entities; not applied, H2); F8 window search (no measurable effect at current scale; held-out pairs need H1); F7 new index 100% coverage (live untouched); F9/F10 root causes reported; F11 pinned envs documented. Safety correction: suite now runs via run_suite_isolated.sh (PREFLIGHT §5). Suite 793/0. Tag `pre-phase4`.
 
+- Phase 4 S1 (2026-11-01, L0074–L0077): FT5 test + dev scored on Kaggle T4 (tag `kaggle-2026-10-31`; run 1 OOM'd at dev row 4,608, run 2 `mapnai_kaggle_gpu_runs (1).ipynb` resumed with an OOM-retry, never triggered). Caches complete and clean; Kaggle torch 2.11 vs local torch 2.6 on 2,560 shared rows: max |Δp| 1e-05, 0 flips. **Gate 4 PASS:** avg11 75.02 [73.96, 76.09] vs 75.0 (gap +0.02); avg10 74.72 vs 74.7; all 11 datasets within ±0.22 of the leaderboard. Dev avg11 72.69 (News-3 67.38). Harness is validated: downstream AggreFact comparisons need no "unvalidated" label.
+
 ## Stopped / moved to Colab (2026-10-24)
 - Local FT5 run (2,560 / 29,320 test rows cached, tag s1-2026-10-24) and the main generation (628 / 1,920 rewrites, 636 Groq calls total) were stopped by Claude Code's low-memory reaper. Not restarted (user decision).
-- All GPU work moved to `research/colab/mapnai_gpu_runs.ipynb` (tag colab-2026-10-24): FT5 test (S1) + dev, optional DeBERTa, Bespoke-7B (S5). The user runs it and returns `mapnai_colab_results_colab-2026-10-24.zip`; then summarize locally with e20 `--scored-on` (README).
+- All GPU work moved to `research/colab/mapnai_gpu_runs.ipynb` (tag colab-2026-10-24): FT5 test (S1) + dev, optional DeBERTa; Bespoke-7B (S5, A100 only, optional) split out to `research/colab/mapnai_bespoke_7b.ipynb`. The user runs it and returns `mapnai_colab_results_colab-2026-10-24.zip`; then summarize locally with e20 `--scored-on` (README).
 - Generation can resume locally (same command, same tag) when memory allows; it is network-bound.
 
 ## Next (in order)
-1. After the FT5 test run: Gate 4 (S1 = |avg11 − 75.0| ≤ 2.0). Then S2 NER on the GPU: `"$C" research/experiments/e21_gate_aggrefact.py --step ner --split test` (and dev), `"$V" ... --step ner-fallback`, `"$V" ... --step gate --split test --tag s2-2026-10-24`.
+1. S2 NER on the GPU (Gate 4 passed): `"$C" research/experiments/e21_gate_aggrefact.py --step ner --split test` (and dev), `"$V" ... --step ner-fallback`, `"$V" ... --step gate --split test --tag s2-2026-10-24`.
 2. After generation: `"$V" research/experiments/e14_score_gates.py --rewrites main-2026-10-24 --tag main-2026-10-24`, then `"$V" research/experiments/e12_export_annotation.py --tag gold-2026-10-24` → hand the sheet to annotators (H1).
-3. Silver labels (Claude, two prompts) on dev items; CAFG dev tuning (AggreFact dev FT5 probabilities + MAPNAI dev silver); freeze config + sha256 + commit; score test once (CAFG-L+M on AggreFact test reuses the cached FT5 test probabilities for escalated rows).
-4. Colab: Bespoke-7B (S5) by the user, `research/colab/README.md`.
+3. Silver labels (Claude, two prompts) on dev items; CAFG dev tuning (AggreFact dev FT5 probabilities = `cache/e20_minicheck-ft5_dev_kaggle-2026-10-31.jsonl` + MAPNAI dev silver); freeze config + sha256 + commit; score test once (CAFG-L+M on AggreFact test reuses the cached FT5 test probabilities `cache/e20_minicheck-ft5_test_kaggle-2026-10-31.jsonl` for escalated rows).
+4. Colab: Bespoke-7B (S5) by the user, `research/colab/README.md` (A100 only; Kaggle T4 is too small). Optional: DeBERTa (Part 2b) on Kaggle with the OOM-retry notebook.
 
 ## Blockers / pending user decisions
 - H4 (Phase 2B): RESOLVED 2026-10-24 (user HF login; token in ~/.cache/huggingface, outside the repo).

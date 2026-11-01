@@ -1,0 +1,27 @@
+{
+ "benchmark": "LLM-AggreFact",
+ "prereg": "PREREG.md \u00a74 + \u00a79 (v2)",
+ "tag": "2026-11-01",
+ "cafg_config": {
+  "normalize_entities": true,
+  "added_names": true,
+  "added_months": false,
+  "lexical_accept": 0.8,
+  "require_retention": false,
+  "learned": false
+ },
+ "stage3": {
+  "checker": "minicheck-ft5 (MiniCheck-Flan-T5-Large @ 96eafd01)",
+  "protocol": "P-fixed",
+  "threshold": "prob > 0.5",
+  "probabilities": "cache/e20_minicheck-ft5_<split>_kaggle-2026-10-31.jsonl"
+ },
+ "selected_on": "dev",
+ "selection_rule": "lowest News-3 call rate with dev News-3 BAcc \u2265 FT5 \u2212 1.0; ties \u2192 higher BAcc",
+ "dev": {
+  "news3": 67.23,
+  "avg11": 72.48,
+  "call_rate_news3": 0.7549,
+  "call_rate_all": 0.7217
+ }
+}

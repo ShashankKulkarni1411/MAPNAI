@@ -1,0 +1,166 @@
+{
+ "meta": {
+  "script": "research/experiments/e20_aggrefact_eval.py",
+  "run_at_utc": "2026-11-01T09:11:46+00:00",
+  "git_commit": "daf80b1",
+  "python": "3.11.9",
+  "checker": "minicheck-ft5",
+  "split": "test",
+  "tag": "kaggle-2026-10-31",
+  "limit": 0,
+  "dataset_revision": "981dfd0bd8e58e7238a9ab92b2e6ea44bce918e4",
+  "protocol": "P-fixed",
+  "batch_size": 16,
+  "torch": "2.6.0+cu124",
+  "gpu": "NVIDIA GeForce RTX 3050 6GB Laptop GPU",
+  "scored_on": "Kaggle T4 (torch 2.11.0+cu128, py3.13; notebook mapnai_kaggle_gpu_runs, resumed once after CUDA OOM)",
+  "wall_seconds_this_run": 11.0
+ },
+ "n": 29320,
+ "published": {
+  "avg11": 75.0,
+  "avg10_paper": 74.7
+ },
+ "per_dataset": {
+  "AggreFact-CNN": {
+   "n": 558,
+   "bacc": 69.95,
+   "ci95": [
+    63.19,
+    76.43
+   ]
+  },
+  "AggreFact-XSum": {
+   "n": 558,
+   "bacc": 74.26,
+   "ci95": [
+    70.72,
+    77.93
+   ]
+  },
+  "ClaimVerify": {
+   "n": 1088,
+   "bacc": 74.59,
+   "ci95": [
+    71.47,
+    77.57
+   ]
+  },
+  "ExpertQA": {
+   "n": 3702,
+   "bacc": 58.95,
+   "ci95": [
+    57.01,
+    60.86
+   ]
+  },
+  "FactCheck-GPT": {
+   "n": 1566,
+   "bacc": 74.72,
+   "ci95": [
+    72.07,
+    77.29
+   ]
+  },
+  "Lfqa": {
+   "n": 1911,
+   "bacc": 85.19,
+   "ci95": [
+    83.52,
+    86.85
+   ]
+  },
+  "RAGTruth": {
+   "n": 16371,
+   "bacc": 77.98,
+   "ci95": [
+    76.99,
+    78.98
+   ]
+  },
+  "Reveal": {
+   "n": 1710,
+   "bacc": 86.25,
+   "ci95": [
+    84.46,
+    88.04
+   ]
+  },
+  "TofuEval-MediaS": {
+   "n": 726,
+   "bacc": 73.58,
+   "ci95": [
+    69.77,
+    77.49
+   ]
+  },
+  "TofuEval-MeetB": {
+   "n": 772,
+   "bacc": 77.3,
+   "ci95": [
+    73.24,
+    81.21
+   ]
+  },
+  "Wice": {
+   "n": 358,
+   "bacc": 72.42,
+   "ci95": [
+    67.36,
+    77.54
+   ]
+  }
+ },
+ "avg_all": {
+  "bacc": 75.02,
+  "ci95": [
+   73.96,
+   76.09
+  ],
+  "datasets": [
+   "AggreFact-CNN",
+   "AggreFact-XSum",
+   "ClaimVerify",
+   "ExpertQA",
+   "FactCheck-GPT",
+   "Lfqa",
+   "RAGTruth",
+   "Reveal",
+   "TofuEval-MediaS",
+   "TofuEval-MeetB",
+   "Wice"
+  ]
+ },
+ "avg_without_ragtruth": {
+  "bacc": 74.72,
+  "ci95": [
+   73.56,
+   75.89
+  ],
+  "datasets": [
+   "AggreFact-CNN",
+   "AggreFact-XSum",
+   "ClaimVerify",
+   "ExpertQA",
+   "FactCheck-GPT",
+   "Lfqa",
+   "Reveal",
+   "TofuEval-MediaS",
+   "TofuEval-MeetB",
+   "Wice"
+  ]
+ },
+ "news3": {
+  "bacc": 72.6,
+  "ci95": [
+   69.73,
+   75.41
+  ],
+  "datasets": [
+   "AggreFact-CNN",
+   "AggreFact-XSum",
+   "TofuEval-MediaS"
+  ]
+ },
+ "s1_gap_vs_published_avg11": 0.02
+}
