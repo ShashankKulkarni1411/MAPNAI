@@ -1,0 +1,170 @@
+{
+ "meta": {
+  "script": "research/experiments/e23_cafg_mapnai.py",
+  "run_at_utc": "2026-11-15T14:50:14+00:00",
+  "git_commit": "922b659",
+  "python": "3.11.9",
+  "step": "test",
+  "tag": "2026-11-15",
+  "frozen_config": "research\\faithgate\\configs\\cafg_mapnai_2026-11-15.json",
+  "frozen_config_sha256": "fa5028dda2420acab833838ac6af4ce9c3a52752416d0f15972ac3e0de6a03c9",
+  "config_commit": "922b659",
+  "bootstrap": "2000 over 182 source articles, seed 13, weighted"
+ },
+ "n": 240,
+ "n_unfaithful": 58,
+ "n_lexical": 11,
+ "n_semantic": 47,
+ "cafg_ft5_calls": 131,
+ "cafg_stages": {
+  "core_omission": 80,
+  "addition": 3,
+  "learned": 131,
+  "lexical_accept": 25,
+  "unparseable": 1
+ },
+ "gates": {
+  "v1": {
+   "frr": {
+    "est": 0.3763,
+    "ci95": [
+     0.3037,
+     0.4542
+    ]
+   },
+   "far": {
+    "est": 0.3301,
+    "ci95": [
+     0.1849,
+     0.4692
+    ]
+   },
+   "far_lex": {
+    "est": 0.4442,
+    "ci95": [
+     0.0,
+     0.724
+    ]
+   },
+   "far_sem": {
+    "est": 0.304,
+    "ci95": [
+     0.1541,
+     0.4609
+    ]
+   },
+   "serve": {
+    "est": 0.5577,
+    "ci95": [
+     0.4861,
+     0.6268
+    ]
+   }
+  },
+  "cafg": {
+   "frr": {
+    "est": 0.3264,
+    "ci95": [
+     0.2534,
+     0.3989
+    ]
+   },
+   "far": {
+    "est": 0.4467,
+    "ci95": [
+     0.2999,
+     0.5833
+    ]
+   },
+   "far_lex": {
+    "est": 0.694,
+    "ci95": [
+     0.3721,
+     0.9261
+    ]
+   },
+   "far_sem": {
+    "est": 0.3902,
+    "ci95": [
+     0.2336,
+     0.5391
+    ]
+   },
+   "serve": {
+    "est": 0.6226,
+    "ci95": [
+     0.5542,
+     0.69
+    ]
+   }
+  }
+ },
+ "diff_v1_minus_cafg": {
+  "frr": {
+   "est": 0.0499,
+   "ci95": [
+    -0.0129,
+    0.1184
+   ]
+  },
+  "far": {
+   "est": -0.1166,
+   "ci95": [
+    -0.2309,
+    -0.0059
+   ]
+  },
+  "far_lex": {
+   "est": -0.2497,
+   "ci95": [
+    -0.6348,
+    0.0
+   ]
+  },
+  "far_sem": {
+   "est": -0.0861,
+   "ci95": [
+    -0.217,
+    0.0356
+   ]
+  }
+ },
+ "s4": {
+  "frr_lower_by_10pts": false,
+  "far_lex_noninferior_2pts": false,
+  "semantic_target": false,
+  "S4_pass": false
+ },
+ "main_batch_agreement": {
+  "round1": {
+   "kappa_faithful": 0.5566,
+   "ci95": [
+    0.3832,
+    0.7
+   ],
+   "agreement": 0.9
+  },
+  "round2": {
+   "kappa_faithful": 0.5565,
+   "ci95": [
+    0.427,
+    0.6796
+   ],
+   "agreement": 0.8542
+  }
+ },
+ "confusion_unweighted": {
+  "v1": {
+   "faithful=1/accept=0": 78,
+   "faithful=0/accept=0": 42,
+   "faithful=1/accept=1": 104,
+   "faithful=0/accept=1": 16
+  },
+  "cafg": {
+   "faithful=1/accept=0": 65,
+   "faithful=0/accept=0": 34,
+   "faithful=1/accept=1": 117,
+   "faithful=0/accept=1": 24
+  }
+ }
+}
