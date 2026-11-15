@@ -1,0 +1,64 @@
+{
+  "meta": {
+    "script": "research2/n01_prepare.py",
+    "tag": "2026-11-15",
+    "run_at_utc": "2026-11-15T15:42:51+00:00",
+    "seed": 13
+  },
+  "impressions": {
+    "train": 156965,
+    "dev": 73152
+  },
+  "articles_in_news_tsv": 65238,
+  "candidate_articles": 22771,
+  "candidate_articles_train_only": 17402,
+  "candidate_articles_dev_only": 2483,
+  "candidate_articles_both": 2886,
+  "empty_abstract": 1304,
+  "abstract_truncated_at_chars": 600,
+  "abstract_truncated": 83,
+  "categories": {
+    "news": 6604,
+    "sports": 6478,
+    "finance": 1389,
+    "lifestyle": 1238,
+    "travel": 1227,
+    "video": 1118,
+    "foodanddrink": 1098,
+    "weather": 1003,
+    "health": 754,
+    "autos": 663,
+    "music": 368,
+    "tv": 310,
+    "entertainment": 271,
+    "movies": 235,
+    "kids": 14,
+    "northamerica": 1
+  },
+  "exposed_ge_50_impressions": 5172,
+  "exposed_ge_50_with_click": 4844,
+  "pilot_n": 50,
+  "human_n": 100,
+  "human_allocation": {
+    "autos": 6,
+    "foodanddrink": 8,
+    "video": 6,
+    "sports": 11,
+    "finance": 8,
+    "entertainment": 5,
+    "lifestyle": 8,
+    "news": 14,
+    "health": 7,
+    "travel": 6,
+    "weather": 6,
+    "music": 5,
+    "movies": 5,
+    "tv": 5
+  },
+  "prompt_sha256": "2550d607c7d80996152cd356a9d62d682b31ed21e432cd95242a7d391a40eeb8",
+  "files": {
+    "data/articles_to_score.jsonl": "48cec4412f64a6e492147fbf34a10712923d29a59d6f14cd7180419452576a0b",
+    "data/article_meta.csv": "e7bedbd5eecfd58abaf43d8ab4cb69bd5e431d9a631a5f52f0348971bd8c0dca",
+    "data/human_sample.json": "f66a41c9bb125e6f2cda83170878ab930e1f1e572bc1d7f04a6e856ddb9098b1"
+  }
+}

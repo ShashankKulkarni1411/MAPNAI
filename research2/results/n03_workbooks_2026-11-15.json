@@ -1,0 +1,14 @@
+{
+  "meta": {
+    "script": "research2/n03_annotation_workbook.py",
+    "tag": "2026-11-15",
+    "run_at_utc": "2026-11-15T15:54:31+00:00"
+  },
+  "n_items": 100,
+  "sample_sha256": "f66a41c9bb125e6f2cda83170878ab930e1f1e572bc1d7f04a6e856ddb9098b1",
+  "codebook_sha256": "136d19dc9e2eb61276da270da91700a86c536a608bae1f4382089e189fe10edd",
+  "workbooks": {
+    "annotation/nv_labels_A1.xlsx": "34f5b6b9d9c14f576911f91f7487a244399bbd854f0aff8ab6e22c5c936ac3f9",
+    "annotation/nv_labels_A2.xlsx": "b341ecb440c65df4b6035d2d0e4898332eec09e1aac21e845cabf37cc036791f"
+  }
+}

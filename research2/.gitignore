@@ -1,0 +1,8 @@
+# MIND-derived text (Microsoft Research licence: no redistribution)
+data/
+annotation/
+# third-party papers (copyright)
+*.pdf
+# local runs
+cache/
+__pycache__/
