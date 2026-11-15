@@ -1,0 +1,16 @@
+{
+  "added_names": false,
+  "retention": "budget_core",
+  "lexical_accept": 0.9,
+  "theta": 0.3,
+  "normalize_entities": true,
+  "added_months": false,
+  "core_k": 3,
+  "budget_words": {
+    "short": 50,
+    "medium": 120
+  },
+  "learned": "minicheck-ft5 @ 96eafd01 (P-fixed), min over rewrite sentences",
+  "selected_by": "PREREG \u00a713: min dev FRR s.t. FAR <= FAR_v1 + 0.02",
+  "dev_tag": "2026-11-15"
+}

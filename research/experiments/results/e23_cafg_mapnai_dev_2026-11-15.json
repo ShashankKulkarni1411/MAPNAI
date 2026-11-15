@@ -1,0 +1,455 @@
+{
+ "meta": {
+  "script": "research/experiments/e23_cafg_mapnai.py",
+  "run_at_utc": "2026-11-15T14:49:42+00:00",
+  "git_commit": "8ab059f",
+  "python": "3.11.9",
+  "step": "tune",
+  "tag": "2026-11-15",
+  "labels": "human pilot labels (soft = mean of annotators)"
+ },
+ "n_dev_items": 160,
+ "dev_unfaithful_mass": 34.5,
+ "v1": {
+  "frr": 0.4422,
+  "far": 0.3478,
+  "bacc": 0.605
+ },
+ "grid": [
+  {
+   "idx": 0,
+   "added_names": true,
+   "retention": "off",
+   "lexical_accept": null,
+   "theta": 0.3,
+   "frr": 0.1793,
+   "far": 0.5217,
+   "bacc": 0.6495,
+   "ft5_calls": 148,
+   "stages": {
+    "learned": 148,
+    "addition": 11,
+    "unparseable": 1
+   },
+   "qualifies": false
+  },
+  {
+   "idx": 1,
+   "added_names": true,
+   "retention": "off",
+   "lexical_accept": null,
+   "theta": 0.5,
+   "frr": 0.2271,
+   "far": 0.5217,
+   "bacc": 0.6256,
+   "ft5_calls": 148,
+   "stages": {
+    "learned": 148,
+    "addition": 11,
+    "unparseable": 1
+   },
+   "qualifies": false
+  },
+  {
+   "idx": 2,
+   "added_names": true,
+   "retention": "off",
+   "lexical_accept": null,
+   "theta": 0.7,
+   "frr": 0.243,
+   "far": 0.4348,
+   "bacc": 0.6611,
+   "ft5_calls": 148,
+   "stages": {
+    "learned": 148,
+    "addition": 11,
+    "unparseable": 1
+   },
+   "qualifies": false
+  },
+  {
+   "idx": 3,
+   "added_names": true,
+   "retention": "off",
+   "lexical_accept": 0.9,
+   "theta": 0.3,
+   "frr": 0.1793,
+   "far": 0.5217,
+   "bacc": 0.6495,
+   "ft5_calls": 140,
+   "stages": {
+    "learned": 140,
+    "addition": 11,
+    "lexical_accept": 8,
+    "unparseable": 1
+   },
+   "qualifies": false
+  },
+  {
+   "idx": 4,
+   "added_names": true,
+   "retention": "off",
+   "lexical_accept": 0.9,
+   "theta": 0.5,
+   "frr": 0.2271,
+   "far": 0.5217,
+   "bacc": 0.6256,
+   "ft5_calls": 140,
+   "stages": {
+    "learned": 140,
+    "addition": 11,
+    "lexical_accept": 8,
+    "unparseable": 1
+   },
+   "qualifies": false
+  },
+  {
+   "idx": 5,
+   "added_names": true,
+   "retention": "off",
+   "lexical_accept": 0.9,
+   "theta": 0.7,
+   "frr": 0.2351,
+   "far": 0.4348,
+   "bacc": 0.6651,
+   "ft5_calls": 140,
+   "stages": {
+    "learned": 140,
+    "addition": 11,
+    "lexical_accept": 8,
+    "unparseable": 1
+   },
+   "qualifies": false
+  },
+  {
+   "idx": 6,
+   "added_names": true,
+   "retention": "budget_core",
+   "lexical_accept": null,
+   "theta": 0.3,
+   "frr": 0.3865,
+   "far": 0.3478,
+   "bacc": 0.6329,
+   "ft5_calls": 106,
+   "stages": {
+    "learned": 106,
+    "core_omission": 42,
+    "addition": 11,
+    "unparseable": 1
+   },
+   "qualifies": true
+  },
+  {
+   "idx": 7,
+   "added_names": true,
+   "retention": "budget_core",
+   "lexical_accept": null,
+   "theta": 0.5,
+   "frr": 0.4104,
+   "far": 0.3478,
+   "bacc": 0.6209,
+   "ft5_calls": 106,
+   "stages": {
+    "learned": 106,
+    "core_omission": 42,
+    "addition": 11,
+    "unparseable": 1
+   },
+   "qualifies": true
+  },
+  {
+   "idx": 8,
+   "added_names": true,
+   "retention": "budget_core",
+   "lexical_accept": null,
+   "theta": 0.7,
+   "frr": 0.4183,
+   "far": 0.3478,
+   "bacc": 0.6169,
+   "ft5_calls": 106,
+   "stages": {
+    "learned": 106,
+    "core_omission": 42,
+    "addition": 11,
+    "unparseable": 1
+   },
+   "qualifies": true
+  },
+  {
+   "idx": 9,
+   "added_names": true,
+   "retention": "budget_core",
+   "lexical_accept": 0.9,
+   "theta": 0.3,
+   "frr": 0.3865,
+   "far": 0.3478,
+   "bacc": 0.6329,
+   "ft5_calls": 98,
+   "stages": {
+    "learned": 98,
+    "core_omission": 42,
+    "addition": 11,
+    "lexical_accept": 8,
+    "unparseable": 1
+   },
+   "qualifies": true
+  },
+  {
+   "idx": 10,
+   "added_names": true,
+   "retention": "budget_core",
+   "lexical_accept": 0.9,
+   "theta": 0.5,
+   "frr": 0.4104,
+   "far": 0.3478,
+   "bacc": 0.6209,
+   "ft5_calls": 98,
+   "stages": {
+    "learned": 98,
+    "core_omission": 42,
+    "addition": 11,
+    "lexical_accept": 8,
+    "unparseable": 1
+   },
+   "qualifies": true
+  },
+  {
+   "idx": 11,
+   "added_names": true,
+   "retention": "budget_core",
+   "lexical_accept": 0.9,
+   "theta": 0.7,
+   "frr": 0.4104,
+   "far": 0.3478,
+   "bacc": 0.6209,
+   "ft5_calls": 98,
+   "stages": {
+    "learned": 98,
+    "core_omission": 42,
+    "addition": 11,
+    "lexical_accept": 8,
+    "unparseable": 1
+   },
+   "qualifies": true
+  },
+  {
+   "idx": 12,
+   "added_names": false,
+   "retention": "off",
+   "lexical_accept": null,
+   "theta": 0.3,
+   "frr": 0.1394,
+   "far": 0.5507,
+   "bacc": 0.6549,
+   "ft5_calls": 156,
+   "stages": {
+    "learned": 156,
+    "addition": 3,
+    "unparseable": 1
+   },
+   "qualifies": false
+  },
+  {
+   "idx": 13,
+   "added_names": false,
+   "retention": "off",
+   "lexical_accept": null,
+   "theta": 0.5,
+   "frr": 0.1873,
+   "far": 0.5507,
+   "bacc": 0.631,
+   "ft5_calls": 156,
+   "stages": {
+    "learned": 156,
+    "addition": 3,
+    "unparseable": 1
+   },
+   "qualifies": false
+  },
+  {
+   "idx": 14,
+   "added_names": false,
+   "retention": "off",
+   "lexical_accept": null,
+   "theta": 0.7,
+   "frr": 0.2032,
+   "far": 0.4638,
+   "bacc": 0.6665,
+   "ft5_calls": 156,
+   "stages": {
+    "learned": 156,
+    "addition": 3,
+    "unparseable": 1
+   },
+   "qualifies": false
+  },
+  {
+   "idx": 15,
+   "added_names": false,
+   "retention": "off",
+   "lexical_accept": 0.9,
+   "theta": 0.3,
+   "frr": 0.1394,
+   "far": 0.5507,
+   "bacc": 0.6549,
+   "ft5_calls": 148,
+   "stages": {
+    "learned": 148,
+    "lexical_accept": 8,
+    "addition": 3,
+    "unparseable": 1
+   },
+   "qualifies": false
+  },
+  {
+   "idx": 16,
+   "added_names": false,
+   "retention": "off",
+   "lexical_accept": 0.9,
+   "theta": 0.5,
+   "frr": 0.1873,
+   "far": 0.5507,
+   "bacc": 0.631,
+   "ft5_calls": 148,
+   "stages": {
+    "learned": 148,
+    "lexical_accept": 8,
+    "addition": 3,
+    "unparseable": 1
+   },
+   "qualifies": false
+  },
+  {
+   "idx": 17,
+   "added_names": false,
+   "retention": "off",
+   "lexical_accept": 0.9,
+   "theta": 0.7,
+   "frr": 0.1952,
+   "far": 0.4638,
+   "bacc": 0.6705,
+   "ft5_calls": 148,
+   "stages": {
+    "learned": 148,
+    "lexical_accept": 8,
+    "addition": 3,
+    "unparseable": 1
+   },
+   "qualifies": false
+  },
+  {
+   "idx": 18,
+   "added_names": false,
+   "retention": "budget_core",
+   "lexical_accept": null,
+   "theta": 0.3,
+   "frr": 0.3785,
+   "far": 0.3478,
+   "bacc": 0.6368,
+   "ft5_calls": 107,
+   "stages": {
+    "learned": 107,
+    "core_omission": 49,
+    "addition": 3,
+    "unparseable": 1
+   },
+   "qualifies": true
+  },
+  {
+   "idx": 19,
+   "added_names": false,
+   "retention": "budget_core",
+   "lexical_accept": null,
+   "theta": 0.5,
+   "frr": 0.4024,
+   "far": 0.3478,
+   "bacc": 0.6249,
+   "ft5_calls": 107,
+   "stages": {
+    "learned": 107,
+    "core_omission": 49,
+    "addition": 3,
+    "unparseable": 1
+   },
+   "qualifies": true
+  },
+  {
+   "idx": 20,
+   "added_names": false,
+   "retention": "budget_core",
+   "lexical_accept": null,
+   "theta": 0.7,
+   "frr": 0.4104,
+   "far": 0.3478,
+   "bacc": 0.6209,
+   "ft5_calls": 107,
+   "stages": {
+    "learned": 107,
+    "core_omission": 49,
+    "addition": 3,
+    "unparseable": 1
+   },
+   "qualifies": true
+  },
+  {
+   "idx": 21,
+   "added_names": false,
+   "retention": "budget_core",
+   "lexical_accept": 0.9,
+   "theta": 0.3,
+   "frr": 0.3785,
+   "far": 0.3478,
+   "bacc": 0.6368,
+   "ft5_calls": 99,
+   "stages": {
+    "learned": 99,
+    "core_omission": 49,
+    "lexical_accept": 8,
+    "addition": 3,
+    "unparseable": 1
+   },
+   "qualifies": true
+  },
+  {
+   "idx": 22,
+   "added_names": false,
+   "retention": "budget_core",
+   "lexical_accept": 0.9,
+   "theta": 0.5,
+   "frr": 0.4024,
+   "far": 0.3478,
+   "bacc": 0.6249,
+   "ft5_calls": 99,
+   "stages": {
+    "learned": 99,
+    "core_omission": 49,
+    "lexical_accept": 8,
+    "addition": 3,
+    "unparseable": 1
+   },
+   "qualifies": true
+  },
+  {
+   "idx": 23,
+   "added_names": false,
+   "retention": "budget_core",
+   "lexical_accept": 0.9,
+   "theta": 0.7,
+   "frr": 0.4024,
+   "far": 0.3478,
+   "bacc": 0.6249,
+   "ft5_calls": 99,
+   "stages": {
+    "learned": 99,
+    "core_omission": 49,
+    "lexical_accept": 8,
+    "addition": 3,
+    "unparseable": 1
+   },
+   "qualifies": true
+  }
+ ],
+ "selected_idx": 21,
+ "frozen_config": "research\\faithgate\\configs\\cafg_mapnai_2026-11-15.json",
+ "frozen_config_sha256": "fa5028dda2420acab833838ac6af4ce9c3a52752416d0f15972ac3e0de6a03c9"
+}
