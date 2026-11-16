@@ -1,0 +1,139 @@
+{
+ "meta": {
+  "script": "research/experiments/e14_score_gates.py",
+  "run_at_utc": "2026-11-01T12:32:22+00:00",
+  "git_commit": "da9b525",
+  "python": "3.11.9",
+  "tag": "main-2026-10-24",
+  "rewrites": "main-2026-10-24",
+  "gates": {
+   "v1": {},
+   "v2": {
+    "normalize_entities": true,
+    "check_added_names": true
+   }
+  },
+  "label": "no human labels: serve rates only, not FRR/FAR"
+ },
+ "n_items": 1919,
+ "source_hash_mismatches": 0,
+ "nondeterministic_decisions": 0,
+ "serve": {
+  "v1": {
+   "short": {
+    "n": 959,
+    "served": 503,
+    "serve_rate": 0.5245,
+    "serve_rate_wilson95": [
+     0.4929,
+     0.556
+    ],
+    "fallback_reasons": {
+     "entity": 429,
+     "number": 127,
+     "added_number": 14,
+     "month": 5
+    },
+    "unparseable": 5
+   },
+   "medium": {
+    "n": 960,
+    "served": 569,
+    "serve_rate": 0.5927,
+    "serve_rate_wilson95": [
+     0.5613,
+     0.6234
+    ],
+    "fallback_reasons": {
+     "entity": 366,
+     "number": 110,
+     "added_number": 7,
+     "month": 1
+    },
+    "unparseable": 7
+   },
+   "all": {
+    "n": 1919,
+    "served": 1072,
+    "serve_rate": 0.5586,
+    "serve_rate_wilson95": [
+     0.5363,
+     0.5807
+    ],
+    "fallback_reasons": {
+     "entity": 795,
+     "number": 237,
+     "added_number": 21,
+     "month": 6
+    },
+    "unparseable": 12
+   }
+  },
+  "v2": {
+   "short": {
+    "n": 959,
+    "served": 526,
+    "serve_rate": 0.5485,
+    "serve_rate_wilson95": [
+     0.5169,
+     0.5797
+    ],
+    "fallback_reasons": {
+     "entity": 395,
+     "added_name": 50,
+     "number": 127,
+     "added_number": 14,
+     "month": 5
+    },
+    "unparseable": 5
+   },
+   "medium": {
+    "n": 960,
+    "served": 619,
+    "serve_rate": 0.6448,
+    "serve_rate_wilson95": [
+     0.614,
+     0.6744
+    ],
+    "fallback_reasons": {
+     "number": 110,
+     "added_name": 35,
+     "entity": 308,
+     "added_number": 7,
+     "month": 1
+    },
+    "unparseable": 7
+   },
+   "all": {
+    "n": 1919,
+    "served": 1145,
+    "serve_rate": 0.5967,
+    "serve_rate_wilson95": [
+     0.5745,
+     0.6184
+    ],
+    "fallback_reasons": {
+     "entity": 703,
+     "added_name": 85,
+     "number": 237,
+     "added_number": 21,
+     "month": 6
+    },
+    "unparseable": 12
+   }
+  }
+ },
+ "length_compliance": {
+  "short": {
+   "n": 954,
+   "within_limit": 945,
+   "identical_to_source": 17
+  },
+  "medium": {
+   "n": 953,
+   "within_limit": 946,
+   "identical_to_source": 20
+  }
+ },
+ "e03_live_reference": "render_cache 2026-10-23: 8/12 served (short 4/7, medium 4/5), descriptive"
+}

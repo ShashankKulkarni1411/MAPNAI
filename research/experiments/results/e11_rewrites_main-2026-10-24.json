@@ -1,0 +1,36 @@
+{
+ "meta": {
+  "script": "research/experiments/e11_generate_rewrites.py",
+  "run_at_utc": "2026-11-01T12:32:07+00:00",
+  "git_commit": "da9b525",
+  "python": "3.11.9",
+  "tag": "main-2026-10-24",
+  "model": "openai/gpt-oss-120b",
+  "prompt_version": "r2",
+  "temperature": 0.2,
+  "max_tokens": 800,
+  "extra_body": {
+   "reasoning_effort": "low"
+  },
+  "subset": "all",
+  "cells": "short:plain:low,medium:plain:low,short:analyst:high,medium:analyst:high",
+  "sources": "e10_sources_2026-10-24.json"
+ },
+ "rows": 1920,
+ "new_this_run": 111,
+ "groq_calls_this_run": 111,
+ "groq_calls_total_all_runs": 2126,
+ "parsed": 1907,
+ "unparseable": 12,
+ "errors": 1,
+ "latency_ms": {
+  "p50": 2707.8,
+  "p95": 5359.839999999997
+ },
+ "tokens": {
+  "prompt": 713852,
+  "completion": 306373
+ },
+ "rewrites_file": "cache/e11_main-2026-10-24.jsonl",
+ "rewrites_file_sha256": "b98dad3c70a5809fc178c571dab1ef9d0360c23cab33439c7dff20792122db64"
+}

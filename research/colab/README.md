@@ -1,23 +1,27 @@
 # Colab: GPU runs for LLM-AggreFact
 
-`mapnai_gpu_runs.ipynb` runs all GPU work that does not fit on the project laptop (RTX 3050 6 GB, 11.6 GB RAM):
+Two notebooks run the GPU work that does not fit on the project laptop (RTX 3050 6 GB, 11.6 GB RAM). Step-by-step instructions: `INSTRUCTIONS.md`.
+
+- `mapnai_gpu_runs.ipynb`: Parts 1, 2, 2b (T4 is enough).
+- `mapnai_bespoke_7b.ipynb`: Bespoke-MiniCheck-7B (optional, A100 only).
+- `mapnai_kaggle_gpu_runs.ipynb`: the same Parts 1, 2, 2b on Kaggle (free T4; tag `kaggle-2026-10-31`, zip from the Output tab; summarize locally with `--tag kaggle-2026-10-31 --scored-on "Kaggle T4"`).
 
 | Part | Run | Scorecard | GPU |
 |---|---|---|---|
 | 1 | MiniCheck-Flan-T5-Large, test (29,320 pairs) | S1 harness validity (target 75.0 ± 2.0) | T4 or better |
 | 2 | MiniCheck-Flan-T5-Large, dev (30,420 pairs) | CAFG tuning (S3) | T4 or better |
 | 2b | MiniCheck-DeBERTa-v3-Large, test + dev (optional) | cheaper baseline | T4 or better |
-| 3 | Bespoke-MiniCheck-7B, test | S5 ceiling (published 77.4) | **A100 only** |
+| `mapnai_bespoke_7b.ipynb` | Bespoke-MiniCheck-7B, test | S5 ceiling (published 77.4) | **A100 only** |
 
 ## Steps
 
 1. Open https://colab.research.google.com → **File → Upload notebook** → choose `research/colab/mapnai_gpu_runs.ipynb`.
-2. **Runtime → Change runtime type → GPU**: T4 for Parts 1–2 (free tier works, slowly); **A100** for Part 3 (Colab Pro / compute units). If you have an A100 session, you can do everything in it.
+2. **Runtime → Change runtime type → GPU**: T4 for Parts 1–2 (free tier works, slowly).
 3. Run **Part 0** top to bottom (cells 0.1–0.6). Approve the Google Drive pop-up in 0.2, paste a Hugging Face **read** token in 0.4 (the account that accepted the LLM-AggreFact terms). Cell 0.5 must print `dataset OK` and `checkpoints OK`; if an `assert` fails, stop and report it.
 4. Run **Part 1**, then **Part 2** (and **2b** if you want). Each prints progress every 256 rows and a summary at the end.
    **If Colab disconnects:** reconnect, run 0.1–0.6 again, then re-run the part you were in. Finished rows are kept on Drive and skipped.
-5. Run **Part 4**. It writes `mapnai_colab_results_colab-2026-10-24.zip` to `My Drive/mapnai_colab/`.
-6. For **Part 3**: switch to an A100, **Runtime → Restart session**, run 0.1, 0.2, 0.4, 0.5, 0.6 (skip 0.3), then 3.1–3.3, then Part 4 again.
+5. Run **Part 3** (packaging). It writes `mapnai_colab_results_colab-2026-10-24.zip` to `My Drive/mapnai_colab/`.
+6. Optional, when you have an A100: upload `mapnai_bespoke_7b.ipynb` and run it top to bottom in a fresh A100 session. It uses the same Drive folder and tag, and its last cell rebuilds the same zip with everything scored so far.
 7. Download the zip from Google Drive and put it anywhere on this laptop; tell Claude the path.
 
 ## What happens with the zip
@@ -49,4 +53,4 @@ The notebook's own printed numbers are a preview; the reported numbers are the o
 
   The review found only torch/transformers/einops/sentencepiece/tokenizers imports (plus optional flash_attn and the stdlib modules `math`, `queue`, `threading`, `os`, `shutil.copyfile`), no network calls, exec/eval, subprocess, pickle or `torch.load`, and the standard `save_vocabulary` as the only file write. `config.json` `auto_map["AutoModel"]` points at an unpinned third-party repository; the notebook loads through minicheck/vLLM only, never `AutoModel`.
 
-`run_bespoke.py` is the earlier stand-alone version of Part 3, kept for reference.
+`run_bespoke.py` is the earlier stand-alone version of the Bespoke run, kept for reference.

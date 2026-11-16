@@ -1,0 +1,15 @@
+{
+ "meta": {
+  "script": "research/experiments/e15_humancheck_sheet.py",
+  "run_at_utc": "2026-11-04T20:36:44+00:00",
+  "git_commit": "da9b525",
+  "python": "3.11.9",
+  "tag": "gold-2026-11-01",
+  "seed": 13
+ },
+ "items": 80,
+ "strata": 8,
+ "per_stratum": 10,
+ "sheet_sha256": "9a48200b906c69d2675928ea458c82d960e68e73e795eeb0d77d653828e27899",
+ "ids_sha256": "1960b598ca599be2f5d3569fe5b3bf20865edc7308275ae00ca0a440ac749be2"
+}

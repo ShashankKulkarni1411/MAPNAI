@@ -1,0 +1,73 @@
+{
+ "annotator_files": {
+  "pilot_A1_gold-2026-11-01.csv": {
+   "rows": 120,
+   "sha256": "134c52bf73a328bfba2b46f1e1a6e8d0cbbe6f6e3418cb275e290efc0a475769"
+  },
+  "main_A1_gold-2026-11-01.csv": {
+   "rows": 240,
+   "sha256": "e9acfdcbc2d4e14a46332eea473626b04e99ab59a7822f9fcd7ba82413da8931"
+  },
+  "pilot_A2_gold-2026-11-01.csv": {
+   "rows": 120,
+   "sha256": "889a7f0959bd18fb12b61a7335a2e498881e9359db32cfd5f07b48306cd6eb08"
+  },
+  "main_A2_gold-2026-11-01.csv": {
+   "rows": 240,
+   "sha256": "dc5b4d49b60bc64d363f494a04d0bd3869c7a0fb9ab3783ae952041bd9b35e50"
+  }
+ },
+ "meta": {
+  "script": "research/experiments/e12_export_annotation.py",
+  "run_at_utc": "2026-11-01T12:32:44+00:00",
+  "git_commit": "da9b525",
+  "python": "3.11.9",
+  "tag": "gold-2026-11-01",
+  "seed": 13,
+  "rewrites": "main-2026-10-24",
+  "scores": "main-2026-10-24",
+  "guideline": "GUIDELINES_D3.md v1"
+ },
+ "items": 400,
+ "by_batch": {
+  "B-test": 240,
+  "A-pilot": 160
+ },
+ "double_annotated": 320,
+ "batch_b_strata": {
+  "medium:analyst:high|reject": {
+   "population": 129,
+   "sampled": 30
+  },
+  "medium:analyst:high|pass": {
+   "population": 207,
+   "sampled": 30
+  },
+  "medium:plain:low|reject": {
+   "population": 146,
+   "sampled": 30
+  },
+  "medium:plain:low|pass": {
+   "population": 190,
+   "sampled": 30
+  },
+  "short:analyst:high|reject": {
+   "population": 160,
+   "sampled": 30
+  },
+  "short:analyst:high|pass": {
+   "population": 175,
+   "sampled": 30
+  },
+  "short:plain:low|reject": {
+   "population": 159,
+   "sampled": 30
+  },
+  "short:plain:low|pass": {
+   "population": 177,
+   "sampled": 30
+  }
+ },
+ "sheet_sha256": "aa8e86689d0787469d0d75deb56cc4d8a103a1f229cf2528ae93aa95143f5f50",
+ "key_sha256": "ce74d949c67152d9da29a410204f2877942f866825c96d766f354ab741fc67f6"
+}

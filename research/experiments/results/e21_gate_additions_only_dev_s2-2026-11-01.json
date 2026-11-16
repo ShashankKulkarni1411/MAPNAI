@@ -1,0 +1,161 @@
+{
+ "meta": {
+  "script": "research/experiments/e21_gate_aggrefact.py",
+  "run_at_utc": "2026-11-01T10:06:40+00:00",
+  "git_commit": "da9b525",
+  "python": "3.11.9",
+  "wrapper": "additions_only",
+  "split": "dev",
+  "tag": "s2-2026-11-01",
+  "dataset_revision": "981dfd0bd8e58e7238a9ab92b2e6ea44bce918e4",
+  "gate": "factcheck v1 (production default)",
+  "ner_sources_unique_docs": {
+   "spacy-fallback": 1368,
+   "bert": 9300
+  },
+  "ms_per_row_both_wrappers": 1.881
+ },
+ "n": 30420,
+ "serve_rate": 0.9345,
+ "per_dataset": {
+  "AggreFact-CNN": {
+   "n": 459,
+   "bacc": 53.01,
+   "ci95": [
+    50.19,
+    56.65
+   ]
+  },
+  "AggreFact-XSum": {
+   "n": 777,
+   "bacc": 60.24,
+   "ci95": [
+    57.99,
+    62.44
+   ]
+  },
+  "ClaimVerify": {
+   "n": 1093,
+   "bacc": 54.78,
+   "ci95": [
+    52.96,
+    56.71
+   ]
+  },
+  "ExpertQA": {
+   "n": 3773,
+   "bacc": 52.05,
+   "ci95": [
+    50.88,
+    53.19
+   ]
+  },
+  "FactCheck-GPT": {
+   "n": 1537,
+   "bacc": 55.8,
+   "ci95": [
+    54.13,
+    57.35
+   ]
+  },
+  "Lfqa": {
+   "n": 2029,
+   "bacc": 52.86,
+   "ci95": [
+    52.11,
+    53.65
+   ]
+  },
+  "RAGTruth": {
+   "n": 15340,
+   "bacc": 55.69,
+   "ci95": [
+    54.78,
+    56.59
+   ]
+  },
+  "Reveal": {
+   "n": 1656,
+   "bacc": 65.42,
+   "ci95": [
+    63.7,
+    67.13
+   ]
+  },
+  "TofuEval-MediaS": {
+   "n": 1800,
+   "bacc": 52.57,
+   "ci95": [
+    51.15,
+    53.98
+   ]
+  },
+  "TofuEval-MeetB": {
+   "n": 1607,
+   "bacc": 55.51,
+   "ci95": [
+    53.68,
+    57.44
+   ]
+  },
+  "Wice": {
+   "n": 349,
+   "bacc": 63.23,
+   "ci95": [
+    60.0,
+    66.4
+   ]
+  }
+ },
+ "avg_all": {
+  "bacc": 56.47,
+  "ci95": [
+   55.85,
+   57.06
+  ],
+  "datasets": [
+   "AggreFact-CNN",
+   "AggreFact-XSum",
+   "ClaimVerify",
+   "ExpertQA",
+   "FactCheck-GPT",
+   "Lfqa",
+   "RAGTruth",
+   "Reveal",
+   "TofuEval-MediaS",
+   "TofuEval-MeetB",
+   "Wice"
+  ]
+ },
+ "avg_without_ragtruth": {
+  "bacc": 56.55,
+  "ci95": [
+   55.89,
+   57.2
+  ],
+  "datasets": [
+   "AggreFact-CNN",
+   "AggreFact-XSum",
+   "ClaimVerify",
+   "ExpertQA",
+   "FactCheck-GPT",
+   "Lfqa",
+   "Reveal",
+   "TofuEval-MediaS",
+   "TofuEval-MeetB",
+   "Wice"
+  ]
+ },
+ "news3": {
+  "bacc": 55.27,
+  "ci95": [
+   53.89,
+   56.74
+  ],
+  "datasets": [
+   "AggreFact-CNN",
+   "AggreFact-XSum",
+   "TofuEval-MediaS"
+  ]
+ }
+}

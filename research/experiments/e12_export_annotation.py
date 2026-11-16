@@ -93,8 +93,29 @@ def main():
             keyed[item_id] = {"article_id": aid, "cell": cell, "split": split[aid]["split"], "batch": c["batch"],
                               "double_annotate": c["double"], "gate_v1_serve": gate.get(c["key"]),
                               "weight": c["weight"]}
+    # per-annotator sheets (research/S4_instructions.md, Step 2): pilot = the double items + half of the single pilot
+    # items each; main = all batch-B items, in a different random order per annotator. Same sampled items as above.
+    with sheet.open(encoding="utf-8", newline="") as fh:
+        rows = list(csv.reader(fh))
+    header, body = rows[0], rows[1:]
+    singles = [r for r in body if keyed[r[0]]["batch"] == "A-pilot" and not keyed[r[0]]["double_annotate"]]
+    files = {}
+    for n, who in enumerate(("A1", "A2")):
+        for k, r in enumerate(singles):
+            if k % 2 == n:
+                keyed[r[0]].setdefault("assigned", []).append(who)
+        pilot = [r for r in body if keyed[r[0]]["batch"] == "A-pilot" and
+                 (keyed[r[0]]["double_annotate"] or who in keyed[r[0]].get("assigned", []))]
+        main_rows = [r for r in body if keyed[r[0]]["batch"] == "B-test"]
+        rng.shuffle(pilot)
+        rng.shuffle(main_rows)
+        for part, part_rows in (("pilot", pilot), ("main", main_rows)):
+            path = OUT / f"{part}_{who}_{args.tag}.csv"
+            with path.open("w", newline="", encoding="utf-8") as fh:
+                csv.writer(fh).writerows([header] + part_rows)
+            files[path.name] = {"rows": len(part_rows), "sha256": hashlib.sha256(path.read_bytes()).hexdigest()}
     key.write_text(json.dumps(keyed, indent=1), encoding="utf-8")
-    payload = {"meta": run_metadata("research/experiments/e12_export_annotation.py", tag=args.tag, seed=args.seed,
+    payload = {"annotator_files": files,"meta": run_metadata("research/experiments/e12_export_annotation.py", tag=args.tag, seed=args.seed,
                                     rewrites=args.rewrites, scores=args.scores, guideline="GUIDELINES_D3.md v1"),
                "items": len(keyed), "by_batch": dict(Counter(v["batch"] for v in keyed.values())),
                "double_annotated": sum(v["double_annotate"] for v in keyed.values()),
