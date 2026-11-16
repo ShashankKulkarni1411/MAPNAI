@@ -1,0 +1,91 @@
+% Body of the paper. Numbers: n01 = results/n01_prepare_2026-11-15.json, n04 = results/n04_validity_2026-11-16.json,
+% n05 = results/n05_clicks_2026-11-16.json (as-planned inference), n06 = results/n06_twoway_2026-11-16.json.
+
+\section{Introduction}
+Journalism theory holds that some events are more \emph{newsworthy} than others: conflict, scale, elite actors, surprise, usefulness and human interest raise the chance that a story is selected and told \cite{galtung1965,harcup2017}. News recommenders, in contrast, are trained to predict clicks. Whether the qualities editors call newsworthy are the qualities readers click on is therefore a practical question for recommender design, and a normative one: if \emph{public importance} and \emph{engagement} come apart, a recommender optimised for clicks will under-serve important news \cite{meese2025,vrijenhoek2023}.
+
+Prior studies linked news values to sharing and social-media popularity \cite{trilling2017,piotrkowicz2017} and to headline click-through \cite{lagerwerf2021}, and recent work used an LLM to detect news values in the lead images of the MIND benchmark \cite{sotic2025}. Two gaps remain. First, engagement studies use aggregate counts (shares, likes, click-through rate), which mix an article's appeal with how often it was shown. Second, the one MIND study did not test news values against clicks; it names this as future work \cite{sotic2025}.
+
+We address both gaps for headline and abstract text. We score all 22,771 candidate articles of MIND-small \cite{wu2020mind} on seven news values with an open-weight LLM, check the scores against two human annotators, and relate them to clicks \emph{within impressions}, comparing only items shown to the same user at the same time. Our contributions are:
+\begin{itemize}
+\item Validated textual news-value annotations for all MIND-small candidate articles: six of seven values pass a preregistered human reliability and LLM validity gate.
+\item An exposure-controlled test of news values against impression logs. We show that the usual user-level bootstrap is badly anti-conservative for article attributes: a random per-article score appears ``significant'' under it. We use a two-way bootstrap and permutation tests instead.
+\item Evidence that public importance is not rewarded by clicks. Neither importance nor the preregistered candidates prominence and surprise reliably predict clicks within impressions; practical utility predicts \emph{fewer} clicks and conflict more, both replicating across splits.
+\end{itemize}
+The analysis plan and hypotheses were committed to a public repository before any score was produced; deviations are reported in Section~\ref{sec:deviations}.
+
+\section{Related Work}
+\textbf{News values.} Galtung and Ruge \cite{galtung1965} proposed factors that make foreign events newsworthy; Harcup and O'Neill \cite{harcup2017} revised the list for contemporary news, and Bednarek and Caple \cite{bednarek2017} treat news values as constructed in the text itself, which motivates annotating headlines and abstracts rather than events.
+
+\textbf{News values and audience behaviour.} News factors predict sharing of Dutch news articles \cite{trilling2017}; headline news values have been extracted automatically and related to social popularity \cite{piotrkowicz2017}; and foregrounding news values in online headlines has been tested against click-through rate \cite{lagerwerf2021}. These studies use aggregate engagement and do not control exposure.
+
+\textbf{News values in MIND.} Sotic and Kamps \cite{sotic2025} scraped MIND lead images, annotated eleven visual news values and showed that GPT-4.1 detects them with moderate accuracy, but did not relate them to clicks. Vrijenhoek \cite{vrijenhoek2023} documents that MIND skews to soft news and that candidate generation is undocumented; Xun et al.\ \cite{xun2021} show that visual impressions affect clicks. Meese and Herbertson \cite{meese2025} propose survey-based public-value labels for recommenders, without results.
+
+\textbf{LLMs as annotators.} LLMs can match or exceed crowd workers on text annotation \cite{gilardi2023}, but their validity must be checked per construct against human judgement, which we do before any click analysis.
+
+\section{Data and Annotation}
+\textbf{Data.} MIND-small \cite{wu2020mind} logs MSN News impressions: each impression lists the candidate articles shown to a user and which were clicked. The train split covers 9 to 14 November 2019 (156,965 impressions) and the dev split 15 November 2019 (73,152 impressions); 50,000 users appear in each. The 22,771 distinct candidate articles are our corpus; 1,304 have an empty abstract. Dev is our primary split and train a replication.
+
+\textbf{News values.} We use seven values adapted from \cite{harcup2017}: \emph{conflict} (negativity, disputes, crime, disasters), \emph{magnitude} (scale of impact), \emph{prominence} (elite people, organisations, nations), \emph{surprise}, \emph{utility} (information a reader could act on: health, money, safety, weather, travel), \emph{entertainment} (show business, sport as spectacle, human interest) and \emph{importance} (how much a well-informed citizen ought to know it, however entertaining or dull). Each is rated from 1 to 5 from the headline and abstract (cut at 600 characters); the category label is withheld.
+
+\textbf{LLM scoring.} Qwen2.5-7B-Instruct \cite{qwen2025} scored every article with greedy decoding and a fixed prompt containing the seven definitions (prompt SHA-256 \texttt{2550d607\ldots}). All 22,771 outputs parsed as valid JSON on the first attempt (two NVIDIA T4 GPUs, about four hours).
+
+\textbf{Human annotation.} Two annotators independently rated 100 articles, sampled across 14 categories (square-root-proportional, at least two per category, each with $\ge$50 impressions), using a codebook with the same definitions and anchored examples. One item was left blank by one annotator, leaving 99.
+
+\textbf{Validity gate (preregistered).} For each value we computed quadratic-weighted Cohen's $\kappa$ \cite{cohen1968} between annotators and Spearman's $\rho$ between the LLM and the annotators' mean, with 2,000 item-bootstrap CIs. A value enters confirmatory tests only if $\rho \ge 0.40$ and $\kappa \ge 0.40$.
+
+\section{Click Analysis Method}
+\textbf{Within-impression AUC.} For impression $i$ and value $v$, $\mathrm{AUC}_{i,v}$ is the probability that a clicked candidate scores higher on $v$ than a non-clicked one (ties count one half). We average over the impressions that have at least one click and one non-click (all 73,152 dev impressions), the convention of MIND's AUC metric. Comparing items within an impression removes differences in how often articles were shown. An AUC above 0.5 means readers prefer items high on $v$.
+
+\textbf{Inference.} Impressions are crossed with articles: the same popular items recur across thousands of impressions. We therefore use a two-way bootstrap that resamples users and articles simultaneously with independent Poisson(1) weights (the pigeonhole bootstrap \cite{owen2007,owen2012}), and an article-level permutation test (scores shuffled across articles) for $p$-values. As a built-in check, a random score per article must yield a CI containing 0.5.
+
+\textbf{Hypotheses (preregistered).} H1: entertainment, prominence and surprise each have AUC $>0.5$ (Holm correction over three tests). H2: AUC(importance) $<$ AUC(entertainment). H3: among the 5,172 articles with $\ge$50 impressions, Spearman $\rho$(importance, click rate) $<$ $\rho$(entertainment, click rate), with an article bootstrap.
+
+\textbf{Exploratory analyses.} E1: AUC of conflict, magnitude and utility. E2: a multinomial logit per click (alternatives: the clicked item and the impression's non-clicked items) on all seven standardised values. E3: per-category results and two quadrants: \emph{important but ignored} (importance $\ge$4, click rate in the bottom quartile) and \emph{clicked but unimportant} (importance $\le$2, top quartile). E4: an article's train-period click rate as a popularity baseline. E5: sensitivity to short impressions, empty abstracts and gate-excluded values.
+
+\section{Results}
+\subsection{Validity of the LLM scores}
+\input{sections/table_validity}
+Six of seven values pass the gate (Table~\ref{tab:validity}). Human agreement is substantial for conflict ($\kappa$=0.81) and utility (0.73), and LLM-human correlations range from 0.46 (magnitude) to 0.78 (utility). \emph{Entertainment fails}: the annotators disagree ($\kappa$=0.20) because one used the midpoint for 67 of 99 items, although the LLM tracks the other annotator closely ($\rho$=0.82). Following the preregistered rule, entertainment and the hypotheses that use it (part of H1, H2, H3) are treated as exploratory.
+
+\subsection{Within-impression AUC}
+% n06 (two-way bootstrap, permutation); n05 for the user-only CI of the random score
+\input{sections/table_auc}
+\textbf{Inference check.} Under the user-only bootstrap, the random per-article score had a dev CI of [0.513, 0.517], excluding 0.5. Under the two-way bootstrap its CI is [0.484, 0.558] in dev and [0.477, 0.513] in train, both containing 0.5 (Table~\ref{tab:auc}), and the permutation null has a standard deviation of about 0.02 AUC. Intervals that ignore article-level variation are thus roughly 18 times too narrow.
+
+\textbf{Confirmatory test (H1).} Prominence (AUC 0.528, $p$=0.16) and surprise (0.527, $p$=0.18) lie above 0.5 in both splits, but neither is significant on dev (Holm-adjusted $p$=0.49 for both). \emph{H1 is not supported.} Entertainment (exploratory) is likewise inconclusive (0.515, $p$=0.44).
+
+\textbf{Exploratory values.} Two values are clearly associated with clicks, in both splits. \emph{Utility} predicts fewer clicks: dev 0.434 [0.392, 0.456], $p$=0.002 (the smallest attainable with 500 permutations); train 0.457 [0.440, 0.473]. \emph{Conflict} predicts more: dev 0.535 [0.510, 0.572], $p$=0.03; train 0.517 [0.505, 0.533]. \emph{Importance} shows no association on dev (0.505 [0.467, 0.548], $p$=0.83) and a slightly negative one on train (0.481 [0.465, 0.496]). Conflict exceeds importance by 0.031 [0.007, 0.059] on dev, and utility falls below it by 0.071 [0.023, 0.143]. The importance-entertainment difference (H2, exploratory) is inconclusive on dev ($-$0.010 [$-$0.073, 0.053]) and negative on train ($-$0.042 [$-$0.076, $-$0.016]).
+
+\textbf{Within categories (E3).} Restricting each impression to candidates of one category, utility stays below 0.5 with a CI excluding 0.5 in news (0.411), finance (0.442), health (0.431), sports (0.467) and video (0.408), so the utility effect does not come only from service categories being clicked less overall. Importance is not above 0.5 with a CI excluding 0.5 in any category except movies (0.517 [0.510, 0.572]).
+
+\textbf{Sensitivity (E5).} Removing the 1,304 empty-abstract articles changes no AUC by more than 0.007. In impressions with at most ten candidates, all values move towards or below 0.5 with wide CIs; these short lists are a small and atypical subset.
+
+\subsection{Article-level click rate}
+% n05 H3 / E3 (article bootstrap, unaffected by Change 1)
+Across the 5,172 articles with at least 50 impressions, click rate correlates with utility ($\rho$=$-$0.215, 95\% CI [$-$0.240, $-$0.191]), conflict (0.177 [0.149, 0.206]) and surprise (0.163 [0.136, 0.189]), weakly with entertainment (0.069) and prominence (0.049), and not with magnitude (0.009) or \emph{importance} ($-$0.008 [$-$0.035, 0.019]). The importance-entertainment difference (H3, exploratory) is $-$0.077 [$-$0.125, $-$0.030]. 41\% of these articles have importance $\ge$4; 565 are \emph{important but ignored}, mostly news (288), finance (93) and health (64), and 197 are \emph{clicked but unimportant}, mostly food (33), video (31), sports (31) and lifestyle (30).
+
+\subsection{Multivariate model and popularity baseline}
+% n06: E2 (two-way bootstrap, B=100), E4 (covered subset, B=100)
+\textbf{Joint model (E2).} In the per-click multinomial logit with all seven standardised values (dev, 111,383 clicks), the point estimates follow the AUCs: utility $-$0.18 (odds ratio 0.84 per standard deviation), conflict $+$0.13 (1.13), surprise $+$0.09, importance $-$0.09, entertainment $-$0.02. With two-way bootstrap CIs, however, no coefficient excludes zero (utility [$-$0.47, 0.05]); the values are correlated (e.g.\ importance with magnitude, $\rho$=0.53), and article-level uncertainty is large. Dropping entertainment changes no coefficient by more than 0.01.
+
+\textbf{Popularity baseline (E4).} 78.7\% of dev candidate rows have a train-period click rate. On that subset, past click rate reaches AUC 0.587 [0.545, 0.624], above every news value (best: prominence 0.535) and above their sum (0.525; difference $-$0.062 [$-$0.105, $-$0.008]). News values describe content in interpretable terms, but they predict clicks poorly.
+
+\section{Discussion}
+\textbf{Importance and clicks.} An LLM rating of public importance, valid against human judgement ($\rho$=0.67), carries no positive signal about which of the items on screen a reader clicks, within impressions or across articles ($\rho$ with click rate $-$0.008 [$-$0.035, 0.019]). A recommender trained on clicks therefore receives no pressure to surface important items; 565 heavily exposed articles rated highly important sit in the bottom click quartile, mostly news, finance and health. This supports giving importance its own weight in the ranking objective, since training on clicks alone will not promote it \cite{meese2025,vrijenhoek2023}.
+
+\textbf{Utility and conflict.} The clearest effect is negative: items offering practical, actionable information are clicked less than the items shown beside them, even within categories. One possible reading is that service content (forecasts, finance tips, health advice) is skimmed from headlines or sought elsewhere, while feeds reward stories with narrative pull; conflict's positive effect is consistent with the expectation in news-value theory that negativity attracts attention \cite{galtung1965,harcup2017}. We did not test either explanation.
+
+\textbf{Effect sizes.} All effects are small (AUC 0.43 to 0.54) next to past popularity (0.59). That is expected for properties of the content, which compete with user interest, timing and layout \cite{xun2021}.
+
+\textbf{Inference on MIND.} Article attributes are crossed with users in MIND, so any per-article score inherits article-level noise. A user-level bootstrap made a random score look significant. Studies relating item features (topics, sentiment, LLM judgements) to MIND clicks should resample articles as well as users, or use permutation tests; otherwise small AUC differences can be artefacts.
+
+\textbf{Validity.} For prominence and utility the LLM tracked the annotators' mean more closely ($\rho$=0.74, 0.78) than the annotators tracked each other (0.70, 0.71); for magnitude and surprise it was clearly weaker (0.46 vs 0.71; 0.54 vs 0.71). Entertainment failed on annotator disagreement, while the LLM agreed well with one annotator; tighter anchors for the midpoint would likely fix it.
+
+\section{Deviations From the Plan and Limitations}\label{sec:deviations}
+\textbf{Deviations.} (i) The plan specified a user-level bootstrap. Its built-in sanity check failed: a random per-article score gave dev AUC 0.515 with CI [0.513, 0.517]. Because articles recur across impressions, resampling users alone ignores article-level variation. We replaced it with the two-way bootstrap and a permutation test before running them; point estimates are unchanged, and the planned-method results are reported in the repository. (ii) Bootstrap replicate counts were reduced for runtime after the first three intervals had been computed. (iii) Entertainment failed the gate, so H2, H3 and part of H1 are exploratory.
+
+\textbf{Limitations.} MIND covers one platform over six days in 2019 and skews to soft news \cite{vrijenhoek2023}; candidate generation is undocumented and screen position is unavailable, so layout and images, which affect clicks \cite{xun2021}, are not controlled. Scores come from one LLM and one prompt, validated on 99 items. Associations are observational, not causal. LLM importance reflects a model's notion of civic relevance, not a survey of citizens \cite{meese2025}.
+
+\section{Conclusion}
+We annotated all 22,771 MIND-small candidate articles with seven LLM-scored news values, validated six against two human annotators, and related them to clicks within impressions with inference that respects the crossing of users and articles. The preregistered hypothesis that prominence and surprise predict clicks was not supported. Public importance was unrelated to clicks; practical utility predicted fewer clicks and conflict more, in both data splits. For news recommendation, engagement is not a proxy for importance, and item-level analyses of MIND need article-aware inference. Code, prompts, hypotheses and result files are available at \url{https://github.com/killerx1411/Importance-Is-Not-Engagement}; MIND text is not redistributed.

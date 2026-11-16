@@ -1,0 +1,2641 @@
+{
+  "meta": {
+    "script": "research2/n05_clicks.py",
+    "tag": "2026-11-16",
+    "plan": "HYPOTHESES.md v1",
+    "run_at_utc": "2026-11-16T06:58:38+00:00",
+    "n_boot": 1000,
+    "seed": 13,
+    "gate_pass": [
+      "conflict",
+      "importance",
+      "magnitude",
+      "prominence",
+      "surprise",
+      "utility"
+    ],
+    "inputs_sha256": {
+      "research2/data/nv_scores_kaggle-2026-11-15.jsonl": "9902e3a20fbbf93ce1be45be8d631c962ec5763c107cf3ad02118bc479238be0",
+      "research2/results/n04_validity_2026-11-16.json": "88e845ee390448835a3c1b043646a910cf09dd61be6097d46dd33f9a3ea4f2d4",
+      "research2/data/articles_to_score.jsonl": "48cec4412f64a6e492147fbf34a10712923d29a59d6f14cd7180419452576a0b",
+      "research2/data/article_meta.csv": "e7bedbd5eecfd58abaf43d8ab4cb69bd5e431d9a631a5f52f0348971bd8c0dca"
+    }
+  },
+  "dev": {
+    "n_impressions_total": 73152,
+    "n_users": 50000,
+    "n_candidate_rows": 2740998,
+    "n_impressions_usable": 73152,
+    "mean_candidates_per_impression": 37.4699,
+    "click_rate_rows": 0.0406,
+    "auc": {
+      "conflict": {
+        "auc": 0.5353,
+        "ci95": [
+          0.5331,
+          0.5375
+        ],
+        "p_vs_0.5": 0.001,
+        "n_impressions": 73152
+      },
+      "magnitude": {
+        "auc": 0.5009,
+        "ci95": [
+          0.4992,
+          0.5027
+        ],
+        "p_vs_0.5": 0.282,
+        "n_impressions": 73152
+      },
+      "prominence": {
+        "auc": 0.5283,
+        "ci95": [
+          0.5262,
+          0.5303
+        ],
+        "p_vs_0.5": 0.001,
+        "n_impressions": 73152
+      },
+      "surprise": {
+        "auc": 0.5267,
+        "ci95": [
+          0.5246,
+          0.5286
+        ],
+        "p_vs_0.5": 0.001,
+        "n_impressions": 73152
+      },
+      "utility": {
+        "auc": 0.4338,
+        "ci95": [
+          0.4318,
+          0.4359
+        ],
+        "p_vs_0.5": 0.001,
+        "n_impressions": 73152
+      },
+      "entertainment": {
+        "auc": 0.5145,
+        "ci95": [
+          0.5126,
+          0.5166
+        ],
+        "p_vs_0.5": 0.001,
+        "n_impressions": 73152
+      },
+      "importance": {
+        "auc": 0.5046,
+        "ci95": [
+          0.5026,
+          0.5068
+        ],
+        "p_vs_0.5": 0.001,
+        "n_impressions": 73152
+      },
+      "sum7": {
+        "auc": 0.5188,
+        "ci95": [
+          0.5165,
+          0.5208
+        ],
+        "p_vs_0.5": 0.001,
+        "n_impressions": 73152
+      },
+      "random": {
+        "auc": 0.5151,
+        "ci95": [
+          0.513,
+          0.5172
+        ],
+        "p_vs_0.5": 0.001,
+        "n_impressions": 73152
+      },
+      "E5_le10cand:conflict": {
+        "auc": 0.5315,
+        "ci95": [
+          0.5261,
+          0.5369
+        ],
+        "p_vs_0.5": 0.001,
+        "n_impressions": 18381
+      },
+      "E5_noemptyabs:conflict": {
+        "auc": 0.5289,
+        "ci95": [
+          0.5268,
+          0.5311
+        ],
+        "p_vs_0.5": 0.001,
+        "n_impressions": 69351
+      },
+      "E4_covered:conflict": {
+        "auc": 0.5306,
+        "ci95": [
+          0.5283,
+          0.5331
+        ],
+        "p_vs_0.5": 0.001,
+        "n_impressions": 57398
+      },
+      "E5_le10cand:magnitude": {
+        "auc": 0.4815,
+        "ci95": [
+          0.4771,
+          0.4858
+        ],
+        "p_vs_0.5": 0.001,
+        "n_impressions": 18381
+      },
+      "E5_noemptyabs:magnitude": {
+        "auc": 0.5024,
+        "ci95": [
+          0.5007,
+          0.5042
+        ],
+        "p_vs_0.5": 0.014,
+        "n_impressions": 69351
+      },
+      "E4_covered:magnitude": {
+        "auc": 0.5154,
+        "ci95": [
+          0.5134,
+          0.5175
+        ],
+        "p_vs_0.5": 0.001,
+        "n_impressions": 57398
+      },
+      "E5_le10cand:prominence": {
+        "auc": 0.4833,
+        "ci95": [
+          0.4781,
+          0.4882
+        ],
+        "p_vs_0.5": 0.001,
+        "n_impressions": 18381
+      },
+      "E5_noemptyabs:prominence": {
+        "auc": 0.5279,
+        "ci95": [
+          0.5258,
+          0.53
+        ],
+        "p_vs_0.5": 0.001,
+        "n_impressions": 69351
+      },
+      "E4_covered:prominence": {
+        "auc": 0.5354,
+        "ci95": [
+          0.5332,
+          0.5376
+        ],
+        "p_vs_0.5": 0.001,
+        "n_impressions": 57398
+      },
+      "E5_le10cand:surprise": {
+        "auc": 0.4795,
+        "ci95": [
+          0.4743,
+          0.4847
+        ],
+        "p_vs_0.5": 0.001,
+        "n_impressions": 18381
+      },
+      "E5_noemptyabs:surprise": {
+        "auc": 0.5231,
+        "ci95": [
+          0.5209,
+          0.5252
+        ],
+        "p_vs_0.5": 0.001,
+        "n_impressions": 69351
+      },
+      "E4_covered:surprise": {
+        "auc": 0.5249,
+        "ci95": [
+          0.5226,
+          0.5271
+        ],
+        "p_vs_0.5": 0.001,
+        "n_impressions": 57398
+      },
+      "E5_le10cand:utility": {
+        "auc": 0.4786,
+        "ci95": [
+          0.4732,
+          0.4838
+        ],
+        "p_vs_0.5": 0.001,
+        "n_impressions": 18381
+      },
+      "E5_noemptyabs:utility": {
+        "auc": 0.4374,
+        "ci95": [
+          0.4353,
+          0.4395
+        ],
+        "p_vs_0.5": 0.001,
+        "n_impressions": 69351
+      },
+      "E4_covered:utility": {
+        "auc": 0.4349,
+        "ci95": [
+          0.4328,
+          0.4372
+        ],
+        "p_vs_0.5": 0.001,
+        "n_impressions": 57398
+      },
+      "E5_le10cand:entertainment": {
+        "auc": 0.4848,
+        "ci95": [
+          0.4801,
+          0.4896
+        ],
+        "p_vs_0.5": 0.001,
+        "n_impressions": 18381
+      },
+      "E5_noemptyabs:entertainment": {
+        "auc": 0.5167,
+        "ci95": [
+          0.5146,
+          0.5188
+        ],
+        "p_vs_0.5": 0.001,
+        "n_impressions": 69351
+      },
+      "E4_covered:entertainment": {
+        "auc": 0.52,
+        "ci95": [
+          0.518,
+          0.5223
+        ],
+        "p_vs_0.5": 0.001,
+        "n_impressions": 57398
+      },
+      "E5_le10cand:importance": {
+        "auc": 0.4934,
+        "ci95": [
+          0.4883,
+          0.4988
+        ],
+        "p_vs_0.5": 0.012,
+        "n_impressions": 18381
+      },
+      "E5_noemptyabs:importance": {
+        "auc": 0.5042,
+        "ci95": [
+          0.5021,
+          0.5066
+        ],
+        "p_vs_0.5": 0.001,
+        "n_impressions": 69351
+      },
+      "E4_covered:importance": {
+        "auc": 0.5043,
+        "ci95": [
+          0.502,
+          0.5066
+        ],
+        "p_vs_0.5": 0.001,
+        "n_impressions": 57398
+      },
+      "E4_covered:sum7": {
+        "auc": 0.5249,
+        "ci95": [
+          0.5225,
+          0.5274
+        ],
+        "p_vs_0.5": 0.001,
+        "n_impressions": 57398
+      },
+      "E4_covered:train_ctr": {
+        "auc": 0.587,
+        "ci95": [
+          0.5848,
+          0.5894
+        ],
+        "p_vs_0.5": 0.001,
+        "n_impressions": 57398
+      },
+      "E3_cat:autos:conflict": {
+        "auc": 0.4876,
+        "ci95": [
+          0.4768,
+          0.4978
+        ],
+        "p_vs_0.5": 0.024,
+        "n_impressions": 1936
+      },
+      "E3_cat:autos:magnitude": {
+        "auc": 0.4912,
+        "ci95": [
+          0.4764,
+          0.5054
+        ],
+        "p_vs_0.5": 0.214,
+        "n_impressions": 1936
+      },
+      "E3_cat:autos:prominence": {
+        "auc": 0.4325,
+        "ci95": [
+          0.4161,
+          0.4497
+        ],
+        "p_vs_0.5": 0.001,
+        "n_impressions": 1936
+      },
+      "E3_cat:autos:surprise": {
+        "auc": 0.5567,
+        "ci95": [
+          0.543,
+          0.5706
+        ],
+        "p_vs_0.5": 0.001,
+        "n_impressions": 1936
+      },
+      "E3_cat:autos:utility": {
+        "auc": 0.5127,
+        "ci95": [
+          0.4985,
+          0.5281
+        ],
+        "p_vs_0.5": 0.078,
+        "n_impressions": 1936
+      },
+      "E3_cat:autos:entertainment": {
+        "auc": 0.555,
+        "ci95": [
+          0.5383,
+          0.5709
+        ],
+        "p_vs_0.5": 0.001,
+        "n_impressions": 1936
+      },
+      "E3_cat:autos:importance": {
+        "auc": 0.4655,
+        "ci95": [
+          0.4504,
+          0.4803
+        ],
+        "p_vs_0.5": 0.001,
+        "n_impressions": 1936
+      },
+      "E3_cat:entertainment:conflict": {
+        "auc": 0.5002,
+        "ci95": [
+          0.4991,
+          0.5014
+        ],
+        "p_vs_0.5": 0.776,
+        "n_impressions": 2179
+      },
+      "E3_cat:entertainment:magnitude": {
+        "auc": 0.5035,
+        "ci95": [
+          0.4945,
+          0.5119
+        ],
+        "p_vs_0.5": 0.442,
+        "n_impressions": 2179
+      },
+      "E3_cat:entertainment:prominence": {
+        "auc": 0.4675,
+        "ci95": [
+          0.4585,
+          0.4765
+        ],
+        "p_vs_0.5": 0.001,
+        "n_impressions": 2179
+      },
+      "E3_cat:entertainment:surprise": {
+        "auc": 0.5381,
+        "ci95": [
+          0.5274,
+          0.5492
+        ],
+        "p_vs_0.5": 0.001,
+        "n_impressions": 2179
+      },
+      "E3_cat:entertainment:utility": {
+        "auc": 0.4838,
+        "ci95": [
+          0.4694,
+          0.4989
+        ],
+        "p_vs_0.5": 0.034,
+        "n_impressions": 2179
+      },
+      "E3_cat:entertainment:entertainment": {
+        "auc": 0.4783,
+        "ci95": [
+          0.4717,
+          0.4849
+        ],
+        "p_vs_0.5": 0.001,
+        "n_impressions": 2179
+      },
+      "E3_cat:entertainment:importance": {
+        "auc": 0.497,
+        "ci95": [
+          0.487,
+          0.5073
+        ],
+        "p_vs_0.5": 0.62,
+        "n_impressions": 2179
+      },
+      "E3_cat:finance:conflict": {
+        "auc": 0.5051,
+        "ci95": [
+          0.4961,
+          0.5134
+        ],
+        "p_vs_0.5": 0.252,
+        "n_impressions": 3140
+      },
+      "E3_cat:finance:magnitude": {
+        "auc": 0.492,
+        "ci95": [
+          0.4814,
+          0.5023
+        ],
+        "p_vs_0.5": 0.15,
+        "n_impressions": 3140
+      },
+      "E3_cat:finance:prominence": {
+        "auc": 0.49,
+        "ci95": [
+          0.4783,
+          0.5014
+        ],
+        "p_vs_0.5": 0.086,
+        "n_impressions": 3140
+      },
+      "E3_cat:finance:surprise": {
+        "auc": 0.5373,
+        "ci95": [
+          0.529,
+          0.5454
+        ],
+        "p_vs_0.5": 0.001,
+        "n_impressions": 3140
+      },
+      "E3_cat:finance:utility": {
+        "auc": 0.4424,
+        "ci95": [
+          0.432,
+          0.4542
+        ],
+        "p_vs_0.5": 0.001,
+        "n_impressions": 3140
+      },
+      "E3_cat:finance:entertainment": {
+        "auc": 0.5615,
+        "ci95": [
+          0.5491,
+          0.574
+        ],
+        "p_vs_0.5": 0.001,
+        "n_impressions": 3140
+      },
+      "E3_cat:finance:importance": {
+        "auc": 0.5024,
+        "ci95": [
+          0.4936,
+          0.5106
+        ],
+        "p_vs_0.5": 0.598,
+        "n_impressions": 3140
+      },
+      "E3_cat:foodanddrink:conflict": {
+        "auc": 0.5005,
+        "ci95": [
+          0.4997,
+          0.5013
+        ],
+        "p_vs_0.5": 0.32,
+        "n_impressions": 4948
+      },
+      "E3_cat:foodanddrink:magnitude": {
+        "auc": 0.513,
+        "ci95": [
+          0.509,
+          0.5169
+        ],
+        "p_vs_0.5": 0.001,
+        "n_impressions": 4948
+      },
+      "E3_cat:foodanddrink:prominence": {
+        "auc": 0.6362,
+        "ci95": [
+          0.6266,
+          0.646
+        ],
+        "p_vs_0.5": 0.001,
+        "n_impressions": 4948
+      },
+      "E3_cat:foodanddrink:surprise": {
+        "auc": 0.6075,
+        "ci95": [
+          0.598,
+          0.6177
+        ],
+        "p_vs_0.5": 0.001,
+        "n_impressions": 4948
+      },
+      "E3_cat:foodanddrink:utility": {
+        "auc": 0.43,
+        "ci95": [
+          0.4202,
+          0.44
+        ],
+        "p_vs_0.5": 0.001,
+        "n_impressions": 4948
+      },
+      "E3_cat:foodanddrink:entertainment": {
+        "auc": 0.5976,
+        "ci95": [
+          0.5887,
+          0.6069
+        ],
+        "p_vs_0.5": 0.001,
+        "n_impressions": 4948
+      },
+      "E3_cat:foodanddrink:importance": {
+        "auc": 0.4235,
+        "ci95": [
+          0.4153,
+          0.4317
+        ],
+        "p_vs_0.5": 0.001,
+        "n_impressions": 4948
+      },
+      "E3_cat:health:conflict": {
+        "auc": 0.493,
+        "ci95": [
+          0.4846,
+          0.5006
+        ],
+        "p_vs_0.5": 0.086,
+        "n_impressions": 3358
+      },
+      "E3_cat:health:magnitude": {
+        "auc": 0.5129,
+        "ci95": [
+          0.5048,
+          0.5207
+        ],
+        "p_vs_0.5": 0.001,
+        "n_impressions": 3358
+      },
+      "E3_cat:health:prominence": {
+        "auc": 0.5292,
+        "ci95": [
+          0.5171,
+          0.5406
+        ],
+        "p_vs_0.5": 0.001,
+        "n_impressions": 3358
+      },
+      "E3_cat:health:surprise": {
+        "auc": 0.5409,
+        "ci95": [
+          0.5296,
+          0.5517
+        ],
+        "p_vs_0.5": 0.001,
+        "n_impressions": 3358
+      },
+      "E3_cat:health:utility": {
+        "auc": 0.4314,
+        "ci95": [
+          0.4202,
+          0.4424
+        ],
+        "p_vs_0.5": 0.001,
+        "n_impressions": 3358
+      },
+      "E3_cat:health:entertainment": {
+        "auc": 0.5614,
+        "ci95": [
+          0.55,
+          0.5731
+        ],
+        "p_vs_0.5": 0.001,
+        "n_impressions": 3358
+      },
+      "E3_cat:health:importance": {
+        "auc": 0.4638,
+        "ci95": [
+          0.4539,
+          0.474
+        ],
+        "p_vs_0.5": 0.001,
+        "n_impressions": 3358
+      },
+      "E3_cat:lifestyle:conflict": {
+        "auc": 0.5005,
+        "ci95": [
+          0.4986,
+          0.5024
+        ],
+        "p_vs_0.5": 0.61,
+        "n_impressions": 13393
+      },
+      "E3_cat:lifestyle:magnitude": {
+        "auc": 0.4933,
+        "ci95": [
+          0.4909,
+          0.4957
+        ],
+        "p_vs_0.5": 0.001,
+        "n_impressions": 13393
+      },
+      "E3_cat:lifestyle:prominence": {
+        "auc": 0.5647,
+        "ci95": [
+          0.5589,
+          0.5707
+        ],
+        "p_vs_0.5": 0.001,
+        "n_impressions": 13393
+      },
+      "E3_cat:lifestyle:surprise": {
+        "auc": 0.5909,
+        "ci95": [
+          0.585,
+          0.5961
+        ],
+        "p_vs_0.5": 0.001,
+        "n_impressions": 13393
+      },
+      "E3_cat:lifestyle:utility": {
+        "auc": 0.4195,
+        "ci95": [
+          0.4137,
+          0.4253
+        ],
+        "p_vs_0.5": 0.001,
+        "n_impressions": 13393
+      },
+      "E3_cat:lifestyle:entertainment": {
+        "auc": 0.5405,
+        "ci95": [
+          0.5351,
+          0.5465
+        ],
+        "p_vs_0.5": 0.001,
+        "n_impressions": 13393
+      },
+      "E3_cat:lifestyle:importance": {
+        "auc": 0.5151,
+        "ci95": [
+          0.5111,
+          0.5192
+        ],
+        "p_vs_0.5": 0.001,
+        "n_impressions": 13393
+      },
+      "E3_cat:movies:conflict": {
+        "auc": 0.5914,
+        "ci95": [
+          0.5781,
+          0.6035
+        ],
+        "p_vs_0.5": 0.001,
+        "n_impressions": 2242
+      },
+      "E3_cat:movies:magnitude": {
+        "auc": 0.5187,
+        "ci95": [
+          0.5147,
+          0.5225
+        ],
+        "p_vs_0.5": 0.001,
+        "n_impressions": 2242
+      },
+      "E3_cat:movies:prominence": {
+        "auc": 0.5616,
+        "ci95": [
+          0.5518,
+          0.5717
+        ],
+        "p_vs_0.5": 0.001,
+        "n_impressions": 2242
+      },
+      "E3_cat:movies:surprise": {
+        "auc": 0.4159,
+        "ci95": [
+          0.4021,
+          0.4305
+        ],
+        "p_vs_0.5": 0.001,
+        "n_impressions": 2242
+      },
+      "E3_cat:movies:utility": {
+        "auc": 0.4364,
+        "ci95": [
+          0.419,
+          0.4541
+        ],
+        "p_vs_0.5": 0.001,
+        "n_impressions": 2242
+      },
+      "E3_cat:movies:entertainment": {
+        "auc": 0.4053,
+        "ci95": [
+          0.3926,
+          0.4193
+        ],
+        "p_vs_0.5": 0.001,
+        "n_impressions": 2242
+      },
+      "E3_cat:movies:importance": {
+        "auc": 0.5175,
+        "ci95": [
+          0.5133,
+          0.5217
+        ],
+        "p_vs_0.5": 0.001,
+        "n_impressions": 2242
+      },
+      "E3_cat:music:conflict": {
+        "auc": 0.5696,
+        "ci95": [
+          0.5486,
+          0.5912
+        ],
+        "p_vs_0.5": 0.001,
+        "n_impressions": 1528
+      },
+      "E3_cat:music:magnitude": {
+        "auc": 0.4618,
+        "ci95": [
+          0.4497,
+          0.4734
+        ],
+        "p_vs_0.5": 0.001,
+        "n_impressions": 1528
+      },
+      "E3_cat:music:prominence": {
+        "auc": 0.5359,
+        "ci95": [
+          0.5188,
+          0.5537
+        ],
+        "p_vs_0.5": 0.001,
+        "n_impressions": 1528
+      },
+      "E3_cat:music:surprise": {
+        "auc": 0.4973,
+        "ci95": [
+          0.4797,
+          0.5135
+        ],
+        "p_vs_0.5": 0.706,
+        "n_impressions": 1528
+      },
+      "E3_cat:music:utility": {
+        "auc": 0.5078,
+        "ci95": [
+          0.4915,
+          0.5246
+        ],
+        "p_vs_0.5": 0.358,
+        "n_impressions": 1528
+      },
+      "E3_cat:music:entertainment": {
+        "auc": 0.4517,
+        "ci95": [
+          0.4327,
+          0.4704
+        ],
+        "p_vs_0.5": 0.001,
+        "n_impressions": 1528
+      },
+      "E3_cat:music:importance": {
+        "auc": 0.5337,
+        "ci95": [
+          0.5143,
+          0.5555
+        ],
+        "p_vs_0.5": 0.001,
+        "n_impressions": 1528
+      },
+      "E3_cat:news:conflict": {
+        "auc": 0.5639,
+        "ci95": [
+          0.5593,
+          0.5684
+        ],
+        "p_vs_0.5": 0.001,
+        "n_impressions": 17827
+      },
+      "E3_cat:news:magnitude": {
+        "auc": 0.4736,
+        "ci95": [
+          0.4701,
+          0.4774
+        ],
+        "p_vs_0.5": 0.001,
+        "n_impressions": 17827
+      },
+      "E3_cat:news:prominence": {
+        "auc": 0.4426,
+        "ci95": [
+          0.4376,
+          0.4475
+        ],
+        "p_vs_0.5": 0.001,
+        "n_impressions": 17827
+      },
+      "E3_cat:news:surprise": {
+        "auc": 0.5488,
+        "ci95": [
+          0.545,
+          0.5528
+        ],
+        "p_vs_0.5": 0.001,
+        "n_impressions": 17827
+      },
+      "E3_cat:news:utility": {
+        "auc": 0.4113,
+        "ci95": [
+          0.4072,
+          0.4151
+        ],
+        "p_vs_0.5": 0.001,
+        "n_impressions": 17827
+      },
+      "E3_cat:news:entertainment": {
+        "auc": 0.5727,
+        "ci95": [
+          0.5681,
+          0.5769
+        ],
+        "p_vs_0.5": 0.001,
+        "n_impressions": 17827
+      },
+      "E3_cat:news:importance": {
+        "auc": 0.4862,
+        "ci95": [
+          0.4819,
+          0.4906
+        ],
+        "p_vs_0.5": 0.001,
+        "n_impressions": 17827
+      },
+      "E3_cat:sports:conflict": {
+        "auc": 0.4895,
+        "ci95": [
+          0.4847,
+          0.4941
+        ],
+        "p_vs_0.5": 0.001,
+        "n_impressions": 21203
+      },
+      "E3_cat:sports:magnitude": {
+        "auc": 0.5234,
+        "ci95": [
+          0.5199,
+          0.5272
+        ],
+        "p_vs_0.5": 0.001,
+        "n_impressions": 21203
+      },
+      "E3_cat:sports:prominence": {
+        "auc": 0.5725,
+        "ci95": [
+          0.5681,
+          0.5771
+        ],
+        "p_vs_0.5": 0.001,
+        "n_impressions": 21203
+      },
+      "E3_cat:sports:surprise": {
+        "auc": 0.5023,
+        "ci95": [
+          0.4989,
+          0.5055
+        ],
+        "p_vs_0.5": 0.194,
+        "n_impressions": 21203
+      },
+      "E3_cat:sports:utility": {
+        "auc": 0.4667,
+        "ci95": [
+          0.4643,
+          0.4689
+        ],
+        "p_vs_0.5": 0.001,
+        "n_impressions": 21203
+      },
+      "E3_cat:sports:entertainment": {
+        "auc": 0.4653,
+        "ci95": [
+          0.4608,
+          0.4699
+        ],
+        "p_vs_0.5": 0.001,
+        "n_impressions": 21203
+      },
+      "E3_cat:sports:importance": {
+        "auc": 0.5247,
+        "ci95": [
+          0.5213,
+          0.5285
+        ],
+        "p_vs_0.5": 0.001,
+        "n_impressions": 21203
+      },
+      "E3_cat:travel:conflict": {
+        "auc": 0.6149,
+        "ci95": [
+          0.6012,
+          0.6289
+        ],
+        "p_vs_0.5": 0.001,
+        "n_impressions": 1769
+      },
+      "E3_cat:travel:magnitude": {
+        "auc": 0.5168,
+        "ci95": [
+          0.5078,
+          0.5266
+        ],
+        "p_vs_0.5": 0.001,
+        "n_impressions": 1769
+      },
+      "E3_cat:travel:prominence": {
+        "auc": 0.5897,
+        "ci95": [
+          0.5729,
+          0.6057
+        ],
+        "p_vs_0.5": 0.001,
+        "n_impressions": 1769
+      },
+      "E3_cat:travel:surprise": {
+        "auc": 0.5445,
+        "ci95": [
+          0.5279,
+          0.5602
+        ],
+        "p_vs_0.5": 0.001,
+        "n_impressions": 1769
+      },
+      "E3_cat:travel:utility": {
+        "auc": 0.4465,
+        "ci95": [
+          0.4313,
+          0.4637
+        ],
+        "p_vs_0.5": 0.001,
+        "n_impressions": 1769
+      },
+      "E3_cat:travel:entertainment": {
+        "auc": 0.3517,
+        "ci95": [
+          0.3368,
+          0.3679
+        ],
+        "p_vs_0.5": 0.001,
+        "n_impressions": 1769
+      },
+      "E3_cat:travel:importance": {
+        "auc": 0.6265,
+        "ci95": [
+          0.6123,
+          0.6398
+        ],
+        "p_vs_0.5": 0.001,
+        "n_impressions": 1769
+      },
+      "E3_cat:tv:conflict": {
+        "auc": 0.5514,
+        "ci95": [
+          0.5413,
+          0.562
+        ],
+        "p_vs_0.5": 0.001,
+        "n_impressions": 4069
+      },
+      "E3_cat:tv:magnitude": {
+        "auc": 0.4963,
+        "ci95": [
+          0.4944,
+          0.4983
+        ],
+        "p_vs_0.5": 0.001,
+        "n_impressions": 4069
+      },
+      "E3_cat:tv:prominence": {
+        "auc": 0.4809,
+        "ci95": [
+          0.4717,
+          0.4904
+        ],
+        "p_vs_0.5": 0.001,
+        "n_impressions": 4069
+      },
+      "E3_cat:tv:surprise": {
+        "auc": 0.518,
+        "ci95": [
+          0.509,
+          0.5267
+        ],
+        "p_vs_0.5": 0.001,
+        "n_impressions": 4069
+      },
+      "E3_cat:tv:utility": {
+        "auc": 0.4584,
+        "ci95": [
+          0.4518,
+          0.4643
+        ],
+        "p_vs_0.5": 0.001,
+        "n_impressions": 4069
+      },
+      "E3_cat:tv:entertainment": {
+        "auc": 0.4671,
+        "ci95": [
+          0.4583,
+          0.4759
+        ],
+        "p_vs_0.5": 0.001,
+        "n_impressions": 4069
+      },
+      "E3_cat:tv:importance": {
+        "auc": 0.5203,
+        "ci95": [
+          0.51,
+          0.5306
+        ],
+        "p_vs_0.5": 0.001,
+        "n_impressions": 4069
+      },
+      "E3_cat:video:conflict": {
+        "auc": 0.49,
+        "ci95": [
+          0.483,
+          0.4972
+        ],
+        "p_vs_0.5": 0.012,
+        "n_impressions": 2110
+      },
+      "E3_cat:video:magnitude": {
+        "auc": 0.5025,
+        "ci95": [
+          0.4948,
+          0.5105
+        ],
+        "p_vs_0.5": 0.526,
+        "n_impressions": 2110
+      },
+      "E3_cat:video:prominence": {
+        "auc": 0.5388,
+        "ci95": [
+          0.5252,
+          0.5526
+        ],
+        "p_vs_0.5": 0.001,
+        "n_impressions": 2110
+      },
+      "E3_cat:video:surprise": {
+        "auc": 0.5191,
+        "ci95": [
+          0.5049,
+          0.532
+        ],
+        "p_vs_0.5": 0.006,
+        "n_impressions": 2110
+      },
+      "E3_cat:video:utility": {
+        "auc": 0.408,
+        "ci95": [
+          0.3969,
+          0.421
+        ],
+        "p_vs_0.5": 0.001,
+        "n_impressions": 2110
+      },
+      "E3_cat:video:entertainment": {
+        "auc": 0.5603,
+        "ci95": [
+          0.5485,
+          0.5711
+        ],
+        "p_vs_0.5": 0.001,
+        "n_impressions": 2110
+      },
+      "E3_cat:video:importance": {
+        "auc": 0.4473,
+        "ci95": [
+          0.4356,
+          0.4607
+        ],
+        "p_vs_0.5": 0.001,
+        "n_impressions": 2110
+      },
+      "E3_cat:weather:conflict": {
+        "auc": 0.403,
+        "ci95": [
+          0.3627,
+          0.4397
+        ],
+        "p_vs_0.5": 0.001,
+        "n_impressions": 423
+      },
+      "E3_cat:weather:magnitude": {
+        "auc": 0.3837,
+        "ci95": [
+          0.3422,
+          0.4244
+        ],
+        "p_vs_0.5": 0.001,
+        "n_impressions": 423
+      },
+      "E3_cat:weather:prominence": {
+        "auc": 0.3967,
+        "ci95": [
+          0.3546,
+          0.4351
+        ],
+        "p_vs_0.5": 0.001,
+        "n_impressions": 423
+      },
+      "E3_cat:weather:surprise": {
+        "auc": 0.5965,
+        "ci95": [
+          0.5623,
+          0.6345
+        ],
+        "p_vs_0.5": 0.001,
+        "n_impressions": 423
+      },
+      "E3_cat:weather:utility": {
+        "auc": 0.5053,
+        "ci95": [
+          0.4843,
+          0.5265
+        ],
+        "p_vs_0.5": 0.648,
+        "n_impressions": 423
+      },
+      "E3_cat:weather:entertainment": {
+        "auc": 0.5046,
+        "ci95": [
+          0.4738,
+          0.5363
+        ],
+        "p_vs_0.5": 0.744,
+        "n_impressions": 423
+      },
+      "E3_cat:weather:importance": {
+        "auc": 0.3899,
+        "ci95": [
+          0.3532,
+          0.4275
+        ],
+        "p_vs_0.5": 0.001,
+        "n_impressions": 423
+      }
+    },
+    "E4_coverage": {
+      "candidate_rows_with_train_ctr": 0.7873,
+      "impressions_usable": 57398
+    },
+    "E3_categories_dropped_lt_min_impressions": [
+      "kids",
+      "northamerica"
+    ],
+    "H1": {
+      "entertainment": {
+        "auc": 0.5145,
+        "ci95": [
+          0.5126,
+          0.5166
+        ],
+        "p": 0.001,
+        "p_holm_m3": 0.003,
+        "confirmatory": false,
+        "supported": true
+      },
+      "prominence": {
+        "auc": 0.5283,
+        "ci95": [
+          0.5262,
+          0.5303
+        ],
+        "p": 0.001,
+        "p_holm_m3": 0.003,
+        "confirmatory": true,
+        "supported": true
+      },
+      "surprise": {
+        "auc": 0.5267,
+        "ci95": [
+          0.5246,
+          0.5286
+        ],
+        "p": 0.001,
+        "p_holm_m3": 0.003,
+        "confirmatory": true,
+        "supported": true
+      }
+    },
+    "H2": {
+      "auc_importance_minus_entertainment": -0.0099,
+      "ci95": [
+        -0.0132,
+        -0.0064
+      ],
+      "confirmatory": false,
+      "supported": true
+    },
+    "paired_diffs_vs_importance": {
+      "conflict": {
+        "diff": 0.0307,
+        "ci95": [
+          0.0293,
+          0.0321
+        ]
+      },
+      "magnitude": {
+        "diff": -0.0037,
+        "ci95": [
+          -0.0053,
+          -0.002
+        ]
+      },
+      "prominence": {
+        "diff": 0.0237,
+        "ci95": [
+          0.0215,
+          0.0259
+        ]
+      },
+      "surprise": {
+        "diff": 0.0221,
+        "ci95": [
+          0.0189,
+          0.0249
+        ]
+      },
+      "utility": {
+        "diff": -0.0707,
+        "ci95": [
+          -0.074,
+          -0.0674
+        ]
+      },
+      "entertainment": {
+        "diff": 0.0099,
+        "ci95": [
+          0.0064,
+          0.0132
+        ]
+      }
+    },
+    "E4_paired_diffs_vs_train_ctr": {
+      "conflict": {
+        "diff": -0.0564,
+        "ci95": [
+          -0.06,
+          -0.0526
+        ]
+      },
+      "magnitude": {
+        "diff": -0.0716,
+        "ci95": [
+          -0.0747,
+          -0.0686
+        ]
+      },
+      "prominence": {
+        "diff": -0.0515,
+        "ci95": [
+          -0.0548,
+          -0.0483
+        ]
+      },
+      "surprise": {
+        "diff": -0.0621,
+        "ci95": [
+          -0.0659,
+          -0.0587
+        ]
+      },
+      "utility": {
+        "diff": -0.152,
+        "ci95": [
+          -0.1552,
+          -0.149
+        ]
+      },
+      "entertainment": {
+        "diff": -0.0669,
+        "ci95": [
+          -0.07,
+          -0.0637
+        ]
+      },
+      "importance": {
+        "diff": -0.0826,
+        "ci95": [
+          -0.0862,
+          -0.0792
+        ]
+      },
+      "sum7": {
+        "diff": -0.0621,
+        "ci95": [
+          -0.0654,
+          -0.059
+        ]
+      }
+    }
+  },
+  "E2": {
+    "n_clicks": 111383,
+    "n_impressions": 73152,
+    "iterations": 5,
+    "loglik": -370315.75,
+    "loglik_null": -390945.22,
+    "coef": {
+      "conflict": {
+        "beta": 0.1259,
+        "se_cluster_user": 0.0049,
+        "se_model": 0.0043,
+        "ci95": [
+          0.1163,
+          0.1355
+        ],
+        "odds_ratio_per_sd": 1.1342,
+        "z": 25.6644
+      },
+      "magnitude": {
+        "beta": -0.0574,
+        "se_cluster_user": 0.0043,
+        "se_model": 0.0044,
+        "ci95": [
+          -0.0658,
+          -0.0489
+        ],
+        "odds_ratio_per_sd": 0.9442,
+        "z": -13.3298
+      },
+      "prominence": {
+        "beta": 0.0418,
+        "se_cluster_user": 0.0043,
+        "se_model": 0.004,
+        "ci95": [
+          0.0334,
+          0.0501
+        ],
+        "odds_ratio_per_sd": 1.0426,
+        "z": 9.7963
+      },
+      "surprise": {
+        "beta": 0.0877,
+        "se_cluster_user": 0.0037,
+        "se_model": 0.0035,
+        "ci95": [
+          0.0805,
+          0.0949
+        ],
+        "odds_ratio_per_sd": 1.0916,
+        "z": 23.8636
+      },
+      "utility": {
+        "beta": -0.1806,
+        "se_cluster_user": 0.005,
+        "se_model": 0.0048,
+        "ci95": [
+          -0.1904,
+          -0.1707
+        ],
+        "odds_ratio_per_sd": 0.8348,
+        "z": -36.0012
+      },
+      "entertainment": {
+        "beta": -0.0197,
+        "se_cluster_user": 0.0047,
+        "se_model": 0.0045,
+        "ci95": [
+          -0.0288,
+          -0.0105
+        ],
+        "odds_ratio_per_sd": 0.9805,
+        "z": -4.2014
+      },
+      "importance": {
+        "beta": -0.0889,
+        "se_cluster_user": 0.0056,
+        "se_model": 0.0053,
+        "ci95": [
+          -0.0998,
+          -0.0779
+        ],
+        "odds_ratio_per_sd": 0.915,
+        "z": -15.9135
+      }
+    }
+  },
+  "E5_E2_gate_passing_only": {
+    "n_clicks": 111383,
+    "n_impressions": 73152,
+    "iterations": 5,
+    "loglik": -370325.12,
+    "loglik_null": -391349.96,
+    "coef": {
+      "conflict": {
+        "beta": 0.1289,
+        "se_cluster_user": 0.0048,
+        "se_model": 0.0043,
+        "ci95": [
+          0.1194,
+          0.1383
+        ],
+        "odds_ratio_per_sd": 1.1376,
+        "z": 26.6768
+      },
+      "magnitude": {
+        "beta": -0.0557,
+        "se_cluster_user": 0.0043,
+        "se_model": 0.0044,
+        "ci95": [
+          -0.0642,
+          -0.0473
+        ],
+        "odds_ratio_per_sd": 0.9458,
+        "z": -12.9364
+      },
+      "prominence": {
+        "beta": 0.0362,
+        "se_cluster_user": 0.0041,
+        "se_model": 0.0038,
+        "ci95": [
+          0.0282,
+          0.0442
+        ],
+        "odds_ratio_per_sd": 1.0369,
+        "z": 8.9026
+      },
+      "surprise": {
+        "beta": 0.0848,
+        "se_cluster_user": 0.0036,
+        "se_model": 0.0034,
+        "ci95": [
+          0.0777,
+          0.0919
+        ],
+        "odds_ratio_per_sd": 1.0885,
+        "z": 23.4399
+      },
+      "utility": {
+        "beta": -0.1756,
+        "se_cluster_user": 0.0049,
+        "se_model": 0.0046,
+        "ci95": [
+          -0.1851,
+          -0.1661
+        ],
+        "odds_ratio_per_sd": 0.839,
+        "z": -36.1238
+      },
+      "importance": {
+        "beta": -0.0794,
+        "se_cluster_user": 0.0051,
+        "se_model": 0.0048,
+        "ci95": [
+          -0.0895,
+          -0.0693
+        ],
+        "odds_ratio_per_sd": 0.9237,
+        "z": -15.4668
+      }
+    }
+  },
+  "train": {
+    "n_impressions_total": 156965,
+    "n_users": 50000,
+    "n_candidate_rows": 5843444,
+    "n_impressions_usable": 156965,
+    "mean_candidates_per_impression": 37.2277,
+    "click_rate_rows": 0.0404,
+    "auc": {
+      "conflict": {
+        "auc": 0.5169,
+        "ci95": [
+          0.5154,
+          0.5183
+        ],
+        "p_vs_0.5": 0.001,
+        "n_impressions": 156965
+      },
+      "magnitude": {
+        "auc": 0.4984,
+        "ci95": [
+          0.497,
+          0.4997
+        ],
+        "p_vs_0.5": 0.02,
+        "n_impressions": 156965
+      },
+      "prominence": {
+        "auc": 0.5096,
+        "ci95": [
+          0.508,
+          0.5114
+        ],
+        "p_vs_0.5": 0.001,
+        "n_impressions": 156965
+      },
+      "surprise": {
+        "auc": 0.5251,
+        "ci95": [
+          0.5237,
+          0.5264
+        ],
+        "p_vs_0.5": 0.001,
+        "n_impressions": 156965
+      },
+      "utility": {
+        "auc": 0.4566,
+        "ci95": [
+          0.4553,
+          0.458
+        ],
+        "p_vs_0.5": 0.001,
+        "n_impressions": 156965
+      },
+      "entertainment": {
+        "auc": 0.5231,
+        "ci95": [
+          0.5215,
+          0.5247
+        ],
+        "p_vs_0.5": 0.001,
+        "n_impressions": 156965
+      },
+      "importance": {
+        "auc": 0.4813,
+        "ci95": [
+          0.4798,
+          0.4827
+        ],
+        "p_vs_0.5": 0.001,
+        "n_impressions": 156965
+      },
+      "sum7": {
+        "auc": 0.4964,
+        "ci95": [
+          0.4949,
+          0.4979
+        ],
+        "p_vs_0.5": 0.001,
+        "n_impressions": 156965
+      },
+      "random": {
+        "auc": 0.4936,
+        "ci95": [
+          0.4921,
+          0.495
+        ],
+        "p_vs_0.5": 0.001,
+        "n_impressions": 156965
+      }
+    },
+    "H1": {
+      "entertainment": {
+        "auc": 0.5231,
+        "ci95": [
+          0.5215,
+          0.5247
+        ],
+        "p": 0.001,
+        "p_holm_m3": 0.003,
+        "confirmatory": false,
+        "supported": true
+      },
+      "prominence": {
+        "auc": 0.5096,
+        "ci95": [
+          0.508,
+          0.5114
+        ],
+        "p": 0.001,
+        "p_holm_m3": 0.003,
+        "confirmatory": true,
+        "supported": true
+      },
+      "surprise": {
+        "auc": 0.5251,
+        "ci95": [
+          0.5237,
+          0.5264
+        ],
+        "p": 0.001,
+        "p_holm_m3": 0.003,
+        "confirmatory": true,
+        "supported": true
+      }
+    },
+    "H2": {
+      "auc_importance_minus_entertainment": -0.0418,
+      "ci95": [
+        -0.0447,
+        -0.039
+      ],
+      "confirmatory": false,
+      "supported": true
+    },
+    "paired_diffs_vs_importance": {
+      "conflict": {
+        "diff": 0.0356,
+        "ci95": [
+          0.0341,
+          0.037
+        ]
+      },
+      "magnitude": {
+        "diff": 0.0171,
+        "ci95": [
+          0.0158,
+          0.0185
+        ]
+      },
+      "prominence": {
+        "diff": 0.0284,
+        "ci95": [
+          0.0264,
+          0.0305
+        ]
+      },
+      "surprise": {
+        "diff": 0.0439,
+        "ci95": [
+          0.0418,
+          0.0459
+        ]
+      },
+      "utility": {
+        "diff": -0.0247,
+        "ci95": [
+          -0.0265,
+          -0.0228
+        ]
+      },
+      "entertainment": {
+        "diff": 0.0418,
+        "ci95": [
+          0.039,
+          0.0447
+        ]
+      }
+    }
+  },
+  "H3": {
+    "n_articles": 5172,
+    "rho_ctr": {
+      "conflict": {
+        "rho": 0.1775,
+        "ci95": [
+          0.1488,
+          0.2056
+        ]
+      },
+      "magnitude": {
+        "rho": 0.0085,
+        "ci95": [
+          -0.0178,
+          0.0371
+        ]
+      },
+      "prominence": {
+        "rho": 0.0489,
+        "ci95": [
+          0.0213,
+          0.0743
+        ]
+      },
+      "surprise": {
+        "rho": 0.1631,
+        "ci95": [
+          0.1359,
+          0.1889
+        ]
+      },
+      "utility": {
+        "rho": -0.2153,
+        "ci95": [
+          -0.2401,
+          -0.1911
+        ]
+      },
+      "entertainment": {
+        "rho": 0.0685,
+        "ci95": [
+          0.0427,
+          0.0952
+        ]
+      },
+      "importance": {
+        "rho": -0.008,
+        "ci95": [
+          -0.0351,
+          0.0188
+        ]
+      }
+    },
+    "rho_importance_minus_entertainment": -0.0765,
+    "ci95": [
+      -0.1249,
+      -0.0302
+    ],
+    "confirmatory": false,
+    "supported": true
+  },
+  "E3_article_level": {
+    "per_category_rho": {
+      "autos": {
+        "n_articles": 189,
+        "rho_importance_ctr": 0.2084,
+        "rho_entertainment_ctr": -0.0441
+      },
+      "entertainment": {
+        "n_articles": 98,
+        "rho_importance_ctr": 0.0054,
+        "rho_entertainment_ctr": -0.0583
+      },
+      "finance": {
+        "n_articles": 426,
+        "rho_importance_ctr": -0.0372,
+        "rho_entertainment_ctr": 0.1095
+      },
+      "foodanddrink": {
+        "n_articles": 373,
+        "rho_importance_ctr": 0.0115,
+        "rho_entertainment_ctr": -0.0054
+      },
+      "health": {
+        "n_articles": 351,
+        "rho_importance_ctr": -0.1117,
+        "rho_entertainment_ctr": 0.1709
+      },
+      "lifestyle": {
+        "n_articles": 409,
+        "rho_importance_ctr": -0.0185,
+        "rho_entertainment_ctr": 0.1174
+      },
+      "movies": {
+        "n_articles": 95,
+        "rho_importance_ctr": 0.2831,
+        "rho_entertainment_ctr": -0.099
+      },
+      "music": {
+        "n_articles": 113,
+        "rho_importance_ctr": 0.0659,
+        "rho_entertainment_ctr": -0.1419
+      },
+      "news": {
+        "n_articles": 1581,
+        "rho_importance_ctr": -0.1166,
+        "rho_entertainment_ctr": 0.1512
+      },
+      "sports": {
+        "n_articles": 845,
+        "rho_importance_ctr": 0.1141,
+        "rho_entertainment_ctr": -0.0792
+      },
+      "travel": {
+        "n_articles": 218,
+        "rho_importance_ctr": -0.0849,
+        "rho_entertainment_ctr": 0.0079
+      },
+      "tv": {
+        "n_articles": 135,
+        "rho_importance_ctr": 0.1082,
+        "rho_entertainment_ctr": -0.23
+      },
+      "video": {
+        "n_articles": 175,
+        "rho_importance_ctr": -0.1484,
+        "rho_entertainment_ctr": 0.2086
+      },
+      "weather": {
+        "n_articles": 163,
+        "rho_importance_ctr": 0.0245,
+        "rho_entertainment_ctr": -0.0304
+      }
+    },
+    "quadrants": {
+      "ctr_q1": 0.0132,
+      "ctr_q3": 0.044,
+      "important_but_ignored": {
+        "n": 565,
+        "by_category": {
+          "autos": 5,
+          "finance": 93,
+          "foodanddrink": 7,
+          "health": 64,
+          "kids": 1,
+          "lifestyle": 16,
+          "movies": 2,
+          "news": 288,
+          "sports": 32,
+          "travel": 23,
+          "video": 9,
+          "weather": 25
+        },
+        "ids": [
+          "N16280",
+          "N62518",
+          "N64244",
+          "N47406",
+          "N54414",
+          "N43803",
+          "N4273",
+          "N33456",
+          "N40381",
+          "N57085",
+          "N27738",
+          "N32508",
+          "N61023",
+          "N10423",
+          "N19924",
+          "N57565",
+          "N291",
+          "N60472",
+          "N12363",
+          "N35567",
+          "N27055",
+          "N57023",
+          "N16331",
+          "N6994",
+          "N53245",
+          "N4807",
+          "N12549",
+          "N22145",
+          "N24146",
+          "N58636",
+          "N11738",
+          "N18971",
+          "N26425",
+          "N1705",
+          "N35812",
+          "N11853",
+          "N42653",
+          "N49498",
+          "N3084",
+          "N16000",
+          "N37143",
+          "N36509",
+          "N46666",
+          "N40472",
+          "N19885",
+          "N1014",
+          "N43438",
+          "N21037",
+          "N37108",
+          "N4672",
+          "N39140",
+          "N64933",
+          "N30550",
+          "N36826",
+          "N7813",
+          "N51808",
+          "N499",
+          "N379",
+          "N21571",
+          "N12280",
+          "N61214",
+          "N24750",
+          "N3059",
+          "N41972",
+          "N32157",
+          "N29155",
+          "N61397",
+          "N8399",
+          "N56137",
+          "N9989",
+          "N9580",
+          "N59566",
+          "N51966",
+          "N5339",
+          "N59214",
+          "N28987",
+          "N53012",
+          "N63478",
+          "N46213",
+          "N6113",
+          "N61392",
+          "N16954",
+          "N61051",
+          "N23585",
+          "N1408",
+          "N33439",
+          "N10051",
+          "N36330",
+          "N707",
+          "N4894",
+          "N56458",
+          "N19882",
+          "N15977",
+          "N6247",
+          "N2658",
+          "N55353",
+          "N37776",
+          "N13865",
+          "N39598",
+          "N40702",
+          "N23107",
+          "N13980",
+          "N45065",
+          "N23827",
+          "N42143",
+          "N15784",
+          "N28589",
+          "N32708",
+          "N50565",
+          "N53515",
+          "N62197",
+          "N56807",
+          "N18685",
+          "N1012",
+          "N20926",
+          "N12052",
+          "N55084",
+          "N61652",
+          "N52104",
+          "N61722",
+          "N57592",
+          "N2700",
+          "N40329",
+          "N30151",
+          "N2869",
+          "N15260",
+          "N9702",
+          "N38691",
+          "N58171",
+          "N11796",
+          "N41188",
+          "N43790",
+          "N9944",
+          "N7038",
+          "N43046",
+          "N50135",
+          "N60961",
+          "N6960",
+          "N9985",
+          "N9392",
+          "N63553",
+          "N3656",
+          "N15117",
+          "N64392",
+          "N42800",
+          "N57734",
+          "N26572",
+          "N22718",
+          "N22543",
+          "N27532",
+          "N54291",
+          "N64954",
+          "N64176",
+          "N62850",
+          "N6787",
+          "N65058",
+          "N56952",
+          "N38496",
+          "N34099",
+          "N9000",
+          "N23749",
+          "N27742",
+          "N23355",
+          "N32159",
+          "N43638",
+          "N50286",
+          "N33563",
+          "N3474",
+          "N62570",
+          "N57007",
+          "N24876",
+          "N17965",
+          "N59577",
+          "N27314",
+          "N28684",
+          "N18349",
+          "N50601",
+          "N49777",
+          "N59586",
+          "N7868",
+          "N52810",
+          "N37729",
+          "N60092",
+          "N17759",
+          "N15830",
+          "N18153",
+          "N46724",
+          "N20049",
+          "N56573",
+          "N15072",
+          "N61229",
+          "N48950",
+          "N15694",
+          "N4635",
+          "N2021",
+          "N9846",
+          "N6099",
+          "N20067",
+          "N15898",
+          "N19433",
+          "N40431",
+          "N38951",
+          "N32780",
+          "N42808",
+          "N60612",
+          "N25480",
+          "N41929",
+          "N25881",
+          "N19182",
+          "N60161",
+          "N39758",
+          "N20977",
+          "N64971",
+          "N59343",
+          "N59436",
+          "N41852",
+          "N5889",
+          "N18236",
+          "N24171",
+          "N41511",
+          "N13408",
+          "N34674",
+          "N64721",
+          "N50406",
+          "N51307",
+          "N33935",
+          "N13105",
+          "N61306",
+          "N52520",
+          "N30813",
+          "N39215",
+          "N25703",
+          "N29961",
+          "N46326",
+          "N777",
+          "N3708",
+          "N4241",
+          "N1204",
+          "N53075",
+          "N28910",
+          "N6894",
+          "N59931",
+          "N13022",
+          "N27521",
+          "N18553",
+          "N21710",
+          "N37749",
+          "N60041",
+          "N13324",
+          "N13540",
+          "N42491",
+          "N61885",
+          "N46862",
+          "N15810",
+          "N4143",
+          "N59138",
+          "N26855",
+          "N50381",
+          "N32986",
+          "N45812",
+          "N3174",
+          "N47475",
+          "N11721",
+          "N42749",
+          "N31727",
+          "N30963",
+          "N28961",
+          "N28497",
+          "N32880",
+          "N8656",
+          "N16118",
+          "N43733",
+          "N58051",
+          "N53201",
+          "N14261",
+          "N31029",
+          "N26712",
+          "N33872",
+          "N50754",
+          "N32407",
+          "N17020",
+          "N6194",
+          "N23818",
+          "N57258",
+          "N45445",
+          "N28588",
+          "N22364",
+          "N6775",
+          "N34852",
+          "N636",
+          "N31763",
+          "N43383",
+          "N40530",
+          "N55050",
+          "N34711",
+          "N348",
+          "N37055",
+          "N52203",
+          "N28495",
+          "N62280",
+          "N57809",
+          "N42950",
+          "N22430",
+          "N12714",
+          "N3806",
+          "N10880",
+          "N12146",
+          "N8564",
+          "N3580",
+          "N30367",
+          "N42672",
+          "N13565",
+          "N61274",
+          "N20841",
+          "N39832",
+          "N58140",
+          "N20018",
+          "N57238",
+          "N25678",
+          "N652",
+          "N56105",
+          "N39109",
+          "N28861",
+          "N45960",
+          "N56806",
+          "N1858",
+          "N60539",
+          "N12059",
+          "N39432",
+          "N3232",
+          "N64691",
+          "N24805",
+          "N58893",
+          "N18606",
+          "N15134",
+          "N45548",
+          "N49483",
+          "N41288",
+          "N13657",
+          "N6566",
+          "N13460",
+          "N20356",
+          "N43518",
+          "N47624",
+          "N40636",
+          "N20076",
+          "N63601",
+          "N24821",
+          "N24275",
+          "N57535",
+          "N47747",
+          "N32399",
+          "N38476",
+          "N38690",
+          "N10232",
+          "N46098",
+          "N28757",
+          "N21741",
+          "N30283",
+          "N49935",
+          "N14637",
+          "N53875",
+          "N21",
+          "N15020",
+          "N21377",
+          "N42249",
+          "N2171",
+          "N64840",
+          "N9822",
+          "N27057",
+          "N34977",
+          "N37395",
+          "N40575",
+          "N61688",
+          "N48025",
+          "N10108",
+          "N44742",
+          "N57340",
+          "N65187",
+          "N59412",
+          "N40691",
+          "N30089",
+          "N578",
+          "N44694",
+          "N49908",
+          "N19195",
+          "N45765",
+          "N44234",
+          "N22666",
+          "N30699",
+          "N40171",
+          "N42537",
+          "N8060",
+          "N33883",
+          "N54534",
+          "N5171",
+          "N1534",
+          "N22170",
+          "N18065",
+          "N52600",
+          "N36865",
+          "N37451",
+          "N37609",
+          "N12124",
+          "N60231",
+          "N13880",
+          "N21324",
+          "N22726",
+          "N20387",
+          "N25183",
+          "N50691",
+          "N17258",
+          "N58075",
+          "N46100",
+          "N55083",
+          "N4476",
+          "N48572",
+          "N5146",
+          "N56897",
+          "N31294",
+          "N31869",
+          "N26944",
+          "N11911",
+          "N15275",
+          "N54401",
+          "N41910",
+          "N51049",
+          "N29017",
+          "N36184",
+          "N10857",
+          "N26233",
+          "N58077",
+          "N15948",
+          "N40565",
+          "N45760",
+          "N2334",
+          "N30123",
+          "N21784",
+          "N12085",
+          "N54805",
+          "N63268",
+          "N51223",
+          "N63560",
+          "N36532",
+          "N54595",
+          "N19270",
+          "N58890",
+          "N44758",
+          "N34736",
+          "N23503",
+          "N52446",
+          "N6638",
+          "N56300",
+          "N25315",
+          "N16161",
+          "N27245",
+          "N64296",
+          "N614",
+          "N51377",
+          "N10552",
+          "N28580",
+          "N33058",
+          "N8047",
+          "N31424",
+          "N15881",
+          "N378",
+          "N28847",
+          "N61878",
+          "N55489",
+          "N26063",
+          "N59257",
+          "N24108",
+          "N37746",
+          "N26305",
+          "N34959",
+          "N724",
+          "N18522",
+          "N6853",
+          "N35493",
+          "N46972",
+          "N8643",
+          "N24619",
+          "N57628",
+          "N38020",
+          "N42518",
+          "N57311",
+          "N40318",
+          "N28414",
+          "N64096",
+          "N61922",
+          "N27540",
+          "N47612",
+          "N37517",
+          "N64852",
+          "N52693",
+          "N33125",
+          "N63328",
+          "N2716",
+          "N56548",
+          "N54792",
+          "N57866",
+          "N57814",
+          "N33700",
+          "N43330",
+          "N37020",
+          "N35112",
+          "N27333",
+          "N43338",
+          "N15856",
+          "N30658",
+          "N31962",
+          "N17419",
+          "N39168",
+          "N41497",
+          "N15518",
+          "N10754",
+          "N64859",
+          "N8595",
+          "N41008",
+          "N39446",
+          "N30153",
+          "N42416",
+          "N42660",
+          "N54890",
+          "N43016",
+          "N32205",
+          "N35682",
+          "N57034",
+          "N55281",
+          "N57670",
+          "N59467",
+          "N17242",
+          "N13661",
+          "N30071",
+          "N6216",
+          "N2350",
+          "N64439",
+          "N45616",
+          "N49973",
+          "N2787",
+          "N17000",
+          "N63442",
+          "N45298",
+          "N32074",
+          "N26918",
+          "N3417",
+          "N45289",
+          "N16291",
+          "N37774",
+          "N62314",
+          "N37817",
+          "N32437",
+          "N46495",
+          "N58450",
+          "N5734",
+          "N22640",
+          "N32283",
+          "N35495",
+          "N39883",
+          "N14225",
+          "N64945",
+          "N62341",
+          "N17924",
+          "N14328",
+          "N35773"
+        ]
+      },
+      "clicked_but_unimportant": {
+        "n": 197,
+        "by_category": {
+          "autos": 12,
+          "entertainment": 7,
+          "finance": 5,
+          "foodanddrink": 33,
+          "health": 2,
+          "lifestyle": 30,
+          "movies": 2,
+          "music": 6,
+          "news": 20,
+          "sports": 31,
+          "travel": 5,
+          "tv": 11,
+          "video": 31,
+          "weather": 2
+        },
+        "ids": [
+          "N62729",
+          "N33947",
+          "N53084",
+          "N38550",
+          "N22880",
+          "N21297",
+          "N1180",
+          "N26262",
+          "N18063",
+          "N806",
+          "N5379",
+          "N42868",
+          "N60675",
+          "N13011",
+          "N3821",
+          "N1034",
+          "N52728",
+          "N832",
+          "N60727",
+          "N59685",
+          "N33981",
+          "N16327",
+          "N53346",
+          "N5930",
+          "N62533",
+          "N9720",
+          "N47383",
+          "N49285",
+          "N49178",
+          "N48740",
+          "N5688",
+          "N17127",
+          "N28300",
+          "N63135",
+          "N45673",
+          "N41020",
+          "N44252",
+          "N1555",
+          "N51006",
+          "N17130",
+          "N27789",
+          "N9464",
+          "N30759",
+          "N29862",
+          "N15093",
+          "N14170",
+          "N10250",
+          "N16022",
+          "N7556",
+          "N61373",
+          "N37009",
+          "N46424",
+          "N30290",
+          "N12409",
+          "N50791",
+          "N54315",
+          "N39931",
+          "N51355",
+          "N52163",
+          "N47817",
+          "N33590",
+          "N59977",
+          "N3469",
+          "N45016",
+          "N1228",
+          "N64486",
+          "N6890",
+          "N63293",
+          "N4955",
+          "N47854",
+          "N49954",
+          "N6926",
+          "N55940",
+          "N14285",
+          "N51225",
+          "N18828",
+          "N64811",
+          "N36545",
+          "N33332",
+          "N40016",
+          "N16920",
+          "N8813",
+          "N52409",
+          "N25064",
+          "N36904",
+          "N45554",
+          "N54491",
+          "N35389",
+          "N47098",
+          "N4689",
+          "N63516",
+          "N28382",
+          "N23814",
+          "N13729",
+          "N11569",
+          "N35676",
+          "N63580",
+          "N60550",
+          "N55913",
+          "N1940",
+          "N32204",
+          "N570",
+          "N54442",
+          "N58264",
+          "N34520",
+          "N33212",
+          "N25867",
+          "N60215",
+          "N13235",
+          "N7129",
+          "N58748",
+          "N4485",
+          "N62532",
+          "N50895",
+          "N26902",
+          "N38779",
+          "N2864",
+          "N30874",
+          "N41004",
+          "N62275",
+          "N3517",
+          "N63683",
+          "N31454",
+          "N17381",
+          "N28738",
+          "N53587",
+          "N18884",
+          "N19013",
+          "N11199",
+          "N51005",
+          "N43102",
+          "N6390",
+          "N57844",
+          "N36186",
+          "N54879",
+          "N4936",
+          "N49487",
+          "N27192",
+          "N58054",
+          "N29385",
+          "N62873",
+          "N14478",
+          "N55582",
+          "N7462",
+          "N28084",
+          "N5448",
+          "N25124",
+          "N47099",
+          "N23942",
+          "N8456",
+          "N28279",
+          "N14523",
+          "N17169",
+          "N41992",
+          "N47861",
+          "N32548",
+          "N60992",
+          "N35930",
+          "N11162",
+          "N25949",
+          "N45754",
+          "N21479",
+          "N35803",
+          "N46111",
+          "N54456",
+          "N6074",
+          "N50670",
+          "N7819",
+          "N19990",
+          "N20972",
+          "N33979",
+          "N57780",
+          "N20746",
+          "N44299",
+          "N35622",
+          "N56193",
+          "N13967",
+          "N56299",
+          "N47556",
+          "N45366",
+          "N11551",
+          "N63656",
+          "N14029",
+          "N43269",
+          "N24509",
+          "N59673",
+          "N36568",
+          "N20702",
+          "N45523",
+          "N61838",
+          "N53017",
+          "N23816",
+          "N23184",
+          "N56225",
+          "N18774",
+          "N2843",
+          "N63583"
+        ]
+      },
+      "share_high_importance_ge4": 0.4132,
+      "share_low_importance_le2": 0.18
+    }
+  }
+}

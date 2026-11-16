@@ -6,3 +6,4 @@ annotation/
 # local runs
 cache/
 __pycache__/
+*.zip

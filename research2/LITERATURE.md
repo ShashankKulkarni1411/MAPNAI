@@ -36,3 +36,14 @@
 **Suggested wording:** "To our knowledge, this is the first study to relate LLM-annotated textual news values to click behaviour in MIND impression logs under a within-impression design."
 
 **Before submitting:** run one more search (Google Scholar: "news values" MIND clicks; "newsworthiness" LLM click-through), and check the Lagerwerf & Govaert chapter so we describe it correctly.
+
+## 4. Novelty search (2026-11-16)
+Three web searches: "news values" LLM annotation click-through MIND; newsworthiness LLM clicks; and the Lagerwerf & Govaert chapter.
+- **No study found** that relates LLM-annotated **textual** news values to clicks in MIND impression logs. The closest is still Sotic & Kamps (TPDL 2025), which covers images and doesn't test clicks.
+- **Adjacent work, citable as context:**
+  - LOLA (arXiv 2406.02611): LLMs predicting the more clickable headline on Upworthy A/B tests. This is click prediction, not news values.
+  - CherryRec (arXiv 2406.12243): a hand-built value model for filtering news. It isn't news-value theory and isn't validated against clicks.
+  - LLM-Assisted Reranking (arXiv 2606.02883): YouTube, not MIND.
+- **Lagerwerf & Govaert:** the chapter "Raising Clickworthiness: Effects of Foregrounding News Values in Online Newspaper Headlines" appears in an edited volume on news values from an audience perspective (Palgrave). A secondary source describes 4,000 Dutch headlines and says only Negativity raised CTR. **Still unverified at first hand:** cite it as "headline news values and CTR in Dutch newspapers", and add the negativity detail only after checking the chapter.
+- **Piotrkowicz et al., ICWSM 2017**, "The Impact of News Values and Linguistic Style on the Popularity of Headlines on Twitter and Facebook". The page was bot-blocked, so details are unverified. Cite only as existing work on headline news values and social popularity.
+- **Not done:** Google Scholar itself (it can't be automated here). Run it by hand before submitting.

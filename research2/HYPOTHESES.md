@@ -48,7 +48,18 @@
 - **Generality:** results cover one platform (MSN, Oct–Nov 2019) and one LLM.
 
 ## Changes after this version
-(none yet)
+
+### Change 1 (2026-11-16): inference for within-impression AUC and E2. Recorded after the as-planned run, before the corrected run.
+- **What triggered it.** `n05_clicks.py` included a sanity check, defined before its first run: a seeded random score per article must give AUC ≈ 0.5. Under the planned user bootstrap it gave dev 0.5151 [0.5130, 0.5172] and train 0.4936 [0.4921, 0.4950]. Both CIs exclude 0.5 for pure noise.
+- **Cause.** Each impression shares its candidate articles with thousands of other impressions. Resampling only users treats article-level variation as fixed, so the CIs are much too narrow for any per-article score.
+- **Change.** Within-impression AUC (A1, H1, H2, E1, E3, E4, E5) now uses:
+  - **Two-way bootstrap** over users and articles (independent Poisson(1) weights, the "pigeonhole" bootstrap; Owen 2007, *Ann. Appl. Stat.*; Owen & Eckles 2012). Seed 13. B = 400 for the main values on dev, 200 for the train replication, 100 for exploratory subsets.
+  - **H1 p-values for Holm:** from an article-level permutation test on dev (scores shuffled across articles, 500 permutations). Holm stays at m = 3.
+  - **E2:** CIs from the same two-way bootstrap (B = 100; 50 for the version without gate-failing values) instead of user-clustered SEs.
+  - **B was first set higher** (1,000 / 500 / 200, with 1,000 permutations). It was cut for runtime after the first three dev CIs had printed (conflict, magnitude, prominence; the same values as in the final run). The CIs are wide (about ±0.03), so these B are enough for 2-decimal endpoints.
+- **Acceptance check:** the random score's CI must include 0.5 in both splits.
+- **Not changed:** point estimates, data, the gate, the hypotheses, and H3 (already an article bootstrap).
+- **Disclosure:** the planned-method results stay in `results/n05_clicks_2026-11-16.json` and are reported alongside. The point estimates had been seen when this change was made.
 
 ## Gate outcome (2026-11-16): the rule above applied, not a change to it
 Source: `results/n04_validity_2026-11-16.json` (`n04_validity.py`). 99 items: A1 left item 84 (N20331) blank.

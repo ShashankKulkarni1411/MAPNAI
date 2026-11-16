@@ -1,0 +1,27 @@
+% Source: results/n06_twoway_2026-11-16.json (two-way users x articles Poisson bootstrap, seed 13;
+% B = 400 dev, 200 train; permutation p from 500 article permutations, dev; minimum possible p = 0.002).
+\begin{table}[t]
+\centering
+\caption{Within-impression AUC of each news value for clicks (0.5 = no association). 95\% CIs from a two-way (users $\times$ articles) bootstrap; $p$ from an article-level permutation test. Dev: 73,152 impressions; train: 156,965.}
+\label{tab:auc}
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{lccc}
+\toprule
+ & \multicolumn{2}{c}{Dev (primary)} & Train (replication) \\
+\cmidrule(lr){2-3}\cmidrule(lr){4-4}
+Score & AUC [95\% CI] & $p$ & AUC [95\% CI] \\
+\midrule
+Conflict        & 0.535 [0.510, 0.572] & 0.032 & 0.517 [0.505, 0.533] \\
+Magnitude       & 0.501 [0.468, 0.535] & 0.960 & 0.498 [0.486, 0.513] \\
+Prominence      & 0.528 [0.497, 0.579] & 0.162 & 0.510 [0.489, 0.524] \\
+Surprise        & 0.527 [0.500, 0.573] & 0.184 & 0.525 [0.513, 0.550] \\
+Utility         & 0.434 [0.392, 0.456] & 0.002 & 0.457 [0.440, 0.473] \\
+Entertainment$^\dagger$ & 0.515 [0.484, 0.551] & 0.441 & 0.523 [0.507, 0.542] \\
+Importance      & 0.505 [0.467, 0.548] & 0.834 & 0.481 [0.465, 0.496] \\
+\midrule
+Sum of seven    & 0.519 [0.488, 0.558] & -- & 0.496 [0.483, 0.519] \\
+Random (check)  & 0.515 [0.484, 0.558] & -- & 0.494 [0.477, 0.513] \\
+\bottomrule
+\multicolumn{4}{l}{\footnotesize $^\dagger$Failed the validity gate (Table~\ref{tab:validity}); exploratory.}
+\end{tabular}
+\end{table}

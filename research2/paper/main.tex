@@ -1,0 +1,45 @@
+% ICIP 2027 submission draft. IEEE conference format, 4-6 pages, abstract <= 400 words, <= 6 keywords,
+% corresponding author marked (Author-submission-guidelines.pdf). Compile on Overleaf with IEEEtran.
+% Every number below comes from research2/results/*.json; the source file is noted in a comment.
+\documentclass[conference]{IEEEtran}
+\usepackage{cite}
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage[hidelinks]{hyperref}
+\newcommand{\TODO}[1]{\textcolor{red}{[TODO: #1]}}
+\usepackage{xcolor}
+
+\begin{document}
+
+\title{Importance Is Not Engagement: LLM-Annotated News Values and Reader Clicks in MIND}
+
+% VERIFY names, order, emails, and who is corresponding author.
+\author{
+\IEEEauthorblockN{Shashank A Kulkarni\textsuperscript{*}, Shaunak M Khandkar, Satvik R Gupta, Jyoti Joglekar}
+\IEEEauthorblockA{Department of Computer Engineering, K.J. Somaiya School of Engineering, Mumbai, India\\
+shashank.ak@somaiya.edu, satvik.gupta@somaiya.edu, shaunak.khandkar@somaiya.edu\\
+\textsuperscript{*}Corresponding author}
+}
+
+\maketitle
+
+\begin{abstract}
+\input{sections/abstract}
+\end{abstract}
+
+\begin{IEEEkeywords}
+news values, news recommendation, click behaviour, large language models, annotation validity, MIND
+\end{IEEEkeywords}
+
+\input{sections/body}
+
+\section*{Acknowledgment}
+% IEEE requires disclosure of AI use. VERIFY wording with the IEEE author guidelines.
+The news-value scores were produced by the open-weight model Qwen2.5-7B-Instruct, as described in Section~III. An AI assistant (Claude, Anthropic) was used to help write analysis code and draft text; the authors checked all code, results and text and take full responsibility for them. MIND is used under its research licence; no article text is redistributed.
+
+\bibliographystyle{IEEEtran}
+\bibliography{refs}
+
+\end{document}

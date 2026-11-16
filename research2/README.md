@@ -16,7 +16,8 @@
 | 2b Kaggle run | you | ✅ 22,771/22,771 parsed → `results/nv_summary_kaggle-2026-11-15.json` (scores in git-ignored `data/`) |
 | 3 Human labels | **Two of you** | ✅ returned: `nv_labels_A1_completed.xlsx` (item 84 blank), `nv_labels_A2_complete (1).xlsx` |
 | 4a Validity gate | Claude | ✅ `n04_validity.py` → `results/n04_validity_2026-11-16.json`: 6/7 pass, entertainment fails (κ 0.20) |
-| 4b Click analysis (A1/H1–H3, E1–E5) | Claude | next |
+| 4b Click analysis (A1/H1–H3, E1–E5) | Claude | ✅ `n05_clicks.py` (as planned) → `results/n05_clicks_2026-11-16.json`; failed its random-score check, so `n06_twoway.py` (Change 1: two-way bootstrap and permutation) → `results/n06_twoway_2026-11-16.json`. H1 not supported; utility −, conflict +, importance null |
+| 6 Paper | Claude drafted, **you verify and submit** | ✅ draft: `paper/main.tex` (+ `sections/`, `refs.bib`); Overleaf upload: `paper_overleaf.zip` (git-ignored) |
 | 5 Literature | Claude read the 4 PDFs; **you check two references** | ✅ `LITERATURE.md` |
 | 6 Paper (IEEEtran, 6 pages) | Claude drafts, **you verify and submit** | after step 4 |
 

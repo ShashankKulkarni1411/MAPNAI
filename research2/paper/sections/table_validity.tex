@@ -1,0 +1,20 @@
+% Source: results/n04_validity_2026-11-16.json (99 items, 2,000 item bootstraps, seed 13)
+\begin{table}[t]
+\centering
+\caption{Validity gate: human reliability (quadratic-weighted $\kappa$, annotator 1 vs 2) and LLM validity (Spearman $\rho$, LLM vs annotator mean), 99 items, 95\% bootstrap CIs. Gate: both $\ge 0.40$.}
+\label{tab:validity}
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{lccc}
+\toprule
+Value & Human $\kappa$ & LLM $\rho$ & Gate \\
+\midrule
+Conflict      & 0.81 [0.71, 0.88] & 0.73 [0.60, 0.83] & pass \\
+Magnitude     & 0.67 [0.56, 0.77] & 0.46 [0.28, 0.61] & pass \\
+Prominence    & 0.68 [0.55, 0.77] & 0.74 [0.63, 0.83] & pass \\
+Surprise      & 0.61 [0.48, 0.72] & 0.54 [0.39, 0.67] & pass \\
+Utility       & 0.73 [0.61, 0.83] & 0.78 [0.68, 0.85] & pass \\
+Entertainment & 0.20 [0.07, 0.34] & 0.71 [0.59, 0.79] & fail \\
+Importance    & 0.68 [0.57, 0.78] & 0.67 [0.54, 0.76] & pass \\
+\bottomrule
+\end{tabular}
+\end{table}
