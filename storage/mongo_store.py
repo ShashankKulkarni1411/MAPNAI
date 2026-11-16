@@ -240,7 +240,7 @@ class MongoStore:
         Agent 4 (Risk Scoring) updates specific risk assessment fields
         to the processed_articles table via $set.
         Only writes: risk_score, risk_confidence, action_recommendation,
-        risk_reasoning and risk_level. Never touches fields written by Agents 1, 2, or 3.
+        risk_reasoning, risk_level and risk_model (which LLM produced the score). Never touches fields written by Agents 1, 2, or 3.
         """
         allowed_keys = {
             "risk_score",
@@ -248,6 +248,7 @@ class MongoStore:
             "action_recommendation",
             "risk_reasoning",
             "risk_level",
+            "risk_model",
         }
         filtered_data = {k: v for k, v in risk_data.items() if k in allowed_keys}
         if not filtered_data:

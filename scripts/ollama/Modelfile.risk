@@ -1,0 +1,9 @@
+# Agent 4 local risk model (RISK_OLLAMA_MODEL=mapnai-risk).
+#   ollama pull qwen2.5:7b
+#   ollama create mapnai-risk -f scripts/ollama/Modelfile.risk
+# Ollama's OpenAI-compatible endpoint ignores per-request num_ctx, and the default window is too small for
+# Agent 4's prompt (system prompt + top entities + up to 4,000 characters of body), which would otherwise be
+# truncated silently. 8192 fits a 6 GB GPU alongside the 4-bit 7B weights.
+FROM qwen2.5:7b
+PARAMETER num_ctx 8192
+PARAMETER temperature 0.1

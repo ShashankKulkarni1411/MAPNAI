@@ -102,7 +102,12 @@ def check_setup() -> bool:
 
     has_groq = bool(settings.groq_api_key)
     results.append((False, has_groq, "GROQ_API_KEY (Agent 4 risk, Agent 5 answers)",
-                    "Agent 4 leaves articles pending; Agent 3 uses extractive summaries"))
+                    "Agent 4 uses the local Ollama model (or leaves articles pending); "
+                    "Agent 3 uses extractive summaries"))
+
+    risk_backend = settings.risk_backend.strip().lower()
+    if risk_backend != "groq":
+        results.append((False, *_check_ollama(settings.ollama_base_url, settings.risk_ollama_model)))
 
     ok = True
     for required, passed, label, hint in results:
@@ -110,8 +115,27 @@ def check_setup() -> bool:
         print(f"[{mark}] {label}" + ("" if passed else f" -> {hint}"))
         ok = ok and (passed or not required)
     print(f"\nAgent 3 summarizer backend: {settings.summarizer_backend}")
+    print(f"Agent 4 risk backend: {risk_backend}")
     print("Ready to run." if ok else "Fix the FAIL items before running.")
     return ok
+
+
+def _check_ollama(base_url: str, model: str):
+    """(passed, label, hint) for Agent 4's local model: Ollama reachable and the model created."""
+    import json
+    import urllib.request
+    label = f"Ollama model {model} (Agent 4 local fallback)"
+    hint = ("install Ollama, then: ollama pull qwen2.5:7b && "
+            "ollama create mapnai-risk -f scripts/ollama/Modelfile.risk")
+    root = base_url.rstrip("/").removesuffix("/v1")
+    try:
+        with urllib.request.urlopen(f"{root}/api/tags", timeout=5) as resp:
+            names = {m.get("name", "") for m in json.load(resp).get("models", [])}
+    except Exception as e:
+        return False, label, f"Ollama not reachable at {root} ({e.__class__.__name__}); {hint}"
+    if model in names or f"{model}:latest" in names:
+        return True, label, ""
+    return False, label, f"model not found in Ollama; {hint}"
 
 
 def main() -> None:

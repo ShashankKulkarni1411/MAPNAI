@@ -166,7 +166,10 @@ def _process_one_article(
             if not doc.get("risk_processed"):
                 agent4_input = mongo_doc_to_agent4_payload(doc, upstream=payload)
                 payload = risk_scorer.process_article(agent4_input)
-                stats["risk_scored"] += 1
+                if payload.pop("risk_skipped", False):
+                    stats["risk_skipped"] += 1
+                else:
+                    stats["risk_scored"] += 1
             else:
                 logger.debug(
                     f"[Pipeline] Skipping risk scoring — already done for {article_id[:8]}"
@@ -223,6 +226,7 @@ def run_agent_pipeline(
         "classified": 0,
         "summarized": 0,
         "risk_scored": 0,
+        "risk_skipped": 0,
         "out_of_scope": 0,
         "total_entities": 0,
         "errors": [],
@@ -287,6 +291,7 @@ def run_agent_pipeline(
         f"[Pipeline] Done — ok={stats['articles_ok']} | failed={stats['failed']} | "
         f"ner={stats['ner_processed']} | classified={stats['classified']} | "
         f"summarized={stats['summarized']} | risk_scored={stats['risk_scored']} | "
+        f"risk_skipped={stats['risk_skipped']} | "
         f"out_of_scope={stats['out_of_scope']}"
     )
 

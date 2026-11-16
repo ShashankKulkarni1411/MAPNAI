@@ -138,8 +138,8 @@ def main() -> int:
 
     from agents.agent4_risk_scorer import RiskScoringAgent
     agent = RiskScoringAgent(mongo_store=mongo)
-    if not agent.client:
-        print("Groq client unavailable (GROQ_API_KEY?); nothing done")
+    if not agent.available:
+        print("No Agent 4 LLM backend (GROQ_API_KEY / RISK_BACKEND?); nothing done")
         return 1
 
     done = 0
@@ -148,7 +148,7 @@ def main() -> int:
         if rep is None:
             source, result = s["scored"], {k: s["scored"].get(k) for k in
                                             ("risk_score", "risk_confidence", "risk_level", "risk_reasoning",
-                                             "action_recommendation")}
+                                             "action_recommendation", "risk_model")}
         else:
             if args.max_calls is not None and done >= args.max_calls:
                 print(f"--max-calls {args.max_calls} reached; rerun to continue")

@@ -30,6 +30,10 @@ class Neo4jWriter:
                     self.uri,
                     auth=(self.user, self.password),
                     connection_timeout=10,
+                    # see storage/neo4j_store.py: survive idle-connection drops on NAT networks
+                    liveness_check_timeout=30,
+                    max_connection_lifetime=300,
+                    keep_alive=True,
                 )
                 self._driver.verify_connectivity()
                 logging.info(f"[Neo4j Writer] Connected to {self.uri}")

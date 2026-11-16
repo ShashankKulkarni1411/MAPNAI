@@ -37,6 +37,17 @@ class Settings(BaseSettings):
     # Agent 3: "auto" = Groq LLM when GROQ_API_KEY is set, else extractive TF-IDF;
     # "extractive" = always offline TF-IDF; "llm" = Groq only
     summarizer_backend: str = Field(default="auto", env="SUMMARIZER_BACKEND")
+    # Agent 4: "auto" = Groq, falling back to the local Ollama model when Groq fails (e.g. 429 daily limit)
+    # or GROQ_API_KEY is missing; "groq" = Groq only (failures leave the article pending);
+    # "ollama" = local model only.
+    risk_backend: str = Field(default="auto", env="RISK_BACKEND")
+    # Ollama's OpenAI-compatible endpoint and the model Agent 4 uses locally.
+    ollama_base_url: str = Field(default="http://localhost:11434/v1", env="OLLAMA_BASE_URL")
+    risk_ollama_model: str = Field(default="mapnai-risk", env="RISK_OLLAMA_MODEL")
+    risk_ollama_timeout_seconds: float = Field(default=300.0, env="RISK_OLLAMA_TIMEOUT_SECONDS")
+    # After Groq fails in "auto" mode, Agent 4 goes straight to Ollama for this long instead of
+    # spending a doomed Groq request on every article.
+    risk_groq_cooldown_seconds: float = Field(default=900.0, env="RISK_GROQ_COOLDOWN_SECONDS")
     openai_api_key: str = Field(default="", env="OPENAI_API_KEY")
 
     # ── Agent 1 NER ──────────────────────────────────────────

@@ -12,16 +12,20 @@ dictionary downstream to Agent 5.
 """
 
 import json
-from typing import Optional
+import time
+from typing import List, Optional, Tuple
 
 from termcolor import colored
+from config.settings import settings
 from storage.mongo_store import MongoStore
 from utils.groq_client import init_groq_llm
+from utils.ollama_client import init_ollama_llm
 from agents.pipeline_bridge import mongo_doc_to_agent4_payload
 from utils.logger import logger
 
 
 RISK_FACTORS = ("event_severity", "entity_salience", "temporal_urgency", "domain_criticality")
+RISK_BACKENDS = ("auto", "groq", "ollama")
 
 
 def risk_level(score: int) -> str:
@@ -67,8 +71,37 @@ class RiskScoringAgent:
     """
 
     def __init__(self, mongo_store: Optional[MongoStore] = None):
-        self.client, self.model_name = init_groq_llm("[Agent 4]", "Risk scoring")
+        backend = settings.risk_backend.strip().lower()
+        if backend not in RISK_BACKENDS:
+            logger.warning(f"[Agent 4] Unknown RISK_BACKEND={backend!r}; using 'auto'.")
+            backend = "auto"
+        self.backend = backend
+        # Groq (primary in auto/groq mode). Kept as self.client/self.model_name for existing callers.
+        self.client, self.model_name = (
+            (None, None) if backend == "ollama" else init_groq_llm("[Agent 4]", "Risk scoring")
+        )
+        # Local Ollama model (fallback in auto mode, primary in ollama mode).
+        self.ollama_client, self.ollama_model = (
+            (None, None) if backend == "groq"
+            else init_ollama_llm("[Agent 4]", "risk scoring", settings.risk_ollama_model)
+        )
+        # monotonic time until which Groq is skipped after an API failure (auto mode only)
+        self._groq_skip_until = 0.0
         self.mongo = mongo_store or MongoStore()
+
+    @property
+    def available(self) -> bool:
+        """True when at least one backend is configured."""
+        return bool(self.client or self.ollama_client)
+
+    def _backends(self) -> List[Tuple[str, object, str]]:
+        """(label, client, model) in the order to try for the next article."""
+        chain = []
+        if self.client and time.monotonic() >= self._groq_skip_until:
+            chain.append(("groq", self.client, self.model_name))
+        if self.ollama_client:
+            chain.append(("ollama", self.ollama_client, self.ollama_model))
+        return chain
 
     # ── Prompt Construction ─────────────────────────────────────
 
@@ -175,8 +208,16 @@ RULES:
         summary_short: str,
         entities: list,
     ) -> dict:
-        """Calls the LLM with ReAct system prompt and returns parsed risk dict."""
-        if not self.client:
+        """Calls the LLM with ReAct system prompt and returns parsed risk dict.
+
+        Tries each backend from _backends() in order (Groq, then the local Ollama model in auto mode) and
+        records which one answered in `risk_model` ("groq:<model>" / "ollama:<model>"). In auto mode a Groq
+        API error (429 daily limit, outage) makes later articles skip Groq for RISK_GROQ_COOLDOWN_SECONDS.
+        A malformed reply only moves this article to the next backend. All backends failing returns the
+        fallback dict, which process_article never writes, so the article stays pending.
+        """
+        backends = self._backends()
+        if not backends:
             return self._fallback_risk()
 
         # Truncate body to save tokens — summary carries the key context
@@ -186,29 +227,40 @@ RULES:
             "title": title,
             "body": truncated_body,
         }, indent=2)
+        messages = [
+            {
+                "role": "system",
+                "content": self._build_system_prompt(
+                    domain, urgency_flag, sentiment, summary_short, entities
+                )
+            },
+            {"role": "user", "content": user_content}
+        ]
 
-        try:
-            response = self.client.chat.completions.create(
-                model=self.model_name,
-                messages=[
-                    {
-                        "role": "system",
-                        "content": self._build_system_prompt(
-                            domain, urgency_flag, sentiment, summary_short, entities
-                        )
-                    },
-                    {"role": "user", "content": user_content}
-                ],
-                response_format={"type": "json_object"},
-                temperature=0.1
-            )
-
-            raw_json = response.choices[0].message.content
-            return normalize_risk(json.loads(raw_json))
-
-        except Exception as e:
-            logger.error(f"[Agent 4] LLM API or JSON parse failed: {e}")
-            return self._fallback_risk()
+        for label, client, model in backends:
+            try:
+                response = client.chat.completions.create(
+                    model=model,
+                    messages=messages,
+                    response_format={"type": "json_object"},
+                    temperature=0.1
+                )
+                raw_json = response.choices[0].message.content
+                result = normalize_risk(json.loads(raw_json))
+                result["risk_model"] = f"{label}:{model}"
+                return result
+            except (ValueError, TypeError, AttributeError, IndexError) as e:
+                # JSON parse / empty reply: specific to this answer, not a reason to avoid the backend
+                logger.error(f"[Agent 4] {label} returned an unusable reply: {e}")
+            except Exception as e:
+                logger.error(f"[Agent 4] {label} LLM API failed: {e}")
+                if label == "groq" and self.ollama_client:
+                    self._groq_skip_until = time.monotonic() + settings.risk_groq_cooldown_seconds
+                    logger.warning(
+                        f"[Agent 4] Using local Ollama ({self.ollama_model}) for the next "
+                        f"{settings.risk_groq_cooldown_seconds:.0f} s."
+                    )
+        return self._fallback_risk()
 
     # ── Fallback ────────────────────────────────────────────────
 
@@ -254,6 +306,10 @@ RULES:
         # 2. Write only Agent 4 fields to MongoDB via $set
         if risk_result.pop("_fallback", False):
             logger.warning(f"[Agent 4] Risk scoring unavailable — {article_id} left pending in MongoDB.")
+            merged_payload = combined_payload.copy()
+            merged_payload.update(risk_result)
+            merged_payload["risk_skipped"] = True
+            return merged_payload
         elif article_id:
             db_success = self.mongo.update_article_risk(article_id, risk_result)
             if not db_success:
@@ -271,7 +327,7 @@ RULES:
         logger.info(
             f"[Agent 4] Risk scoring complete for {article_id} → "
             f"Score: {risk_result.get('risk_score')} ({risk_result.get('risk_level')}) | "
-            f"Confidence: {risk_result.get('risk_confidence')}"
+            f"Confidence: {risk_result.get('risk_confidence')} | Model: {risk_result.get('risk_model')}"
         )
         return merged_payload
 

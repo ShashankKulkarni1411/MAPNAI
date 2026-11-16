@@ -51,6 +51,11 @@ class Neo4jStore:
                     self.uri,
                     auth=(self.user, self.password),
                     connection_timeout=10,
+                    # NAT/hotspot networks silently drop idle TCP connections; ping a pooled
+                    # connection idle >30s before reuse and recycle any older than 5 min.
+                    liveness_check_timeout=30,
+                    max_connection_lifetime=300,
+                    keep_alive=True,
                 )
                 self._driver.verify_connectivity()
                 logger.info(f"[Neo4j] Connected to {self.uri}")

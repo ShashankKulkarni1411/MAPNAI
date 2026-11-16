@@ -199,8 +199,24 @@ NEO4J_PASSWORD=your_password
 
 Set `GROQ_API_KEY` to enable risk scores and LLM query answers. Agent 3 uses Groq when the key is
 set and the offline extractive TF-IDF summarizer otherwise (`SUMMARIZER_BACKEND=extractive` forces
-it). Without the key, Agent 4 leaves articles pending (re-run once the key is set) and Agent 5 uses
-its offline answer fallback. News API keys are optional when using RSS sources; Bluesky needs no credentials.
+it). Agent 5 uses its offline answer fallback without the key. News API keys are optional when using RSS
+sources; Bluesky needs no credentials.
+
+**Agent 4 local fallback (Ollama).** With `RISK_BACKEND=auto` (the default), Agent 4 scores with Groq and
+switches to a local model when Groq fails — e.g. the free tier's daily token limit (HTTP 429) — or has no key.
+After a Groq failure it skips Groq for `RISK_GROQ_COOLDOWN_SECONDS` (default 900). Each score records its
+source in `risk_model` (`groq:<model>` or `ollama:<model>`); scales can differ between models, so filter on it
+when comparing scores. One-time setup (≈5 GB; a 6 GB GPU runs it, CPU works but is slow):
+
+```bash
+# install Ollama (https://ollama.com, or: winget install Ollama.Ollama)
+ollama pull qwen2.5:7b
+ollama create mapnai-risk -f scripts/ollama/Modelfile.risk   # sets an 8k context window
+python run_mapnai.py --check                                  # "[OK  ] Ollama model mapnai-risk"
+```
+
+`RISK_BACKEND=groq` restores Groq-only scoring (failures leave articles pending for a later run);
+`RISK_BACKEND=ollama` scores everything locally.
 
 ### 3. Run a single ingestion cycle
 
@@ -587,6 +603,10 @@ No other code changes needed — the pipeline picks up changes automatically.
 | `MIN_ARTICLE_LENGTH` | `100` | Min body length (chars) |
 | `GROQ_API_KEY` | — | Groq key (summaries, risk scores, Agent 5 answers + LangGraph) |
 | `GROQ_MODEL` | `openai/gpt-oss-120b` | Default Groq chat model |
+| `RISK_BACKEND` | `auto` | Agent 4: `auto` (Groq → local Ollama fallback), `groq`, or `ollama` |
+| `OLLAMA_BASE_URL` | `http://localhost:11434/v1` | Ollama's OpenAI-compatible endpoint |
+| `RISK_OLLAMA_MODEL` | `mapnai-risk` | Local Agent 4 model (built from `scripts/ollama/Modelfile.risk`) |
+| `RISK_GROQ_COOLDOWN_SECONDS` | `900` | After a Groq failure, Agent 4 uses Ollama directly for this long |
 | `QUERY_GRAPH_ENABLED` | `true` | Use the LangGraph Agent 5 pipeline (needs `GROQ_API_KEY`) |
 | `QUERY_GRAPH_MODEL` | — (= `GROQ_MODEL`) | Model for rewrite/generate/check nodes |
 | `QUERY_GRAPH_GRADER_MODEL` | — (= graph model) | Model for document grading (a smaller one keeps it cheap) |
