@@ -1,0 +1,21 @@
+{
+  "run_tag": "kaggle-2026-11-15",
+  "model": "Qwen/Qwen2.5-7B-Instruct",
+  "prompt_sha256": "2550d607c7d80996152cd356a9d62d682b31ed21e432cd95242a7d391a40eeb8",
+  "input_sha256": "48cec4412f64a6e492147fbf34a10712923d29a59d6f14cd7180419452576a0b",
+  "rows": 22771,
+  "ok": 22771,
+  "failed": 0,
+  "failed_ids": [],
+  "batch_size": 32,
+  "max_new_tokens": 64,
+  "decoding": "greedy, repetition_penalty 1.0",
+  "torch": "2.11.0+cu130",
+  "transformers": "5.20.2",
+  "gpus": [
+    "Tesla T4",
+    "Tesla T4"
+  ],
+  "finished_utc": "2026-11-15T20:04:10+00:00",
+  "output_sha256": "9902e3a20fbbf93ce1be45be8d631c962ec5763c107cf3ad02118bc479238be0"
+}
