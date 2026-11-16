@@ -13,8 +13,10 @@
 | 0 Setup: data, stats, human sample | Claude | ✅ `n01_prepare.py` → `results/n01_prepare_2026-11-15.json` |
 | 1 Codebook and prompt | Claude | ✅ `CODEBOOK.md`, `nv_common.py` (prompt sha256 `2550d607…`), 11 parser tests pass |
 | 2 Kaggle notebook | Claude builds, **you run** | ✅ built: `kaggle/nv_kaggle_scoring.ipynb`. Smoke-tested locally with Qwen2.5-1.5B on 75 items (100% parsed, all three resume paths) |
-| 3 Human labels | **Two of you** | ✅ workbooks ready: `annotation/nv_labels_A1.xlsx`, `annotation/nv_labels_A2.xlsx` |
-| 4 Analysis (validity gate, A1/H1–H3, E1–E5) | Claude | after steps 2 and 3 |
+| 2b Kaggle run | you | ✅ 22,771/22,771 parsed → `results/nv_summary_kaggle-2026-11-15.json` (scores in git-ignored `data/`) |
+| 3 Human labels | **Two of you** | ✅ returned: `nv_labels_A1_completed.xlsx` (item 84 blank), `nv_labels_A2_complete (1).xlsx` |
+| 4a Validity gate | Claude | ✅ `n04_validity.py` → `results/n04_validity_2026-11-16.json`: 6/7 pass, entertainment fails (κ 0.20) |
+| 4b Click analysis (A1/H1–H3, E1–E5) | Claude | next |
 | 5 Literature | Claude read the 4 PDFs; **you check two references** | ✅ `LITERATURE.md` |
 | 6 Paper (IEEEtran, 6 pages) | Claude drafts, **you verify and submit** | after step 4 |
 
@@ -48,6 +50,12 @@ python research2/test_nv_common.py
 python research2/n01_prepare.py --tag 2026-11-15
 python research2/n02_build_notebook.py --prep-tag 2026-11-15 --run-tag kaggle-2026-11-15
 python research2/n03_annotation_workbook.py build --tag 2026-11-15
+# after labelling (system Python), then the gate (~/.venvs/mapnai-research: numpy, scipy, sklearn)
+python research2/n03_annotation_workbook.py read research2/annotation/nv_labels_A1_completed.xlsx
+python research2/n03_annotation_workbook.py read "research2/annotation/nv_labels_A2_complete (1).xlsx"
+~/.venvs/mapnai-research/Scripts/python research2/test_n04.py
+~/.venvs/mapnai-research/Scripts/python research2/n04_validity.py --a1 research2/annotation/nv_labels_A1_completed.csv \
+  --a2 "research2/annotation/nv_labels_A2_complete (1).csv" --scores research2/data/nv_scores_kaggle-2026-11-15.jsonl --tag 2026-11-16
 ```
 
 ## Data handling

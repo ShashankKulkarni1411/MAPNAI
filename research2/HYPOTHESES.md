@@ -49,3 +49,14 @@
 
 ## Changes after this version
 (none yet)
+
+## Gate outcome (2026-11-16): the rule above applied, not a change to it
+Source: `results/n04_validity_2026-11-16.json` (`n04_validity.py`). 99 items: A1 left item 84 (N20331) blank.
+
+- **Pass (ρ ≥ 0.40 and κ ≥ 0.40):** conflict, magnitude, prominence, surprise, utility, importance.
+- **Fail:** entertainment. Human κ = 0.199 [0.068, 0.335], though LLM–human ρ = 0.706. Labeller A1 gave 67 of 99 items a 3 and none a 1; ρ(LLM, A2) = 0.815, ρ(LLM, A1) = 0.130.
+- **What follows, per the rule:**
+  - H1 stays confirmatory for **prominence and surprise**. Its entertainment part is reported as exploratory. Holm correction stays over m = 3 as written (conservative).
+  - **H2 and H3 both involve entertainment, so they become exploratory.** They are still run and reported, labelled as such.
+  - Labels are not revised after seeing the gate. Any re-labelling of entertainment would be a disclosed post-hoc change and analysed separately.
+- **Process note:** the first A2 file received shared five columns with A1 exactly (a file mix-up). The labeller sent the correct file the same day, and only that file was used. Hashes are in the result file.
