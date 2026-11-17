@@ -38,3 +38,6 @@ research/experiments/cache/
 research/colab/outputs/
 research/annotation/export/
 research/annotation/llm/
+
+# Generated code-graph output (graphify)
+graphify-out/

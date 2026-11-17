@@ -7,7 +7,7 @@
 
 ## Overview
 
-This is the complete **Layer 1 (Ingestion Layer)** of the MAPNAI system. It ingests news from **30+ RSS feeds, 3 news APIs, 12 subreddits, and 3 scraper targets**, cleans and deduplicates them, enriches with named entities, and writes to **3 storage backends simultaneously**: MongoDB, FAISS, and Neo4j.
+This is the complete **Layer 1 (Ingestion Layer)** of the MAPNAI system. It ingests news from **30+ RSS feeds, 3 news APIs, the Bluesky firehose, and 3 scraper targets**, cleans and deduplicates them, enriches with named entities, and writes to **3 storage backends simultaneously**: MongoDB, FAISS, and Neo4j.
 
 ---
 
@@ -18,8 +18,8 @@ This is the complete **Layer 1 (Ingestion Layer)** of the MAPNAI system. It inge
 │                        INGESTION PIPELINE                           │
 │                                                                     │
 │  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐  ┌────────┐  │
-│  │  RSS Fetcher │  │  API Fetcher │  │Reddit Fetcher│  │Scraper │  │
-│  │  (30+ feeds) │  │(NewsAPI/GNews│  │(12 subreddits│  │(3 sites│  │
+│  │  RSS Fetcher │  │  API Fetcher │  │   Bluesky    │  │Scraper │  │
+│  │  (30+ feeds) │  │(NewsAPI/GNews│  │  (firehose)  │  │(3 sites│  │
 │  │              │  │  /NewsData)  │  │              │  │        │  │
 │  └──────┬───────┘  └──────┬───────┘  └──────┬───────┘  └───┬────┘  │
 │         └─────────────────┴─────────────────┴──────────────┘       │
@@ -68,14 +68,14 @@ mapnai_ingestion/
 ├── agents/
 │   ├── rss_fetcher.py           ← RSS feed fetcher (feedparser)
 │   ├── api_fetcher.py           ← NewsAPI / GNews / NewsData.io
-│   ├── reddit_fetcher.py        ← Reddit via PRAW
+│   ├── bluesky_fetcher.py       ← Bluesky firehose (WebSocket)
 │   ├── web_scraper.py           ← BeautifulSoup scraper
 │   ├── preprocessing_agent.py  ← Cleaning, dedup, normalization
 │   └── enrichment_agent.py     ← spaCy NER enrichment
 │
 ├── config/
 │   ├── settings.py              ← Pydantic settings (loads from .env)
-│   └── sources.py               ← ALL source definitions (RSS, Reddit, etc.)
+│   └── sources.py               ← ALL source definitions (RSS, etc.)
 │
 ├── storage/
 │   ├── mongo_store.py           ← MongoDB read/write layer
@@ -525,7 +525,7 @@ Every article that exits the preprocessing stage is a `ProcessedArticle`:
 | Health RSS | 6 | WHO, NIH, CDC, STAT News |
 | Supply Chain RSS | 4 | Supply Chain Dive, Logistics Management |
 | Government RSS | 8 | RBI, IMF, World Bank, SEBI, US Fed, UN |
-| Reddit | 12 | r/worldnews, r/economics, r/technology, r/investing |
+| Bluesky | 1 | Public firehose (up to `BLUESKY_MAX_POSTS` posts per run) |
 | Scrapers | 3 | Business Standard, LiveMint, NDTV |
 | News APIs | 3 | NewsAPI, GNews, NewsData.io |
 | **Total sources** | **~62** | |
@@ -571,13 +571,6 @@ FINANCE_RSS.append(
 )
 ```
 
-### Add a subreddit
-```python
-REDDIT_SOURCES.append(
-    RedditSource("IndiaInvestments", "finance", post_limit=20)
-)
-```
-
 No other code changes needed — the pipeline picks up changes automatically.
 
 ---
@@ -589,8 +582,6 @@ No other code changes needed — the pipeline picks up changes automatically.
 | `NEWSAPI_KEY` | — | NewsAPI.org key |
 | `GNEWS_API_KEY` | — | GNews.io key |
 | `NEWSDATA_API_KEY` | — | NewsData.io key |
-| `REDDIT_CLIENT_ID` | — | Reddit app client ID |
-| `REDDIT_CLIENT_SECRET` | — | Reddit app secret |
 | `MONGO_URI` | `mongodb://localhost:27017` | MongoDB connection |
 | `MONGO_DB_NAME` | `mapnai` | Database name |
 | `NEO4J_URI` | `bolt://localhost:7687` | Neo4j connection |

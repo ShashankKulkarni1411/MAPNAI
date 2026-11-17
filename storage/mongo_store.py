@@ -293,26 +293,6 @@ class MongoStore:
             logger.warning(f"[MongoDB] Could not load existing hashes: {e}")
             return []
 
-    def get_articles_by_domain(
-        self,
-        domain: str,
-        limit: int = 50,
-        skip: int = 0,
-    ) -> List[Dict]:
-        """Retrieve recent articles for a specific domain."""
-        try:
-            cursor = (
-                self.db["processed_articles"]
-                .find({"domain": domain}, {"_id": 0, "body": 0})  # exclude large body field
-                .sort("published_at", DESCENDING)
-                .skip(skip)
-                .limit(limit)
-            )
-            return list(cursor)
-        except Exception as e:
-            logger.error(f"[MongoDB] get_articles_by_domain error: {e}")
-            return []
-
     def get_article_by_id(self, article_id: str) -> Optional[Dict]:
         """Retrieve full article by article_id."""
         try:
@@ -322,30 +302,6 @@ class MongoStore:
         except Exception as e:
             logger.error(f"[MongoDB] get_article_by_id error: {e}")
             return None
-
-    def get_recent_articles(
-        self,
-        hours: int = 24,
-        domain: str = None,
-        limit: int = 100,
-    ) -> List[Dict]:
-        """Get articles ingested within the last N hours."""
-        from datetime import datetime, timedelta, timezone
-        cutoff = datetime.now(timezone.utc) - timedelta(hours=hours)
-        query: Dict = {"ingested_at": {"$gte": cutoff.isoformat()}}
-        if domain:
-            query["domain"] = domain
-        try:
-            cursor = (
-                self.db["processed_articles"]
-                .find(query, {"_id": 0, "body": 0})
-                .sort("ingested_at", DESCENDING)
-                .limit(limit)
-            )
-            return list(cursor)
-        except Exception as e:
-            logger.error(f"[MongoDB] get_recent_articles error: {e}")
-            return []
 
     def get_articles_published_since(
         self,

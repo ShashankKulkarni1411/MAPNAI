@@ -19,7 +19,6 @@ from pathlib import Path
 from typing import Optional
 
 from dotenv import dotenv_values
-from termcolor import colored
 
 from config.classifier_taxonomy import TAXONOMY_VERSION
 from storage.mongo_store import MongoStore
@@ -220,20 +219,20 @@ if __name__ == "__main__":
     if args.article_id:
         doc = mongo.get_article_by_id(args.article_id)
         if not doc:
-            print(colored(f"No article found: {args.article_id}", "red"))
+            print(f"No article found: {args.article_id}")
             raise SystemExit(1)
         pending = [doc]
     else:
         pending = mongo.get_articles_pending_classification(limit=args.limit)
         if not pending:
-            print(colored("No articles pending classification. Run pipeline.py first.", "yellow"))
+            print("No articles pending classification. Run pipeline.py first.")
             raise SystemExit(0)
 
     for doc in pending:
         payload = mongo_doc_to_agent1_payload(doc)
-        print(colored(f"\n--- Agent 2: {payload['article_id']} ---", "yellow"))
+        print(f"\n--- Agent 2: {payload['article_id']} ---")
         result = agent.process_article(payload)
-        print(colored("--- Output ---", "green"))
+        print("--- Output ---")
         print(json.dumps(result, indent=2))
 
     agent.close()

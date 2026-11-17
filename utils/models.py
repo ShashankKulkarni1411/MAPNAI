@@ -31,7 +31,6 @@ class SourceType(str, Enum):
     NEWSDATA    = "newsdata"
     BLUESKY     = "bluesky"
     SCRAPER     = "scraper"
-    GOVERNMENT  = "government"
 
 
 class SentimentLabel(str, Enum):

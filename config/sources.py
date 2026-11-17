@@ -1,8 +1,8 @@
 """
 MAPNAI — config/sources.py
-Defines all ingestion sources: RSS feeds, API endpoints, Bluesky Firehose,
-government feeds, and scraper targets.
-Add / remove sources here without touching any agent code.
+Defines the RSS feeds (including government feeds) and the domain keyword hints.
+Add / remove feeds here without touching any agent code. News API queries live in
+agents/api_fetcher.py and scraper targets in agents/web_scraper.py.
 
 Note: Reddit has been fully replaced by the Bluesky public Firehose.
       The Firehose is a single always-on WebSocket stream — no per-source
@@ -21,21 +21,6 @@ class RSSSource:
     url: str
     domain: str          # finance | geopolitics | technology | health | supply_chain | sports | entertainment_movies | general
     language: str = "en"
-    active: bool = True
-
-
-# RedditSource removed — replaced by Bluesky Firehose (zero-auth WebSocket).
-# See agents/bluesky_fetcher.py and config/settings.py.
-
-
-@dataclass
-class ScraperTarget:
-    name: str
-    url: str
-    domain: str
-    article_selector: str   # CSS selector for article links
-    title_selector: str
-    body_selector: str
     active: bool = True
 
 

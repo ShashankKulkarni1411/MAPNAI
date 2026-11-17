@@ -3,7 +3,7 @@ MAPNAI — agents/web_scraper.py
 Agent 1d: Web Scraper
 Scrapes non-RSS news sources using requests + BeautifulSoup.
 Respects robots.txt via configurable user-agent.
-Uses CSS selectors defined in ScraperTarget config.
+Uses the CSS selectors defined in SCRAPER_TARGETS below.
 """
 
 import json

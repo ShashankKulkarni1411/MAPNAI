@@ -1,7 +1,7 @@
 # PERSONALIZATION_PLAN.md (v2)
 
 This is the design for the full personalization spec (sections A–L). It replaces the earlier, smaller plan, which is
-kept as `PERSONALIZATION_PLAN.v1.md`. It contains no implementation code.
+in git history (tag `before-cleanup`, `PERSONALIZATION_PLAN.v1.md`). It contains no implementation code.
 
 The plan is based on `PERSONALIZATION_CONTEXT.md`, the v1 code already in the working tree, and a live re-check done
 on 2026-09-29.

@@ -11,7 +11,6 @@ Outputs the fully merged JSON payload downstream for Agent 4.
 """
 
 import json
-from termcolor import colored
 from typing import Optional
 
 from config.settings import settings
@@ -222,46 +221,3 @@ RULES:
 
     def close(self):
         self.mongo.close()
-
-
-# ── Standalone Testing ──────────────────────────────────────────
-
-if __name__ == "__main__":
-    import argparse
-
-    parser = argparse.ArgumentParser(description="Agent 3 — summarize from MongoDB")
-    parser.add_argument("--article-id", type=str, help="Summarize one article by ID")
-    parser.add_argument("--limit", type=int, default=1, help="Max pending articles")
-    args = parser.parse_args()
-
-    mongo = MongoStore()
-    agent = SummarizationAgent(mongo_store=mongo)
-
-    if args.article_id:
-        doc = mongo.get_article_by_id(args.article_id)
-        if not doc:
-            print(colored(f"No article found: {args.article_id}", "red"))
-            raise SystemExit(1)
-        pending = [doc]
-    else:
-        pending = mongo.get_articles_pending_summarization(limit=args.limit)
-        if not pending:
-            print(colored("No articles pending summarization. Run Agent 2 first.", "yellow"))
-            raise SystemExit(0)
-
-    for doc in pending:
-        payload = mongo_doc_to_agent1_payload(doc)
-        payload["domain"] = doc.get("domain", "general")
-        payload["category"] = doc.get("category", "Other")
-        payload["sentiment"] = float(doc.get("sentiment_score", 0.0))
-        payload["urgency_flag"] = doc.get("urgency_flag", False)
-        payload["classification_confidence"] = doc.get("classification_confidence", 0.0)
-        payload["taxonomy_version"] = doc.get("taxonomy_version", "1.0.0")
-
-        print(colored(f"\n--- Agent 3: {payload['article_id']} ---", "yellow"))
-        result = agent.process_article(payload)
-        print(colored("--- Output ---", "green"))
-        print(json.dumps(result, indent=2))
-
-    agent.close()
-    mongo.close()

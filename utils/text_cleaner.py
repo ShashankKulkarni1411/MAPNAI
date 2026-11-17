@@ -6,7 +6,6 @@ timestamp normalization utilities live here.
 
 import re
 import html
-import chardet
 from datetime import datetime, timezone
 from typing import Optional
 from bs4 import BeautifulSoup

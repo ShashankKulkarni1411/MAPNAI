@@ -343,7 +343,6 @@ class TestSettings:
         assert settings.max_articles_per_source > 0
         assert settings.min_article_length > 0
         assert settings.request_timeout_seconds > 0
-        assert settings.max_retries > 0
         assert settings.embedding_model
 
     def test_default_language_is_english(self):

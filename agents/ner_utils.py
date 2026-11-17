@@ -1,11 +1,10 @@
 """
 MAPNAI — agents/ner_utils.py
 Utilities for the NER & Entity Extraction Agent (Agent 1).
-Handles salience scoring, entity deduplication, and spaCy fallback logic.
+Handles salience scoring and entity deduplication.
 """
 
 import math
-import logging
 from typing import List, Dict, Any
 
 # The 8 custom types required for downstream agents
@@ -105,35 +104,3 @@ def deduplicate_and_merge_entities(entities: List[Dict[str, Any]], text_length: 
         
     # Sort descending by salience
     return sorted(final_entities, key=lambda x: x["salience"], reverse=True)
-
-def extract_entities_fallback(text: str) -> List[Dict[str, Any]]:
-    """
-    Fallback extraction using spaCy en_core_web_trf.
-    Returns raw entity dicts to be passed to deduplicate_and_merge_entities.
-    """
-    try:
-        import spacy
-        try:
-            # Prefer transformer model for accuracy
-            nlp = spacy.load("en_core_web_trf")
-        except OSError:
-            logging.warning("[NER Utils] spaCy 'en_core_web_trf' not found. Falling back to 'en_core_web_sm'.")
-            nlp = spacy.load("en_core_web_sm")
-            
-        # Limit text length to prevent memory exhaustion
-        doc = nlp(text[:100000])
-        
-        raw_entities = []
-        for ent in doc.ents:
-            mapped_type = SPACY_TO_CUSTOM_MAP.get(ent.label_)
-            if mapped_type:
-                raw_entities.append({
-                    "text": ent.text,
-                    "label": mapped_type,
-                    "start": ent.start_char,
-                    "end": ent.end_char
-                })
-        return raw_entities
-    except ImportError:
-        logging.error("[NER Utils] spaCy not installed. Fallback failed.")
-        return []

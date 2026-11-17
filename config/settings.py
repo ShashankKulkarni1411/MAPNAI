@@ -48,7 +48,6 @@ class Settings(BaseSettings):
     # After Groq fails in "auto" mode, Agent 4 goes straight to Ollama for this long instead of
     # spending a doomed Groq request on every article.
     risk_groq_cooldown_seconds: float = Field(default=900.0, env="RISK_GROQ_COOLDOWN_SECONDS")
-    openai_api_key: str = Field(default="", env="OPENAI_API_KEY")
 
     # ── Agent 1 NER ──────────────────────────────────────────
     # Type stored for the BERT model's CoNLL MISC label (nationalities, events, works). "Product" is the historical
@@ -79,11 +78,6 @@ class Settings(BaseSettings):
     # After a Neo4j failure, graph retrieval is skipped for this long (connecting can block ~10 s).
     query_graph_neo4j_cooldown_seconds: float = Field(default=300.0, env="QUERY_GRAPH_NEO4J_COOLDOWN_SECONDS")
 
-    # ── Reddit ───────────────────────────────────────────────
-    reddit_client_id: str = Field(default="", env="REDDIT_CLIENT_ID")
-    reddit_client_secret: str = Field(default="", env="REDDIT_CLIENT_SECRET")
-    reddit_user_agent: str = Field(default="MAPNAI/1.0", env="REDDIT_USER_AGENT")
-
     # ── MongoDB ──────────────────────────────────────────────
     mongo_uri: str = Field(default="mongodb://localhost:27017", env="MONGO_URI")
     mongo_db_name: str = Field(default="mapnai", env="MONGO_DB_NAME")
@@ -109,7 +103,6 @@ class Settings(BaseSettings):
     # A publish time further than this ahead of the ingestion time is a wrong date (bad feed / timezone): it is
     # dropped and the article falls back to its ingestion time (date_source "ingested")
     max_future_skew_minutes: int = Field(default=60, env="MAX_FUTURE_SKEW_MINUTES")
-    max_retries: int = Field(default=3, env="MAX_RETRIES")
     # Article images: when the feed/API gave no usable hero image, read og:image / JSON-LD from the article page
     media_page_lookup: bool = Field(default=True, env="MEDIA_PAGE_LOOKUP")
     media_lookup_workers: int = Field(default=8, env="MEDIA_LOOKUP_WORKERS")

@@ -204,13 +204,10 @@ def fetch_bluesky_firehose(
     return articles
 
 
-# ── Public entry-point (mirrors fetch_all_reddit interface) ───
+# ── Public entry-point ───────────────────────────────────────
 
 def fetch_all_bluesky(max_posts: int = None) -> List[RawArticle]:
-    """
-    Fetch a batch of Bluesky Firehose posts.
-    Drop-in replacement for fetch_all_reddit().
-    """
+    """Fetch a batch of Bluesky Firehose posts."""
     try:
         return fetch_bluesky_firehose(max_posts=max_posts)
     except Exception as e:

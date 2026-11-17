@@ -15,12 +15,10 @@ import json
 import time
 from typing import List, Optional, Tuple
 
-from termcolor import colored
 from config.settings import settings
 from storage.mongo_store import MongoStore
 from utils.groq_client import init_groq_llm
 from utils.ollama_client import init_ollama_llm
-from agents.pipeline_bridge import mongo_doc_to_agent4_payload
 from utils.logger import logger
 
 
@@ -333,61 +331,3 @@ RULES:
 
     def close(self):
         self.mongo.close()
-
-
-# ── Standalone Testing ──────────────────────────────────────────
-
-if __name__ == "__main__":
-    import uuid
-    from datetime import datetime
-
-    # Mock payload simulating the full Agent 1 + 2 + 3 merged output
-    mock_combined_payload = {
-        "article_id": str(uuid.uuid4()),
-        "title": "Fed rate cut sparks unexpected crypto rally; supply chains brace for impact",
-        "body": (
-            "The Federal Reserve surprised markets today by cutting interest rates by 50 basis "
-            "points. In response, Bitcoin surged past critical resistance levels. Concurrently, "
-            "major logistics firms express worry that increased consumer demand may overwhelm "
-            "shipping pipelines currently struggling with East Coast port strikes."
-        ),
-        "entities": [
-            {"name": "Federal Reserve", "type": "ORG",     "salience": 0.95},
-            {"name": "Bitcoin",         "type": "PRODUCT", "salience": 0.80},
-            {"name": "East Coast",      "type": "LOC",     "salience": 0.60},
-        ],
-        "source": "Financial Times",
-        "published_at": datetime.utcnow().isoformat(),
-        # Agent 2 fields
-        "domain": "finance",
-        "category": "Markets",
-        "sentiment": -0.3,
-        "urgency_flag": True,
-        "classification_confidence": 0.89,
-        "taxonomy_version": "1.0.0",
-        # Agent 3 fields
-        "summary_short": (
-            "The Federal Reserve cut rates by 50 bps, triggering a Bitcoin rally while East "
-            "Coast port strikes threaten to overwhelm shipping pipelines."
-        ),
-        "summary_long": (
-            "In a move that surprised financial markets, the Federal Reserve announced an "
-            "aggressive 50 basis-point interest rate cut today, sending shockwaves across asset "
-            "classes. Bitcoin responded immediately, breaching key resistance levels as risk "
-            "appetite surged. However, the consumer demand spike expected to follow the rate cut "
-            "is raising alarm among major logistics operators, who warn that already-strained "
-            "East Coast shipping infrastructure — currently impacted by port strikes — may face "
-            "severe capacity shortfalls in the coming weeks, creating a compounding macro risk."
-        ),
-    }
-
-    print(colored("--- Mock Upstream Payload (Agent 1 + 2 + 3) ---", "cyan"))
-    print(json.dumps(mock_combined_payload, indent=2, default=str))
-
-    agent = RiskScoringAgent()
-
-    print(colored("\n--- Processing via Agent 4 (Risk Scoring Agent) ---", "yellow"))
-    final_payload = agent.process_article(mock_combined_payload)
-
-    print(colored("\n--- Agent 4 Output (Merged for Agent 5) ---", "green"))
-    print(json.dumps(final_payload, indent=2, default=str))

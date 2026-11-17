@@ -113,7 +113,7 @@ which doesn't depend on the reader.
 - Entities live on `:Entity`, keyed by `name`+`type`. There is no id, ticker or alias property. The only edge weight
   is `MENTIONED_WITH.count` (raw co-occurrence). No weight or PMI is stored.
 - Existing read helpers: `get_entity_neighbors` (MENTIONED_WITH 1..depth), `get_articles_by_entity`,
-  `get_top_entities`, `get_graph_stats`. No agent calls them.
+  `get_top_entities`, `get_graph_stats`. No agent calls them. (Since removed, except `get_graph_stats`.)
 - The per-relationship-type `MATCH (a)-[r]->(b) LIMIT 5` samples returned nothing because the graph has no types.
 
 ## 5. FAISS

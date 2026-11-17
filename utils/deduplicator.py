@@ -173,7 +173,3 @@ class ArticleDeduplicator:
     def register(self, sim_hash: str):
         """Add hash to seen set after storing article."""
         self._seen_simhashes.add(sim_hash)
-
-    @property
-    def seen_count(self) -> int:
-        return len(self._seen_simhashes)

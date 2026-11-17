@@ -331,11 +331,6 @@ def _close_all(ner_agent, classifier, summarizer, risk_scorer, mongo):
     mongo.close()
 
 
-def run_ner_pipeline(limit: int = 100, skip: int = 0) -> Dict:
-    """Backward-compatible entry: runs the full Agent 1–4 chain."""
-    return run_agent_pipeline(limit=limit, skip=skip, agents={1, 2, 3, 4})
-
-
 def run_agent_pipeline_with_schedule(
     interval_minutes: int = 15,
     batch_limit: int = 100,
@@ -359,10 +354,6 @@ def run_agent_pipeline_with_schedule(
     while True:
         schedule.run_pending()
         time.sleep(30)
-
-
-# Backward-compatible alias
-run_ner_with_schedule = run_agent_pipeline_with_schedule
 
 
 if __name__ == "__main__":
