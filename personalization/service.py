@@ -1879,7 +1879,11 @@ class PersonalizationService:
         return self._query_agent
 
     def ask(self, query: str, domain: Optional[str] = None, context_article_id: Optional[str] = None) -> Dict:
-        """Agent 5 (RAG over the stored articles); `context_article_id` scopes the question to that story."""
+        """
+        Agent 5 (RAG over the stored articles). `context_article_id` scopes the question to that story: it is
+        always the first source, and its title goes to the LLM but not into the keyword search. With no
+        `domain`, only the in-scope domains (ask_domains) are searched.
+        """
         c = self.cfg
         query = (query or "").strip()
         if not query:
@@ -1889,8 +1893,11 @@ class PersonalizationService:
             docs = self.articles.by_ids([context_article_id], {"_id": 0, c.title_field: 1})
             if docs and docs[0].get(c.title_field):
                 question = f"{query} (about: {docs[0][c.title_field]})"
+            else:
+                context_article_id = None
         try:
-            res = self.query_agent().process(question, domain_filter=domain, top_k=5)
+            res = self.query_agent().process(question, domain_filter=domain or list(c.ask_domains), top_k=5,
+                                             search_query=query, context_article_id=context_article_id)
         except Exception as e:
             raise StoreUnavailable(f"Ask is unavailable: {type(e).__name__}") from e
         sources = res.get("sources") or []

@@ -24,7 +24,7 @@ here, so an answer can never cite an article that was not retrieved.
 import operator
 import re
 import time
-from typing import Annotated, Any, Callable, Dict, List, Optional, TypedDict
+from typing import Annotated, Any, Callable, Dict, List, Optional, TypedDict, Union
 
 from langgraph.graph import END, START, StateGraph
 from pydantic import BaseModel, Field
@@ -72,7 +72,8 @@ class QueryState(TypedDict, total=False):
     query: str                      # the user's question
     search_query: str               # what the next retrieval searches for (rewritten after weak retrievals)
     search_queries: List[str]       # every query retrieved so far
-    domain_filter: Optional[str]
+    domain_filter: Optional[Union[str, List[str]]]
+    context_article_id: Optional[str]   # the story the question is asked from; always retrieved first
     top_k: int
     started_at: float               # time.monotonic() at START
     route: str                      # keyword / semantic / graph, chosen by route_query
@@ -119,7 +120,9 @@ _UNTRUSTED = (
 
 _GRADE_SYSTEM = (
     "You decide which news articles help answer a question. An article is relevant only if it contains "
-    "information that answers at least part of the question; sharing a topic or a name is not enough. "
+    "information that answers at least part of the question; sharing a topic or a name is not enough. An article "
+    "that shows the question's premise is wrong or only partly right (the person did something related but "
+    "different) is relevant, since it answers the question. "
     + _UNTRUSTED
 )
 
@@ -262,12 +265,15 @@ class QueryGraph:
         g.add_edge("degrade", END)
         return g.compile()
 
-    def run(self, query: str, domain_filter: Optional[str] = None, top_k: int = 5) -> QueryState:
+    def run(self, query: str, domain_filter: Optional[Union[str, List[str]]] = None, top_k: int = 5,
+            search_query: Optional[str] = None, context_article_id: Optional[str] = None) -> QueryState:
+        """`search_query` is what the first retrieval searches for when it differs from the question."""
         initial: QueryState = {
             "query": query,
-            "search_query": query,
+            "search_query": search_query or query,
             "search_queries": [],
             "domain_filter": domain_filter,
+            "context_article_id": context_article_id,
             "top_k": top_k,
             "started_at": time.monotonic(),
             "routes_used": [],
@@ -346,6 +352,7 @@ class QueryGraph:
 
     def _retrieve(self, state: QueryState) -> Dict[str, Any]:
         q, domain, top_k = state["search_query"], state.get("domain_filter"), state.get("top_k", 5)
+        context_id = state.get("context_article_id")
         articles: List[Dict[str, Any]] = []
         used, note = state["route"], ""
         if state["route"] == "graph":
@@ -356,13 +363,16 @@ class QueryGraph:
                                "using keyword/semantic retrieval")
                 note = " (neo4j unavailable)"
             if not articles:
-                articles, used = self.retriever.retrieve(q, domain_filter=domain, top_k=top_k)
+                articles, used = self.retriever.retrieve(q, domain_filter=domain, top_k=top_k,
+                                                         context_article_id=context_id)
                 note = note or " (no graph match)"
                 used_label = f"{used}{note}"
             else:
+                articles = self.retriever.pin(articles, self.retriever.context_record(context_id), top_k)
                 used_label = "graph"
         else:
-            articles, used = self.retriever.retrieve(q, domain_filter=domain, top_k=top_k, route=state["route"])
+            articles, used = self.retriever.retrieve(q, domain_filter=domain, top_k=top_k, route=state["route"],
+                                                     context_article_id=context_id)
             used_label = used
 
         update: Dict[str, Any] = {
@@ -391,7 +401,10 @@ class QueryGraph:
         ]
         result, calls = self._structured(state, self._grader, messages)
         verdicts = {g.index: g.relevant for g in result.grades}
-        kept = [doc for i, doc in enumerate(new_docs, start=1) if verdicts.get(i) is True]
+        # The story the reader asked from stays in, whatever the grade: the question is about it.
+        pinned = state.get("context_article_id")
+        kept = [doc for i, doc in enumerate(new_docs, start=1)
+                if verdicts.get(i) is True or (pinned and doc.get("article_id") == pinned)]
         seen = {a["article_id"] for a in relevant}
         relevant += [d for d in kept if d["article_id"] not in seen]
         return {

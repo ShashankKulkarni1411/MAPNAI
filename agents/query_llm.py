@@ -9,7 +9,8 @@ Provides:
 """
 
 import os
-from typing import Optional, Dict, Any
+import re
+from typing import Optional, Dict, Any, List, Tuple
 from config.settings import settings
 from utils.logger import logger
 from utils.groq_client import chat_completion, get_groq_client
@@ -19,7 +20,8 @@ SYSTEM_PROMPT = """You are the Query Agent (Agent 5) in the MAPNAI news intellig
 You answer questions about news articles strictly based on the article summaries provided to you.
 Do not invent facts outside the provided summaries.
 If the answer cannot be found in the summaries, say so clearly.
-Always cite which articles your answer is based on.
+Cite sources with markers like [2], the number of the Source Article, after each sentence that states a fact.
+Do not mention article IDs. Write two to four plain sentences: no tables, headings or lists.
 Keep answers concise and factual."""
 
 
@@ -53,7 +55,8 @@ class GroqQueryLLM(QueryLLM):
         temperature: float = 0.1,
         max_tokens: int = 1024,
     ):
-        self.model_name = model_name or settings.groq_model
+        # Ask's own model (QUERY_GRAPH_MODEL), like the query graph, so it has its own daily token limit
+        self.model_name = model_name or settings.query_graph_model or settings.groq_model
         self.api_key = api_key or settings.groq_api_key or os.environ.get("GROQ_API_KEY", "")
         self.temperature = temperature
         self.max_tokens = max_tokens
@@ -66,8 +69,8 @@ class GroqQueryLLM(QueryLLM):
         user_content = (
             f"Context:\n{context}\n\n"
             f"Question: {question}\n\n"
-            "Please provide a factual, grounded answer based strictly on the above context. "
-            "Mention the specific articles (by ID and Title) you used."
+            "Please provide a factual, grounded answer based strictly on the above context, citing the "
+            "Source Article numbers as [n] markers."
         )
 
         messages = [
@@ -92,23 +95,82 @@ class GroqQueryLLM(QueryLLM):
         return self._offline_fallback_answer(question, context)
 
     def _offline_fallback_answer(self, question: str, context: str) -> str:
-        """
-        Extracts key factual statements directly from context when API is unavailable.
-        Ensures pipeline tests pass deterministically without cloud dependency.
-        """
-        lines = [line.strip() for line in context.split("\n") if line.strip()]
-        summaries = [l for l in lines if l.startswith("Summary:") or l.startswith("Short Summary:") or l.startswith("Detailed Summary:")]
-        titles = [l for l in lines if l.startswith("Title:")]
+        """Groq unavailable: quote the source sentences closest to the question (see extractive_answer)."""
+        return extractive_answer(question, context)
 
-        if not summaries:
-            return f"Based on the provided records, the database contains relevant information regarding '{question}', but no detailed summaries were available."
 
-        cited_titles = ", ".join([t.replace("Title:", "").strip() for t in titles[:2]])
-        main_summary = summaries[0].split(":", 1)[-1].strip()
+# ── Extractive fallback (no LLM) ─────────────────────────────
 
-        return (
-            f"Based on [{cited_titles}]: {main_summary}"
-        )
+_BLOCK = re.compile(r"\[Source Article (\d+) - ID: [^\]]*\]\n(.*?)(?=\n\[Source Article \d+ - ID: |\Z)", re.S)
+_SENTENCE_SPLIT = re.compile(r"(?<=[.!?])\s+(?=[\"'‘“A-Z0-9])")
+_WORD = re.compile(r"[a-z0-9]+")
+_ABOUT = re.compile(r"\s*\(about: .*\)\s*$", re.S)
+_FALLBACK_SENTENCES = 3          # quoted at most
+_FALLBACK_PER_ARTICLE = 2
+_FALLBACK_MIN_SIMILARITY = 0.35  # cosine, sentence-transformer embeddings
+_FALLBACK_MIN_OVERLAP = 0.2      # share of the question's words, when the embedding model is unavailable
+FALLBACK_PREFIX = "The AI answer isn't available right now. Closest lines from the stories:"
+FALLBACK_NOTHING = ("The AI answer isn't available right now, and no line in the stories answers this directly. "
+                    "The closest stories are listed below.")
+
+
+def _field(block: str, name: str) -> str:
+    match = re.search(rf"^{name}: (.*)$", block, re.M)
+    return match.group(1).strip() if match else ""
+
+
+def _source_sentences(context: str) -> List[Tuple[int, str]]:
+    """(source index, sentence) from each block's summaries, as QueryAgent._format_context lays them out."""
+    out: List[Tuple[int, str]] = []
+    for idx, block in _BLOCK.findall(context):
+        text = _field(block, "Detailed Summary") or _field(block, "Short Summary")
+        seen = set()
+        for sent in _SENTENCE_SPLIT.split(text):
+            sent = " ".join(sent.split())
+            if 30 <= len(sent) <= 400 and sent.lower() not in seen:
+                seen.add(sent.lower())
+                out.append((int(idx), sent))
+    return out
+
+
+def _similarities(question: str, sentences: List[str]) -> Tuple[List[float], float]:
+    """Cosine similarity with the embedding model behind the FAISS store; word overlap if it can't load."""
+    try:
+        from storage.faiss_store import _get_model
+        model = _get_model()
+        if model is not None:
+            vecs = model.encode([question] + sentences, normalize_embeddings=True)
+            return [float(vecs[0] @ v) for v in vecs[1:]], _FALLBACK_MIN_SIMILARITY
+    except Exception as e:
+        logger.warning(f"[QueryLLM] Embedding model unavailable for the fallback ({e}); using word overlap.")
+    q_words = {w for w in _WORD.findall(question.lower()) if len(w) > 2}
+    scores = [len(q_words & set(_WORD.findall(s.lower()))) / max(1, len(q_words)) for s in sentences]
+    return scores, _FALLBACK_MIN_OVERLAP
+
+
+def extractive_answer(question: str, context: str) -> str:
+    """
+    The no-LLM answer: up to three summary sentences closest to the question, each cited [n] (its source), at
+    most two per article. When none is close enough it says so instead of quoting an unrelated story.
+    """
+    candidates = _source_sentences(context)
+    if not candidates:
+        return FALLBACK_NOTHING
+    # The story title the app adds ("(about: …)") would pull every sentence of that story equally close.
+    core = _ABOUT.sub("", question).strip() or question
+    scores, floor = _similarities(core, [s for _, s in candidates])
+
+    picked: List[Tuple[int, str]] = []
+    per_article: Dict[int, int] = {}
+    for score, (idx, sent) in sorted(zip(scores, candidates), key=lambda x: x[0], reverse=True):
+        if score < floor or len(picked) == _FALLBACK_SENTENCES:
+            break
+        if per_article.get(idx, 0) < _FALLBACK_PER_ARTICLE:
+            per_article[idx] = per_article.get(idx, 0) + 1
+            picked.append((idx, sent))
+    if not picked:
+        return FALLBACK_NOTHING
+    return FALLBACK_PREFIX + "\n\n" + " ".join(f"{sent} [{idx}]" for idx, sent in picked)
 
 
 class CustomModelQueryLLM(QueryLLM):

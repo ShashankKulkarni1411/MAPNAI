@@ -599,7 +599,7 @@ No other code changes needed — the pipeline picks up changes automatically.
 | `RISK_OLLAMA_MODEL` | `mapnai-risk` | Local Agent 4 model (built from `scripts/ollama/Modelfile.risk`) |
 | `RISK_GROQ_COOLDOWN_SECONDS` | `900` | After a Groq failure, Agent 4 uses Ollama directly for this long |
 | `QUERY_GRAPH_ENABLED` | `true` | Use the LangGraph Agent 5 pipeline (needs `GROQ_API_KEY`) |
-| `QUERY_GRAPH_MODEL` | — (= `GROQ_MODEL`) | Model for rewrite/generate/check nodes |
+| `QUERY_GRAPH_MODEL` | — (= `GROQ_MODEL`) | Model for all of Ask: the graph's rewrite/generate/check nodes and the single-pass answer. A different model keeps its own Groq daily token limit |
 | `QUERY_GRAPH_GRADER_MODEL` | — (= graph model) | Model for document grading (a smaller one keeps it cheap) |
 | `QUERY_GRAPH_MAX_REWRITES` | `2` | Max query rewrites per question |
 | `QUERY_GRAPH_MAX_REGENERATIONS` | `1` | Max answer regenerations after a failed grounding check |

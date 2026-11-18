@@ -16,7 +16,7 @@ Supports:
 """
 
 import time
-from typing import Dict, Any, List, Optional, Tuple
+from typing import Dict, Any, List, Optional, Tuple, Union
 
 from agents.query_llm import QueryLLM, GroqQueryLLM, CustomModelQueryLLM
 from agents.query_retriever import QueryRetriever
@@ -77,16 +77,20 @@ class QueryAgent:
     def process(
         self,
         query: str,
-        domain_filter: Optional[str] = None,
+        domain_filter: Union[str, List[str], None] = None,
         top_k: int = 5,
+        search_query: Optional[str] = None,
+        context_article_id: Optional[str] = None,
     ) -> Dict[str, Any]:
         """
         Process a natural language user question and return the standard MAPNAI response contract.
 
         Args:
-            query: The user's natural language question.
-            domain_filter: Optional domain constraint (e.g. 'finance', 'technology').
+            query: The user's natural language question (what the LLM answers).
+            domain_filter: Optional domain constraint (e.g. 'sports'), or a list of allowed domains.
             top_k: Maximum number of source articles to retrieve.
+            search_query: What retrieval searches for, when it differs from `query`.
+            context_article_id: The story the question is asked from; always the first source.
 
         Returns:
             JSON-serializable dictionary following the MAPNAI Query Agent contract.
@@ -104,15 +108,19 @@ class QueryAgent:
 
         logger.info(f"[QueryAgent] Processing query: '{clean_query}'")
 
+        search = (search_query or "").strip() or clean_query
         if self.graph is None:
-            return self._process_single_pass(clean_query, domain_filter, top_k, start_time)
+            return self._process_single_pass(clean_query, domain_filter, top_k, start_time,
+                                             search_query=search, context_article_id=context_article_id)
 
         try:
-            state = self.graph.run(clean_query, domain_filter=domain_filter, top_k=top_k)
+            state = self.graph.run(clean_query, domain_filter=domain_filter, top_k=top_k,
+                                   search_query=search, context_article_id=context_article_id)
         except Exception:
             logger.exception("[QueryAgent] Query graph failed; answering single-pass.")
             return self._process_single_pass(
                 clean_query, domain_filter, top_k, start_time,
+                search_query=search, context_article_id=context_article_id,
                 graph_meta={"outcome": "degraded", "reason": "graph raised", "llm_calls": None},
             )
 
@@ -123,6 +131,7 @@ class QueryAgent:
                 articles=state.get("first_retrieval"),
                 route=state.get("retrieval_route"),
                 graph_meta=self._graph_meta(state),
+                search_query=search, context_article_id=context_article_id,
             )
         return self._graph_response(clean_query, state, start_time)
 
@@ -131,20 +140,25 @@ class QueryAgent:
     def _process_single_pass(
         self,
         clean_query: str,
-        domain_filter: Optional[str],
+        domain_filter: Union[str, List[str], None],
         top_k: int,
         start_time: float,
         articles: Optional[List[Dict[str, Any]]] = None,
         route: Optional[str] = None,
         graph_meta: Optional[Dict[str, Any]] = None,
+        search_query: Optional[str] = None,
+        context_article_id: Optional[str] = None,
     ) -> Dict[str, Any]:
         """Retrieve (unless the graph already did) → one generate call. `graph_meta` → _metadata.graph."""
         # 1. Retrieve relevant articles
         if articles is None:
+            # only passed when set, so a retriever without the parameter still works
+            pin = {"context_article_id": context_article_id} if context_article_id else {}
             articles, route_used = self.retriever.retrieve(
-                query=clean_query,
+                query=search_query or clean_query,
                 domain_filter=domain_filter,
                 top_k=top_k,
+                **pin,
             )
         else:
             route_used = route or "semantic"

@@ -249,6 +249,7 @@ class PersonalizationSettings(BaseSettings):
     related_max: int = 5                 # story page: related stories (cluster mates, then shared entities)
     story_search_scan: int = 200         # newest matching articles ranked per search
     story_search_limit: int = 30
+    ask_domains: List[str] = ["sports", "entertainment_movies"]   # Ask's "All": Agent 2 domains in scope
     comment_max_chars: int = 500
     comments_page_max: int = 100
 

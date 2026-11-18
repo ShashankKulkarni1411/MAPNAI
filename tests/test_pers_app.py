@@ -28,10 +28,11 @@ def ids(items):
 
 class FakeAgent:
     def __init__(self, sources=None, fail=False):
-        self.sources, self.fail, self.questions = sources or [], fail, []
+        self.sources, self.fail, self.questions, self.calls = sources or [], fail, [], []
 
-    def process(self, query, domain_filter=None, top_k=5):
+    def process(self, query, domain_filter=None, top_k=5, **kwargs):
         self.questions.append(query)
+        self.calls.append({"domain_filter": domain_filter, **kwargs})
         if self.fail:
             raise RuntimeError("faiss index missing")
         return {"query": query, "answer": "Acme recalled widgets [1].", "sources": self.sources,
@@ -133,10 +134,21 @@ class TestAsk:
         assert out["answer"] == "Acme recalled widgets [1]." and out["confidence"] == 0.8
         assert out["sources"][0]["source_name"] == "BBC" and out["sources"][0]["published_at"]
         assert dsvc._query_agent.questions == ["What happened to Acme? (about: title mk-s2)"]
+        # the story pins retrieval; the keyword search sees only the reader's words
+        assert dsvc._query_agent.calls == [{"domain_filter": ["sports", "entertainment_movies"],
+                                            "search_query": "What happened to Acme?",
+                                            "context_article_id": "mk-s2"}]
 
     def test_no_sources_means_no_answer(self, dsvc):
         dsvc._query_agent = FakeAgent([])
         assert dsvc.ask("Anything?")["answer"] is None
+
+    def test_domain_chip_and_unknown_context(self, dsvc):
+        dsvc._query_agent = FakeAgent([])
+        dsvc.ask("Anything?", "sports", context_article_id="no-such-article")
+        assert dsvc._query_agent.questions == ["Anything?"]
+        assert dsvc._query_agent.calls[0]["domain_filter"] == "sports"
+        assert dsvc._query_agent.calls[0]["context_article_id"] is None
 
 
 class TestAlertsAndProposalsForTheApp:
