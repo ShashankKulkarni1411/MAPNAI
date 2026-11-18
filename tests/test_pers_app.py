@@ -18,8 +18,7 @@ from fastapi.testclient import TestClient
 from api.app import create_app
 from api.personalization_router import get_service
 from personalization.service import ArticleNotFound, InvalidInput
-from tests.test_pers_phase2 import NOW
-from tests.test_pers_phase4 import dsvc  # noqa: F401  (fixture)
+from tests.fakes import NOW
 
 
 def ids(items):

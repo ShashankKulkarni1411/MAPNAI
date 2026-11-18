@@ -276,6 +276,19 @@ RULES:
 
     # ── Main Pipeline Entry ─────────────────────────────────────
 
+    def score(self, combined_payload: dict) -> dict:
+        """Risk-scores a merged Agents 1–3 payload without writing anything. A failed call returns the fallback
+        dict with `_fallback` set (see _call_llm_risk)."""
+        return self._call_llm_risk(
+            combined_payload.get("title", ""),
+            combined_payload.get("body", ""),
+            combined_payload.get("domain", "general"),
+            combined_payload.get("urgency_flag", False),
+            combined_payload.get("sentiment", 0.0),
+            combined_payload.get("summary_short", ""),
+            combined_payload.get("entities", []),
+        )
+
     def process_article(self, combined_payload: dict) -> dict:
         """
         Main entry pipeline function:
@@ -285,21 +298,12 @@ RULES:
         4. Writes risk fields to MongoDB via $set
         5. Merges new keys into combined dict and returns to Agent 5
         """
-        article_id   = combined_payload.get("article_id")
-        title        = combined_payload.get("title", "")
-        body         = combined_payload.get("body", "")
-        entities     = combined_payload.get("entities", [])
-        domain       = combined_payload.get("domain", "general")
-        sentiment    = combined_payload.get("sentiment", 0.0)
-        urgency_flag = combined_payload.get("urgency_flag", False)
-        summary_short = combined_payload.get("summary_short", "")
+        article_id = combined_payload.get("article_id")
 
         logger.info(f"[Agent 4] Risk scoring article: {article_id}")
 
         # 1. Run LLM risk scoring via ReAct reasoning chain
-        risk_result = self._call_llm_risk(
-            title, body, domain, urgency_flag, sentiment, summary_short, entities
-        )
+        risk_result = self.score(combined_payload)
 
         # 2. Write only Agent 4 fields to MongoDB via $set
         if risk_result.pop("_fallback", False):

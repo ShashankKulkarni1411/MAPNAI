@@ -13,19 +13,15 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, ROOT)
 sys.path.insert(0, os.path.join(ROOT, "scripts"))
 
-from datetime import datetime, timedelta, timezone
+from datetime import timedelta
 
-import mongomock
-import numpy as np
 import pytest
 
 from calibrate_clustering import DEFAULT_FILE, choose, load_pairs, sweep
 from config.personalization import PersonalizationSettings
 from personalization import clustering, jobs, materiality, spread
 from personalization.service import PersonalizationService
-
-CFG = PersonalizationSettings(_env_file=None)
-NOW = datetime(2026, 9, 29, 12, 0, tzinfo=timezone.utc)
+from tests.fakes import CFG, NOW, FakeExposures, FakeMongo, FakeVectors, unit
 
 
 # ── C. Clustering (pure) ─────────────────────────────────────
@@ -323,63 +319,6 @@ def test_pi_topk_max_and_order():
 
 
 # ── Service: clustering job, recluster, compute_pi (mongomock + fakes) ──
-
-class FakeMongo:
-    def __init__(self):
-        self.db = mongomock.MongoClient().db
-
-
-def unit(dim, base_cos, k):
-    """A unit vector with cosine base_cos to e0 and its remainder on axis k (so two such vectors on different
-    axes have cosine base_cos_1 · base_cos_2)."""
-    v = np.zeros(dim, dtype=np.float32)
-    v[0] = base_cos
-    v[k] = math.sqrt(max(0.0, 1 - base_cos ** 2))
-    return v
-
-
-class FakeVectors:
-    """The PersVectorStore contract over a dict of preset vectors."""
-
-    def __init__(self, preset):
-        self.preset, self.rows = preset, {}
-
-    def indexed_article_ids(self):
-        return set(self.rows)
-
-    def sync_from_mongo(self, docs):
-        added = [d["article_id"] for d in docs if d["article_id"] in self.preset and d["article_id"] not in self.rows]
-        for a in added:
-            self.rows[a] = self.preset[a]
-        return len(added)
-
-    def vectors_for(self, ids):
-        return {a: self.rows[a] for a in ids if a in self.rows}
-
-    def search_vector(self, vec, k):
-        hits = sorted(((a, float(np.dot(vec, v))) for a, v in self.rows.items()), key=lambda h: -h[1])
-        return hits[:k]
-
-    @property
-    def total_vectors(self):
-        return len(self.rows)
-
-
-class FakeExposures:
-    def __init__(self, seeds, graph):
-        self.seeds, self.graph = seeds, graph
-
-    def sync_name_lower(self):
-        return 0
-
-    def get_seeds(self, user_id):
-        return self.seeds
-
-    def get_exposures(self, user_id):
-        return [{"key": s["key"], "role": s["role"], "weight": s["weight"]} for s in self.seeds]
-
-    def neighbours(self, keys, top):
-        return {k: self.graph[k][:top] for k in keys if k in self.graph}
 
 
 def doc(article_id, hours_ago, ents, title, source="BBC", domain="sports"):

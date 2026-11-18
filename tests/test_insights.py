@@ -24,10 +24,8 @@ from api.personalization_router import get_service
 from config.personalization import PersonalizationSettings
 from personalization import insights, recap
 from personalization.service import InsightNotFound, PersonalizationService, UserNotFound
-from tests.test_pers_phase2 import FakeMongo
-from tests.test_pers_phase4 import NamedExposures
-from tests.test_recap import Clock, doc as recap_doc, ist
-from utils.models import InsightsResponse
+from tests.fakes import Clock, FakeMongo, NamedExposures, ist, recap_doc
+from personalization.models import InsightsResponse
 
 CFG = PersonalizationSettings(_env_file=None)
 IST = ZoneInfo("Asia/Kolkata")

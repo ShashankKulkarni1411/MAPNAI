@@ -9,91 +9,19 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
-from datetime import datetime, timezone
+from datetime import datetime
 
-import mongomock
 import pytest
 from fastapi.testclient import TestClient
 
 from api.app import create_app
 from api.personalization_router import get_service
-from config.personalization import PersonalizationSettings
 from personalization import explain
-from personalization.keys import encode_key, entity_key
+from personalization.keys import encode_key
 from personalization.service import (
     ArticleNotFound, EntityNotFound, InvalidInput, PersonalizationService, UserNotFound,
 )
-
-CFG = PersonalizationSettings(_env_file=None)
-NOW = datetime(2026, 9, 29, 12, 0, tzinfo=timezone.utc)
-
-
-class FakeMongo:
-    def __init__(self):
-        self.db = mongomock.MongoClient().db
-
-
-class FakeExposureStore:
-    """(name, type, frequency) nodes; edges keyed by (user, name, type) — mirrors ExposureStore's contract."""
-
-    def __init__(self, cfg):
-        self.cfg = cfg
-        self.nodes = [
-            ("Manchester City", "Location", 16), ("Manchester city", "Location", 1),
-            ("Man City", "Location", 13), ("England", "Location", 31), ("U.S", "Location", 21),
-            ("WHO", "Organization", 16),
-        ]
-        self.edges = {}
-        self.users = {}
-
-    def _variants(self, key):
-        return [n for n in self.nodes if entity_key(n[0]) == key]
-
-    def upsert_user(self, user_id, name):
-        self.users[user_id] = name
-
-    def delete_user(self, user_id):
-        self.users.pop(user_id, None)
-        self.edges = {k: v for k, v in self.edges.items() if k[0] != user_id}
-
-    def resolve_key(self, key):
-        return [{"name": n, "type": t, "frequency": f} for n, t, f in self._variants(key)]
-
-    def search_entities(self, q, alias_keys, limit):
-        keys = {entity_key(n) for n, _, _ in self.nodes if q in entity_key(n) or entity_key(n) in alias_keys}
-        return [{"key": k, "name": self.resolve_key(k)[0]["name"], "types": [], "mention_count": 0}
-                for k in sorted(keys)][:limit]
-
-    def set_exposure(self, user_id, key, role, weight, provenance, proposal_id=None):
-        label = {v: k for k, v in self.cfg.weight_levels.items()}[weight]
-        for n, t, _ in self._variants(key):
-            self.edges[(user_id, n, t)] = {"key": key, "role": role, "weight": weight, "weight_label": label,
-                                           "provenance": provenance}
-        v = self.resolve_key(key)
-        return {"key": key, "name": v[0]["name"], "role": role, "weight": weight, "weight_label": label,
-                "provenance": provenance, "nodes": len(v)} if v else {}
-
-    def remove_exposure(self, user_id, key):
-        gone = [k for k, e in self.edges.items() if k[0] == user_id and e["key"] == key]
-        for k in gone:
-            del self.edges[k]
-        return len(gone)
-
-    def get_exposures(self, user_id):
-        out = {}
-        for (u, _, _), e in self.edges.items():
-            if u == user_id:
-                out[e["key"]] = {**e, "name": self.resolve_key(e["key"])[0]["name"]}
-        return sorted(out.values(), key=lambda e: (-e["weight"], e["key"]))
-
-    def get_seeds(self, user_id):
-        return [{"key": e["key"], "role": e["role"], "weight": e["weight"]} for e in self.get_exposures(user_id)]
-
-    def neighbours(self, keys, top):
-        return {}
-
-    def is_available(self):
-        return {"ok": True}
+from tests.fakes import CFG, NOW, FakeExposureStore, FakeMongo
 
 
 ARTICLES = [

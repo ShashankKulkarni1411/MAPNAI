@@ -37,8 +37,6 @@ LIKELIHOODS = ("likely", "possible", "unlikely")
 DISCLAIMER = "AI-generated analysis of the sources below, not a prediction."
 TOPIC_WORDS = {"sports": "Sports", "entertainment_movies": "Film"}
 
-_NAME = re.compile(r"\b[A-Z][\w'’.-]*[\w]|\b[A-Z]\b")
-_WORD = re.compile(r"[a-z0-9]+")
 # odds on an outcome ("a 70% chance", "odds of", "probability"); a percentage the sources report is a fact
 _ODDS = re.compile(r"\d\s*(%|per\s?cent|percent)\s+(chance|likel|probab)|\bodds (of|are|on)\b|\bprobabilit"
                    r"|\b\d+\s*(in|out of)\s*\d+\s+chance", re.I)
@@ -52,11 +50,6 @@ _ADVICE = (
     ("medical", re.compile(r"\b(take|stop taking|dose|medicat\w*|prescri\w*)\b.*\b(pills?|drugs?|medicine|tablets?)\b",
                            re.I)),
 )
-_SENTENCE_START =re.compile(r"(?:^|[.!?:;]\s+|\n)[\"'“‘(]*$")
-# capitalized words that are not names: sentence openers the model may use mid-claim, and the scenario labels
-_NOT_NAMES = {"i", "if", "a", "an", "the", "this", "that", "these", "those", "it", "its", "they", "he", "she",
-              "we", "watch", "likely", "possible", "unlikely", "monday", "tuesday", "wednesday", "thursday",
-              "friday", "saturday", "sunday", "ok"} | set(factcheck._MONTHS)    # months: checked as months
 
 
 # agents/query_graph.py's untrusted-text helpers (not imported: that module loads LangGraph)
@@ -302,40 +295,11 @@ def _list(value) -> list:
 
 # ── Fact check ───────────────────────────────────────────────
 
-def new_names(source: str, text: str, possessive_at_end: bool = False) -> List[str]:
-    """
-    Capitalized words of the text (names, places, acronyms) the source never uses. A sentence's first word is
-    skipped unless it is an acronym; "Indian" is allowed by "India" (one word is a prefix of the other, ≥ 4 letters).
-    possessive_at_end: strip "'s" only at the end of a word. The default strips it anywhere, which turns
-    "O'Sullivan" into "oullivan" and flags it as new; the default is kept for insights until that change is approved.
-    """
-    have = set(_WORD.findall((source or "").lower()))
-    out = []
-    for m in _NAME.finditer(text or ""):
-        word = m.group(0).rstrip(".")
-        acronym = len(word) >= 2 and word.isupper()
-        if not acronym and _SENTENCE_START.search(text[: m.start()]):
-            continue
-        bare = (re.sub(r"['’]s$", "", word.lower()) if possessive_at_end
-                else word.lower().replace("’s", "").replace("'s", ""))
-        parts = _WORD.findall(bare)
-        if not parts or word.lower() in _NOT_NAMES:
-            continue
-        for p in parts:
-            if p in have or p.isdigit():
-                continue
-            if len(p) >= 4 and any(len(h) >= 4 and (p.startswith(h) or h.startswith(p)) for h in have):
-                continue
-            out.append(word)
-            break
-    return list(dict.fromkeys(out))
-
-
 def check_claim(source: str, text: str, names: bool = True) -> Dict:
     """{ok, added: numbers / months / names the source doesn't have, odds: puts a number on an outcome}."""
     _, _, added = factcheck.verify(source, text, [])
     months = sorted(factcheck.months(text, strict=True) - factcheck.months(source, strict=False))
-    extra = new_names(source, text) if names else []
+    extra = factcheck.new_names(source, text) if names else []
     odds = bool(_ODDS.search(text or ""))
     bad = added + [f"month:{m}" for m in months] + [f"name:{n}" for n in extra]
     return {"ok": not bad and not odds, "added": bad, "odds": odds}

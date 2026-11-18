@@ -20,7 +20,7 @@ from fastapi.testclient import TestClient
 from api.app import create_app
 from api.auth_router import get_auth
 from storage.account_store import AccountStore
-from tests.test_pers_phase2 import NOW, FakeMongo
+from tests.fakes import NOW, Clock, FakeMongo
 from utils.auth import (AuthService, EmailTaken, InvalidRequest, Unauthorized, Unverified, check_password,
                         hash_password)
 
@@ -29,18 +29,10 @@ CFG = SimpleNamespace(auth_secret="test-secret", auth_access_ttl_min=60, auth_re
 PW = "correct horse"
 
 
-class Clock:
-    def __init__(self):
-        self.now = NOW
-
-    def __call__(self):
-        return self.now
-
-
 @pytest.fixture
 def auth():
     mail = []
-    clock = Clock()
+    clock = Clock(NOW)
     svc = AuthService(store=AccountStore(FakeMongo()), cfg=CFG, clock=clock,
                       send_email=lambda to, subject, body: mail.append((to, body)))
     svc.mail, svc.tick = mail, clock

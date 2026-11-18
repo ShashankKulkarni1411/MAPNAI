@@ -13,7 +13,7 @@ from pydantic import BaseModel, Field
 from config.personalization import pers_settings
 from personalization import jobs
 from personalization.service import PersonalizationService
-from utils.models import InsightsResponse
+from personalization.models import InsightsResponse
 
 router = APIRouter(prefix="/v1", tags=["personalization"])
 

@@ -20,9 +20,7 @@ from api.personalization_router import get_service
 from personalization import explain, jobs
 from personalization import feedback as fr
 from personalization.service import Conflict, InvalidInput, PersonalizationService, ProposalNotFound
-from tests.test_pers_phase2 import CFG, NOW, FakeMongo, FakeVectors
-from tests.test_pers_phase4 import dsvc  # noqa: F401  (fixture)
-from tests.test_pers_profile import FakeExposureStore
+from tests.fakes import CFG, NOW, FakeExposureStore, FakeMongo, FakeVectors
 
 
 # ── τ (pure) ─────────────────────────────────────────────────

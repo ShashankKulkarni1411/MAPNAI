@@ -14,7 +14,7 @@ from agents.agent5_query import QueryAgent
 from agents.query_llm import FALLBACK_NOTHING, FALLBACK_PREFIX, extractive_answer
 from agents.query_retriever import QueryRetriever
 from agents.query_graph import AnswerCheck, ClaimCheck, GeneratedAnswer, RewriteResult
-from tests.test_query_graph import FakeChat, FakeRetriever, art, make, none_relevant
+from tests.agent5_fakes import FakeChat, FakeRetriever, art, make, none_relevant
 
 T0 = datetime(2026, 11, 1, tzinfo=timezone.utc)
 

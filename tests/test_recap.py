@@ -15,8 +15,6 @@ sys.path.insert(0, os.path.join(ROOT, "scripts"))
 
 import json
 from datetime import date, datetime, timedelta, timezone
-from types import SimpleNamespace
-from zoneinfo import ZoneInfo
 
 import feedparser
 import pytest
@@ -32,17 +30,10 @@ from backfill_dates import date_fields
 from config.personalization import PersonalizationSettings
 from personalization import recap
 from personalization.service import InvalidInput, PersonalizationService, RecapNotReady
-from tests.test_pers_phase2 import FakeMongo
-from tests.test_pers_phase4 import NamedExposures
+from tests.fakes import IST, Clock, FakeLLM, FakeMongo, NamedExposures, ist, recap_doc as doc
 from utils.models import Domain, ProcessedArticle, RawArticle, SourceType
 
 CFG = PersonalizationSettings(_env_file=None)
-IST = ZoneInfo("Asia/Kolkata")
-
-
-def ist(d, h=12, mi=0):
-    """A local Asia/Kolkata time on 2026-10-<d> → UTC."""
-    return datetime(2026, 10, d, h, mi, tzinfo=IST).astimezone(timezone.utc)
 
 
 # ══════════════════════════════════════════════════════════════
@@ -183,24 +174,6 @@ class TestPeriods:
                 recap.parse_week(bad)
 
 
-def doc(article_id, topic="sports", m=0.5, t=None, cluster=None, title=None, keys=(), size=1, source="published",
-        summary="A summary.", body="", ingested=None):
-    """A processed_articles doc as stored (published_ts / ingested_ts BSON dates)."""
-    t = t or ist(21, 12)
-    ingested = ingested or t + timedelta(minutes=30)
-    published = None if source == "ingested" else t
-    return {
-        "article_id": article_id, "title": title or f"title {article_id}", "domain": topic, "source_name": "BBC",
-        "url": f"https://x/{article_id}", "published_at": published.isoformat() if published else None,
-        "published_ts": published or ingested, "ingested_ts": ingested, "ingested_at": ingested.isoformat(),
-        "date_source": source, "cluster_id": cluster, "cluster_size": size,
-        "entities": [{"name": k.title(), "salience": 0.9} for k in keys], "entity_keys": list(keys),
-        "materiality": None if m is None else {"m": m, "unscored": True}, "summary_short": summary,
-        "summary_long": None, "body": body, "media": {"primary_image": {"url": f"https://img/{article_id}.jpg"},
-                                                      "additional_images": []},
-    }
-
-
 class TestTimesAndStories:
     def test_undated_takes_a_dated_siblings_time(self):
         docs = [doc("d", t=ist(20, 23), keys=("kohli",), title="Kohli hits century in Perth"),
@@ -320,25 +293,6 @@ class TestOverviewRules:
 # ══════════════════════════════════════════════════════════════
 # Service + API (mongomock)
 # ══════════════════════════════════════════════════════════════
-
-class FakeLLM:
-    def __init__(self, reply):
-        self.reply, self.calls = reply, []
-        self.chat = SimpleNamespace(completions=self)
-
-    def create(self, **kwargs):
-        self.calls.append(kwargs)
-        if isinstance(self.reply, Exception):
-            raise self.reply
-        return SimpleNamespace(choices=[SimpleNamespace(message=SimpleNamespace(content=self.reply))])
-
-
-class Clock:
-    def __init__(self, now):
-        self.now = now
-
-    def __call__(self):
-        return self.now
 
 
 def make_svc(now, llm=None, docs=()):

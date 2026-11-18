@@ -12,7 +12,6 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from datetime import timedelta
-from types import SimpleNamespace
 
 import pytest
 from fastapi.testclient import TestClient
@@ -21,8 +20,7 @@ from api.app import create_app
 from api.personalization_router import get_service
 from personalization import factcheck, render
 from personalization.service import ArticleNotFound, PersonalizationService, UserNotFound
-from tests.test_pers_phase2 import CFG, NOW, FakeMongo
-from tests.test_pers_profile import FakeExposureStore
+from tests.fakes import CFG, NOW, FakeExposureStore, FakeLLM, FakeMongo
 
 
 # ── Fact check (pure) ────────────────────────────────────────
@@ -136,7 +134,7 @@ class TestEntityNormalization:
 
 
 class TestAddedNames:
-    """F5: gate v2 also rejects a capitalized name the source never uses (insights.new_names). v1 does not check."""
+    """F5: gate v2 also rejects a capitalized name the source never uses (factcheck.new_names). v1 does not check."""
 
     SRC = "Ravi Dubey and Sargun Mehta launched the show in Mumbai on Friday."
     NAMES = ["Ravi Dubey", "Sargun Mehta", "Mumbai"]
@@ -168,7 +166,7 @@ class TestAddedNames:
         assert factcheck.verify(src, rw, names, **factcheck.GATE_VERSIONS["v2"]) == (False, [], ["name:Pant"])
 
     def test_a_single_new_name_opening_a_sentence_is_a_known_blind_spot(self):
-        """insights.new_names skips sentence-initial words (after . ! ? : ;) so ordinary openers aren't flagged;
+        """factcheck.new_names skips sentence-initial words (after . ! ? : ;) so ordinary openers aren't flagged;
         a one-word name there is therefore missed. Kept visible here, measured in E02."""
         src = "The World Cup final drew crowds; the World Cup trophy toured Delhi."
         rw = "The World Cup final drew crowds; Pant trophy toured Delhi."
@@ -188,7 +186,7 @@ class TestAddedNames:
         "Genelia D'Souza and Ravi Dubey starred.", "Ronnie O’Sullivan won in Sheffield.",
     ])
     def test_apostrophe_names_are_not_added(self, src):
-        """insights.new_names stripped "'s" anywhere ("O'Sullivan" → "oullivan"); v2 strips it only at the end."""
+        """factcheck.new_names stripped "'s" anywhere ("O'Sullivan" → "oullivan"); v2 strips it only at the end."""
         assert factcheck.verify(src, src, [], **factcheck.GATE_VERSIONS["v2"]) == (True, [], [])
 
     def test_a_demonym_of_a_source_place_is_allowed(self):
@@ -302,23 +300,8 @@ def faithful(messages):
     return '{"text": "%s"}' % FAITHFUL["short" if "1-2 sentences" in messages[0]["content"] else "medium"]
 
 
-class FakeLLM:
-    """An OpenAI-SDK-shaped client: client.chat.completions.create(...) → choices[0].message.content."""
-
-    def __init__(self, reply=faithful):
-        self.reply, self.calls = reply, []
-        self.chat = SimpleNamespace(completions=self)
-
-    def create(self, **kwargs):
-        self.calls.append(kwargs)
-        content = self.reply(kwargs["messages"]) if callable(self.reply) else self.reply
-        if isinstance(content, Exception):
-            raise content
-        return SimpleNamespace(choices=[SimpleNamespace(message=SimpleNamespace(content=content))])
-
-
 def make_svc(mongo=None, llm=None, cfg=CFG, exposures=None):
-    llm = llm or FakeLLM()
+    llm = llm or FakeLLM(faithful)
     svc = PersonalizationService(mongo=mongo or FakeMongo(), exposures=exposures or FakeExposureStore(cfg), cfg=cfg,
                                  clock=lambda: NOW, llm_factory=lambda: (llm, "llama-3.3-70b-versatile"))
     svc.llm = llm

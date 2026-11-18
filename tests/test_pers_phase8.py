@@ -20,9 +20,7 @@ from api.personalization_router import get_service
 from config.personalization import pers_settings
 from personalization import jobs, metrics
 from personalization.service import InvalidInput, PersonalizationService, UserNotFound
-from tests.test_pers_phase2 import CFG, NOW, FakeMongo
-from tests.test_pers_phase6 import Clock
-from tests.test_pers_profile import FakeExposureStore
+from tests.fakes import CFG, NOW, Clock, FakeExposureStore, FakeMongo
 
 
 @pytest.fixture

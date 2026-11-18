@@ -23,8 +23,7 @@ from personalization import alerts, jobs
 from personalization.keys import entity_key
 from personalization.scoring import parse_ts
 from personalization.service import PersonalizationService, UserNotFound
-from tests.test_pers_phase2 import CFG, NOW, FakeMongo
-from tests.test_pers_profile import FakeExposureStore
+from tests.fakes import CFG, NOW, Clock, FakeExposureStore, FakeMongo
 
 IST = ZoneInfo("Asia/Kolkata")
 UTC = timezone.utc
@@ -130,14 +129,6 @@ def mart(article_id, ents, m, cluster=None, hours_ago=2.0, computed_at=NOW, **ex
             "entities": [{"name": n, "type": "Location", "salience": 1.0 - i / 10} for i, n in enumerate(ents)],
             "entity_keys": [entity_key(n) for n in ents], "cluster_id": cluster or f"c-{article_id}",
             "materiality": {"m": m, **MAT, "computed_at": computed_at}, **extra}
-
-
-class Clock:
-    def __init__(self, now):
-        self.now = now
-
-    def __call__(self):
-        return self.now
 
 
 @pytest.fixture

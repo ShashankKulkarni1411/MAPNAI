@@ -14,7 +14,7 @@ Gate versions (render_gate_version, default v1 = the rules above):
   v2-norm  entity names are compared after normalization (possessive, punctuation, case, a leading "the", hyphens,
            acronym dots, whitespace), so "Formula 1's" is kept by "Formula 1" and "The Beatles" by "Beatles".
            Not safe alone: a substituted mention passes when another spelling of the name survives (E02)
-  v2       v2-norm + a capitalized name the source never uses is an addition (insights.new_names), reported in
+  v2       v2-norm + a capitalized name the source never uses is an addition (new_names below), reported in
            `added` as "name:<word>"
 """
 
@@ -173,6 +173,43 @@ def verify(source: str, rewrite: str, entity_names: Iterable[str],
     allowed |= {n for d in facts["dates"] for n in iso_parts(d)[::2]}     # the year and day of a spelled-out date
     added = sorted(n for n in got_numbers if n not in allowed and n.rstrip("%") not in allowed)
     if check_added_names:
-        from personalization.insights import new_names      # here, not at the top: insights imports this module
         added += [f"name:{w}" for w in new_names(source, rewrite, possessive_at_end=True)]
     return not missing and not added, missing, added
+
+
+_NAME = re.compile(r"\b[A-Z][\w'’.-]*[\w]|\b[A-Z]\b")
+_WORD = re.compile(r"[a-z0-9]+")
+_SENTENCE_START =re.compile(r"(?:^|[.!?:;]\s+|\n)[\"'“‘(]*$")
+# capitalized words that are not names: sentence openers the model may use mid-claim, and the scenario labels
+_NOT_NAMES = {"i", "if", "a", "an", "the", "this", "that", "these", "those", "it", "its", "they", "he", "she",
+              "we", "watch", "likely", "possible", "unlikely", "monday", "tuesday", "wednesday", "thursday",
+              "friday", "saturday", "sunday", "ok"} | set(_MONTHS)    # months: checked as months
+
+
+def new_names(source: str, text: str, possessive_at_end: bool = False) -> List[str]:
+    """
+    Capitalized words of the text (names, places, acronyms) the source never uses. A sentence's first word is
+    skipped unless it is an acronym; "Indian" is allowed by "India" (one word is a prefix of the other, ≥ 4 letters).
+    possessive_at_end: strip "'s" only at the end of a word. The default strips it anywhere, which turns
+    "O'Sullivan" into "oullivan" and flags it as new; the default is kept for insights until that change is approved.
+    """
+    have = set(_WORD.findall((source or "").lower()))
+    out = []
+    for m in _NAME.finditer(text or ""):
+        word = m.group(0).rstrip(".")
+        acronym = len(word) >= 2 and word.isupper()
+        if not acronym and _SENTENCE_START.search(text[: m.start()]):
+            continue
+        bare = (re.sub(r"['’]s$", "", word.lower()) if possessive_at_end
+                else word.lower().replace("’s", "").replace("'s", ""))
+        parts = _WORD.findall(bare)
+        if not parts or word.lower() in _NOT_NAMES:
+            continue
+        for p in parts:
+            if p in have or p.isdigit():
+                continue
+            if len(p) >= 4 and any(len(h) >= 4 and (p.startswith(h) or h.startswith(p)) for h in have):
+                continue
+            out.append(word)
+            break
+    return list(dict.fromkeys(out))

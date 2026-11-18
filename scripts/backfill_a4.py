@@ -3,7 +3,7 @@ Backfill Agent 4 risk scores for the personalization window, one Groq call per e
 
 Scope: articles published in the last --window-h hours (default PERS_CLUSTER_WINDOW_H) with no risk_score.
 Order: biggest clusters first. For each cluster, one representative is scored with Agent 4's own LLM call
-(RiskScoringAgent._call_llm_risk, the same prompt and parsing the pipeline uses) and the result is written to
+(RiskScoringAgent.score, the same prompt and parsing the pipeline uses) and the result is written to
 every unscored member with MongoStore.update_article_risk. Copies carry `risk_copied_from` (the representative's
 article_id). A member that already has a score is copied to the rest of its cluster without a call.
 Representative: a member with summary_short (A4's prompt uses it), then the cluster's first_report, then the
@@ -157,10 +157,8 @@ def main() -> int:
                 print(f"daily cap {args.daily_cap} reached; rerun tomorrow (UTC) to continue")
                 break
             payload = mongo_doc_to_agent4_payload(rep)
-            call = lambda: agent._call_llm_risk(  # noqa: E731
-                payload.get("title", ""), payload.get("body", ""), payload.get("domain", "general"),
-                payload.get("urgency_flag", False), payload.get("sentiment", 0.0),
-                payload.get("summary_short", "") or "", payload.get("entities", []))
+            payload["summary_short"] = payload.get("summary_short") or ""
+            call = lambda: agent.score(payload)  # noqa: E731
             result = call()
             limiter.record(article_id=rep["article_id"], cluster_id=s["cluster_id"],
                            ok=not result.get("_fallback"))

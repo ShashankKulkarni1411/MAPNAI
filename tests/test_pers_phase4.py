@@ -21,7 +21,7 @@ from api.app import create_app
 from api.personalization_router import get_service
 from personalization import candidates, explain, jobs, slate, spread
 from personalization.service import PersonalizationService
-from tests.test_pers_phase2 import CFG, NOW, FakeExposures, FakeMongo, FakeVectors
+from tests.fakes import CFG, NOW, PI, FakeExposures, FakeMongo, FakeVectors
 
 
 def it(article_id, topic="sports", need=0.0, rel=0.5, m=0.5, cluster=None):
@@ -49,16 +49,6 @@ def persona(topics=None, beta=None):
 
 def rng(seed=7):
     return np.random.default_rng(seed)
-
-
-PI = {
-    "acme": {"entity": "acme", "score": 1.0, "path": {"seed": "acme", "role": "owns", "via": [], "relations": []}},
-    "zeta": {"entity": "zeta", "score": 0.1,
-             "path": {"seed": "acme", "role": "owns", "via": [], "relations": ["MENTIONED_WITH"]}},
-    "beta co": {"entity": "beta co", "score": 0.005,
-                "path": {"seed": "acme", "role": "owns", "via": ["zeta"],
-                         "relations": ["MENTIONED_WITH", "MENTIONED_WITH"]}},
-}
 
 
 # ── Need ─────────────────────────────────────────────────────
@@ -387,54 +377,6 @@ class TestAliasSpread:
 
 
 # ── Service: digest on mongomock ─────────────────────────────
-
-class NamedExposures(FakeExposures):
-    def get_exposures(self, user_id):
-        return [{**e, "name": e["key"].title()} for e in super().get_exposures(user_id)]
-
-    def display_names(self, keys):
-        return {k: k.upper() for k in keys}
-
-
-def adoc(article_id, topic, m, keys, cluster=None, hours_ago=2, source="BBC"):
-    return {"article_id": article_id, "title": f"title {article_id}", "domain": topic, "source_name": source,
-            "url": f"u/{article_id}", "published_at": (NOW - timedelta(hours=hours_ago)).isoformat(),
-            "materiality": {"m": m, "risk_norm": None, "size_score": 0.29, "first_report": 0, "source_cred": 0.5,
-                            "unscored": True},
-            "cluster_id": cluster or f"c-{article_id}", "entity_keys": list(keys),
-            "entities": [{"name": k.title(), "type": "Organization", "salience": 1.0} for k in keys]}
-
-
-ARTICLES = [
-    # 7 above τ (need = m × 1.0): 5 must_know + 2 more_you_need
-    adoc("mk-s1", "sports", 0.90, ["acme", "zeta"]), adoc("mk-s2", "sports", 0.85, ["acme"]),
-    adoc("mk-f1", "finance", 0.80, ["acme"]), adoc("mk-s3", "sports", 0.75, ["acme"]),
-    adoc("mk-f2", "finance", 0.70, ["acme"]), adoc("ov-s4", "sports", 0.65, ["acme"]),
-    adoc("ov-f3", "finance", 0.60, ["acme"]),
-    adoc("mk-s1-b", "sports", 0.50, ["acme"], cluster="c-mk-s1", source="Reuters"),   # same story, other source
-    adoc("hop", "sports", 0.50, ["zeta"]),                                           # need .05 < τ
-    adoc("sp1", "sports", 0.30, ["team"]), adoc("sp2", "sports", 0.30, ["team"]),
-    adoc("h1", "health", 0.30, ["who"]), adoc("o1", "other", 0.30, ["x"]), adoc("t1", "technology", 0.30, ["y"]),
-    adoc("g1", "geopolitics", 0.30, ["z"]), adoc("e1", "entertainment_movies", 0.30, ["w"]),
-    adoc("sc1", "supply_chain", 0.40, ["v"]), adoc("sc2", "supply_chain", 0.20, ["v"]),
-]
-
-
-@pytest.fixture
-def dsvc():
-    mongo = FakeMongo()
-    mongo.db.processed_articles.insert_many([dict(a) for a in ARTICLES])
-    mongo.db.personas.insert_one({
-        "user_id": "u1", "name": "Ana", "topics": {"sports": 1.0}, "beta": {}, "history": [], "persona_version": 1,
-        "pi_topk": [PI["acme"], PI["zeta"]], "alert_prefs": {"tz": "Asia/Kolkata"},
-    })
-    eye = np.eye(32, dtype=np.float32)
-    vecs = {a["article_id"]: eye[i] for i, a in enumerate(ARTICLES)}
-    fake = FakeVectors(vecs)
-    fake.rows = dict(vecs)
-    return PersonalizationService(mongo=mongo, exposures=NamedExposures([{"key": "acme", "role": "owns",
-                                                                          "weight": 3}], {}),
-                                  vectors=fake, cfg=CFG, clock=lambda: NOW)
 
 
 def served(d):

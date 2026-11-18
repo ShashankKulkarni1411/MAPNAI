@@ -18,7 +18,7 @@ import pytest
 from config.personalization import PersonalizationSettings
 from personalization import candidates, interest
 from personalization.service import InvalidInput, PersonalizationService
-from tests.test_pers_phase2 import FakeExposures, FakeMongo, FakeVectors, unit
+from tests.fakes import FakeExposures, FakeMongo, FakeVectors, unit
 
 CFG = PersonalizationSettings(_env_file=None)
 NOW = datetime(2026, 9, 29, 12, 0, tzinfo=timezone.utc)
