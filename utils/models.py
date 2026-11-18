@@ -120,7 +120,6 @@ class ProcessedArticle(BaseModel):
     risk_score:      Optional[int]   = None    # 0–100
     risk_confidence: Optional[float] = None    # 0.0–1.0
     urgency_flag:    bool            = False
-    action_rec:      Optional[str]   = None
 
     # ── Summaries (filled by Summarization Agent — later) ─────
     summary_short:   Optional[str]   = None

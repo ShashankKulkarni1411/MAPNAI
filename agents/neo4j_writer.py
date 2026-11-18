@@ -3,12 +3,12 @@ MAPNAI — agents/neo4j_writer.py
 Writer module for the NER & Entity Extraction Agent to upsert entity nodes to Neo4j.
 """
 
-import logging
 from typing import List, Dict, Any
 from neo4j import GraphDatabase, Driver
 from neo4j.exceptions import ServiceUnavailable, AuthError
 
 from config.settings import settings
+from utils.logger import logger
 
 class Neo4jWriter:
     """
@@ -36,10 +36,10 @@ class Neo4jWriter:
                     keep_alive=True,
                 )
                 self._driver.verify_connectivity()
-                logging.info(f"[Neo4j Writer] Connected to {self.uri}")
+                logger.info(f"[Neo4j Writer] Connected to {self.uri}")
                 self._ensure_constraints()
             except (ServiceUnavailable, AuthError) as e:
-                logging.error(f"[Neo4j Writer] Connection failed: {e}")
+                logger.error(f"[Neo4j Writer] Connection failed: {e}")
                 self._driver = None
                 raise
 
@@ -53,7 +53,7 @@ class Neo4jWriter:
                 try:
                     session.run(constraint)
                 except Exception as e:
-                    logging.debug(f"[Neo4j Writer] Constraint issue (may already exist): {e}")
+                    logger.debug(f"[Neo4j Writer] Constraint issue (may already exist): {e}")
 
     @property
     def driver(self) -> Driver:
@@ -102,11 +102,11 @@ class Neo4jWriter:
                 session.run(cypher, entities=entity_records)
             return len(entity_records)
         except Exception as e:
-            logging.error(f"[Neo4j Writer] Upsert failed for article {article_id}: {e}")
+            logger.error(f"[Neo4j Writer] Upsert failed for article {article_id}: {e}")
             return 0
 
     def close(self):
         if self._driver:
             self._driver.close()
             self._driver = None
-            logging.debug("[Neo4j Writer] Connection closed.")
+            logger.debug("[Neo4j Writer] Connection closed.")

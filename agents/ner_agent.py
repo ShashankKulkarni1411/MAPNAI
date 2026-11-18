@@ -8,7 +8,6 @@ Reads/writes using MongoDB (primary store) and upserts to Neo4j.
 All credentials come from config.settings (loaded from .env).
 """
 
-import logging
 import os
 import time
 from typing import Dict, Any, List
@@ -19,9 +18,7 @@ from agents.ner_utils import deduplicate_and_merge_entities
 from agents.neo4j_writer import Neo4jWriter
 from config.settings import get_settings
 from storage.mongo_store import MongoStore
-
-
-logger = logging.getLogger(__name__)
+from utils.logger import logger
 
 LABEL_MAP = {
     "PER": "Person",

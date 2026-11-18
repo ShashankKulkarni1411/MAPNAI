@@ -278,7 +278,7 @@ class TestActions:
     def test_agent4_fallback(self):
         docs = [dict(BUMRAH[0], action_recommendation="Check the team news before the deadline.",
                      **{CFG.risk_field: 70}),
-                dict(BUMRAH[1], action_rec="Place a bet on India.", **{CFG.risk_field: 90}),
+                dict(BUMRAH[1], action_recommendation="Place a bet on India.", **{CFG.risk_field: 90}),
                 dict(BUMRAH[2], action_recommendation="Check the team news before the deadline.")]
         assert insights.fallback_actions(docs, CFG) == [
             {"text": "Check the team news before the deadline.", "sources": ["b1"], "origin": "risk_agent"}]

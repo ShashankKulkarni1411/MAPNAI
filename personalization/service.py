@@ -1704,7 +1704,7 @@ class PersonalizationService:
         aliases = self.logs.alias_map()
 
         # two weeks for the follows' "this week vs last week"; the stories come from the last insights_window_h
-        proj = {**self._recap_projection(), "action_recommendation": 1, "action_rec": 1}
+        proj = {**self._recap_projection(), "action_recommendation": 1}
         docs = {d[c.id_field]: d for d in self.articles.by_time(now - timedelta(days=14), now + timedelta(hours=1), proj)}
         times = {a: v for a, v in recap_rules.effective_times(list(docs.values()), c).items() if v[0] <= now}
         keys_by_id = {a: candidates.resolve_keys(candidates.doc_entity_keys(d, c), aliases) for a, d in docs.items()}
@@ -1760,7 +1760,7 @@ class PersonalizationService:
             return None
         r = doc.get("risk_reasoning") or {}
         out = {"score": doc["risk_score"], "level": doc.get("risk_level"),
-               "action_recommendation": doc.get("action_recommendation") or doc.get("action_rec")}
+               "action_recommendation": doc.get("action_recommendation")}
         if r:
             out["reasoning"] = {"severity": r.get("event_severity"), "prominence": r.get("entity_salience"),
                                 "urgency": r.get("temporal_urgency"), "base_weight": r.get("domain_criticality")}
@@ -1773,7 +1773,7 @@ class PersonalizationService:
         """
         c = self.cfg
         docs = self.articles.by_ids([article_id], self._story_projection(
-            "summary_long", "body", c.risk_field, "risk_reasoning", "action_recommendation", "action_rec"))
+            "summary_long", "body", c.risk_field, "risk_reasoning", "action_recommendation"))
         if not docs:
             raise ArticleNotFound(f"article {article_id} not found")
         doc = docs[0]

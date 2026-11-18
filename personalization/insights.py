@@ -428,7 +428,7 @@ def fallback_actions(articles: Sequence[Dict], cfg) -> List[Dict]:
     c = cfg
     out, seen = [], set()
     for d in sorted(articles, key=lambda d: -(float(d.get(c.risk_field) or 0))):
-        text = _text(d.get("action_recommendation") or d.get("action_rec"), c.insights_action_chars)
+        text = _text(d.get("action_recommendation"), c.insights_action_chars)
         if not text or text.lower() in seen or advice(text):
             continue
         seen.add(text.lower())
