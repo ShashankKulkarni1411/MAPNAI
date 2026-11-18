@@ -18,122 +18,118 @@ _ENV_FILE = Path(__file__).resolve().parent.parent / ".env"
 
 class Settings(BaseSettings):
     # ── News APIs ────────────────────────────────────────────
-    newsapi_key: str = Field(default="", env="NEWSAPI_KEY")
-    gnews_api_key: str = Field(default="", env="GNEWS_API_KEY")
-    newsdata_api_key: str = Field(default="", env="NEWSDATA_API_KEY")
+    newsapi_key: str = ""
+    gnews_api_key: str = ""
+    newsdata_api_key: str = ""
     groq_api_key: str = Field(
         default="",
         validation_alias=AliasChoices("GROQ_API_KEY", "OPENAI_API_KEY"),
     )
     # ── Bluesky Firehose (zero-auth public WebSocket) ────────
-    bluesky_firehose_url: str = Field(
-        default="wss://bsky.network/xrpc/com.atproto.sync.subscribeRepos",
-        env="BLUESKY_FIREHOSE_URL",
-    )
-    bluesky_max_posts: int = Field(default=200, env="BLUESKY_MAX_POSTS")
+    bluesky_firehose_url: str = "wss://bsky.network/xrpc/com.atproto.sync.subscribeRepos"
+    bluesky_max_posts: int = 200
 
     # ── LLM / Groq Settings ──────────────────────────────────
-    groq_model: str = Field(default="openai/gpt-oss-120b", env="GROQ_MODEL")
+    groq_model: str = "openai/gpt-oss-120b"
     # Agent 3: "auto" = Groq LLM when GROQ_API_KEY is set, else extractive TF-IDF;
     # "extractive" = always offline TF-IDF; "llm" = Groq only
-    summarizer_backend: str = Field(default="auto", env="SUMMARIZER_BACKEND")
+    summarizer_backend: str = "auto"
     # Agent 4: "auto" = Groq, falling back to the local Ollama model when Groq fails (e.g. 429 daily limit)
     # or GROQ_API_KEY is missing; "groq" = Groq only (failures leave the article pending);
     # "ollama" = local model only.
-    risk_backend: str = Field(default="auto", env="RISK_BACKEND")
+    risk_backend: str = "auto"
     # Ollama's OpenAI-compatible endpoint and the model Agent 4 uses locally.
-    ollama_base_url: str = Field(default="http://localhost:11434/v1", env="OLLAMA_BASE_URL")
-    risk_ollama_model: str = Field(default="mapnai-risk", env="RISK_OLLAMA_MODEL")
-    risk_ollama_timeout_seconds: float = Field(default=300.0, env="RISK_OLLAMA_TIMEOUT_SECONDS")
+    ollama_base_url: str = "http://localhost:11434/v1"
+    risk_ollama_model: str = "mapnai-risk"
+    risk_ollama_timeout_seconds: float = 300.0
     # After Groq fails in "auto" mode, Agent 4 goes straight to Ollama for this long instead of
     # spending a doomed Groq request on every article.
-    risk_groq_cooldown_seconds: float = Field(default=900.0, env="RISK_GROQ_COOLDOWN_SECONDS")
+    risk_groq_cooldown_seconds: float = 900.0
 
     # ── Agent 1 NER ──────────────────────────────────────────
     # Type stored for the BERT model's CoNLL MISC label (nationalities, events, works). "Product" is the historical
     # mapping; "Misc" is correct but only consistent with stored data after scripts/migrate_ner_misc_types.py runs.
-    ner_misc_label: str = Field(default="Product", env="NER_MISC_LABEL")
+    ner_misc_label: str = "Product"
 
     # ── Agent 5 query graph (agents/query_graph.py) ──────────
     # Off, or no GROQ_API_KEY → Agent 5 runs its single-pass retrieve → generate path.
-    query_graph_enabled: bool = Field(default=True, env="QUERY_GRAPH_ENABLED")
+    query_graph_enabled: bool = True
     # Blank → GROQ_MODEL. The grader runs once per retrieval, so a smaller model keeps it cheap.
-    query_graph_model: str = Field(default="", env="QUERY_GRAPH_MODEL")
-    query_graph_grader_model: str = Field(default="", env="QUERY_GRAPH_GRADER_MODEL")
-    query_graph_max_rewrites: int = Field(default=2, env="QUERY_GRAPH_MAX_REWRITES")
-    query_graph_max_regenerations: int = Field(default=1, env="QUERY_GRAPH_MAX_REGENERATIONS")
+    query_graph_model: str = ""
+    query_graph_grader_model: str = ""
+    query_graph_max_rewrites: int = 2
+    query_graph_max_regenerations: int = 1
     # Hard cap on Groq calls per question, single-pass fallback included (the graph keeps one in reserve for it).
     # Worst case with the defaults above: grade + 2×(rewrite + grade) + 2×(generate + check) = 9, +1 reserved.
-    query_graph_max_llm_calls: int = Field(default=10, env="QUERY_GRAPH_MAX_LLM_CALLS")
+    query_graph_max_llm_calls: int = 10
     # Fewer graded-relevant articles than this → rewrite the query (while rewrites remain). 1 = rewrite only when
     # nothing relevant survived; specific questions often have a single matching story.
-    query_graph_min_relevant_docs: int = Field(default=1, env="QUERY_GRAPH_MIN_RELEVANT_DOCS")
+    query_graph_min_relevant_docs: int = 1
     # No rewrite/regeneration starts after this many seconds (the app's /v1/ask timeout is 20 s).
-    query_graph_deadline_seconds: float = Field(default=12.0, env="QUERY_GRAPH_DEADLINE_SECONDS")
-    query_graph_llm_timeout_seconds: float = Field(default=8.0, env="QUERY_GRAPH_LLM_TIMEOUT_SECONDS")
+    query_graph_deadline_seconds: float = 12.0
+    query_graph_llm_timeout_seconds: float = 8.0
     # Ranking: relevance × (1 − w + w·source_cred); articles below min_credibility are dropped
     # unless that would drop every article.
-    query_graph_credibility_weight: float = Field(default=0.3, env="QUERY_GRAPH_CREDIBILITY_WEIGHT")
-    query_graph_min_credibility: float = Field(default=0.2, env="QUERY_GRAPH_MIN_CREDIBILITY")
+    query_graph_credibility_weight: float = 0.3
+    query_graph_min_credibility: float = 0.2
     # After a Neo4j failure, graph retrieval is skipped for this long (connecting can block ~10 s).
-    query_graph_neo4j_cooldown_seconds: float = Field(default=300.0, env="QUERY_GRAPH_NEO4J_COOLDOWN_SECONDS")
+    query_graph_neo4j_cooldown_seconds: float = 300.0
 
     # ── MongoDB ──────────────────────────────────────────────
-    mongo_uri: str = Field(default="mongodb://localhost:27017", env="MONGO_URI")
-    mongo_db_name: str = Field(default="mapnai", env="MONGO_DB_NAME")
+    mongo_uri: str = "mongodb://localhost:27017"
+    mongo_db_name: str = "mapnai"
 
     # ── Neo4j ────────────────────────────────────────────────
-    neo4j_uri: str = Field(default="bolt://localhost:7687", env="NEO4J_URI")
+    neo4j_uri: str = "bolt://localhost:7687"
     # Aura's credentials file names it NEO4J_USERNAME (newer instances use the instance id, not "neo4j")
     neo4j_user: str = Field(default="neo4j", validation_alias=AliasChoices("NEO4J_USER", "NEO4J_USERNAME"))
-    neo4j_password: str = Field(default="password", env="NEO4J_PASSWORD")
+    neo4j_password: str = "password"
 
     # ── FAISS ────────────────────────────────────────────────
-    faiss_index_path: str = Field(default="./data/faiss_index", env="FAISS_INDEX_PATH")
-    faiss_metadata_path: str = Field(default="./data/faiss_metadata.pkl", env="FAISS_METADATA_PATH")
+    faiss_index_path: str = "./data/faiss_index"
+    faiss_metadata_path: str = "./data/faiss_metadata.pkl"
 
     # ── Embedding ────────────────────────────────────────────
-    embedding_model: str = Field(default="all-MiniLM-L6-v2", env="EMBEDDING_MODEL")
+    embedding_model: str = "all-MiniLM-L6-v2"
 
     # ── Ingestion ────────────────────────────────────────────
-    ingestion_interval_minutes: int = Field(default=30, env="INGESTION_INTERVAL_MINUTES")
-    max_articles_per_source: int = Field(default=50, env="MAX_ARTICLES_PER_SOURCE")
-    min_article_length: int = Field(default=100, env="MIN_ARTICLE_LENGTH")
-    request_timeout_seconds: int = Field(default=15, env="REQUEST_TIMEOUT_SECONDS")
+    ingestion_interval_minutes: int = 30
+    max_articles_per_source: int = 50
+    min_article_length: int = 100
+    request_timeout_seconds: int = 15
     # A publish time further than this ahead of the ingestion time is a wrong date (bad feed / timezone): it is
     # dropped and the article falls back to its ingestion time (date_source "ingested")
-    max_future_skew_minutes: int = Field(default=60, env="MAX_FUTURE_SKEW_MINUTES")
+    max_future_skew_minutes: int = 60
     # Article images: when the feed/API gave no usable hero image, read og:image / JSON-LD from the article page
-    media_page_lookup: bool = Field(default=True, env="MEDIA_PAGE_LOOKUP")
-    media_lookup_workers: int = Field(default=8, env="MEDIA_LOOKUP_WORKERS")
-    media_lookup_timeout_seconds: int = Field(default=8, env="MEDIA_LOOKUP_TIMEOUT_SECONDS")
-    media_lookup_max: int = Field(default=400, env="MEDIA_LOOKUP_MAX")   # page fetches per run
+    media_page_lookup: bool = True
+    media_lookup_workers: int = 8
+    media_lookup_timeout_seconds: int = 8
+    media_lookup_max: int = 400   # page fetches per run
     # Still no image after the page lookup: free Wikipedia image of the story's main entity (utils/image_fallback.py)
-    media_fallback: bool = Field(default=True, env="MEDIA_FALLBACK")
+    media_fallback: bool = True
     # Wikimedia throttles anonymous clients hard unless the User-Agent names the project and a contact
-    wikimedia_user_agent: str = Field(default="MAPNAI/1.0 (https://github.com/ShashankKulkarni1411/MAPNAI) news-images",
-                                      env="WIKIMEDIA_USER_AGENT")
+    wikimedia_user_agent: str = "MAPNAI/1.0 (https://github.com/ShashankKulkarni1411/MAPNAI) news-images"
 
     # ── Language ─────────────────────────────────────────────
-    primary_language: str = Field(default="en", env="PRIMARY_LANGUAGE")
+    primary_language: str = "en"
 
     # ── Logging ──────────────────────────────────────────────
-    log_level: str = Field(default="INFO", env="LOG_LEVEL")
-    log_file: str = Field(default="./logs/ingestion.log", env="LOG_FILE")
+    log_level: str = "INFO"
+    log_file: str = "./logs/ingestion.log"
 
     # ── App accounts (api/auth_router.py) ────────────────────
     # Signs access/refresh tokens. Unset → a random key per API process (every token dies on restart).
-    auth_secret: str = Field(default="", env="AUTH_SECRET")
-    auth_access_ttl_min: int = Field(default=60, env="AUTH_ACCESS_TTL_MIN")
-    auth_refresh_ttl_days: int = Field(default=30, env="AUTH_REFRESH_TTL_DAYS")
-    auth_code_ttl_min: int = Field(default=10, env="AUTH_CODE_TTL_MIN")
-    auth_code_max_attempts: int = Field(default=5, env="AUTH_CODE_MAX_ATTEMPTS")
+    auth_secret: str = ""
+    auth_access_ttl_min: int = 60
+    auth_refresh_ttl_days: int = 30
+    auth_code_ttl_min: int = 10
+    auth_code_max_attempts: int = 5
     # Email codes go out over SMTP; with no SMTP_HOST they are written to the API log instead (development).
-    smtp_host: str = Field(default="", env="SMTP_HOST")
-    smtp_port: int = Field(default=587, env="SMTP_PORT")
-    smtp_user: str = Field(default="", env="SMTP_USER")
-    smtp_password: str = Field(default="", env="SMTP_PASSWORD")
-    smtp_from: str = Field(default="", env="SMTP_FROM")
+    smtp_host: str = ""
+    smtp_port: int = 587
+    smtp_user: str = ""
+    smtp_password: str = ""
+    smtp_from: str = ""
 
     model_config = SettingsConfigDict(
         env_file=str(_ENV_FILE),

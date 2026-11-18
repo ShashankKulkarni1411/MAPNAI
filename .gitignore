@@ -15,7 +15,6 @@ __pycache__/
 .env.*
 !.env.example
 env
-.env.example
 
 # Classifier training bundle (regenerate with scripts/classifier/make_colab_bundle.py)
 data/classifier/colab_bundle.zip
