@@ -4,9 +4,10 @@ Agent 4: Risk Scoring Agent (Layer 2)
 
 Receives the fully merged JSON dictionary from Agent 3 (Summarization),
 which contains all fields from Agents 1, 2, and 3.
-Applies a ReAct-style multi-step reasoning chain across four explicit risk
-factors to produce a final 0–100 risk score, confidence percentage, and
-a one-sentence action recommendation.
+Scores four explicit risk factors to produce a final 0–100 risk score,
+confidence percentage, and a one-sentence action recommendation.
+RISK_BACKEND=model (default) scores offline with MAPNAI's own event model
+(agents/risk_model.py); auto/groq/ollama use a ReAct-style LLM prompt.
 Updates only the risk fields in MongoDB via $set and passes the enriched
 dictionary downstream to Agent 5.
 """
@@ -23,7 +24,7 @@ from utils.logger import logger
 
 
 RISK_FACTORS = ("event_severity", "entity_salience", "temporal_urgency", "domain_criticality")
-RISK_BACKENDS = ("auto", "groq", "ollama")
+RISK_BACKENDS = ("model", "auto", "groq", "ollama")
 
 
 def risk_level(score: int) -> str:
@@ -71,16 +72,21 @@ class RiskScoringAgent:
     def __init__(self, mongo_store: Optional[MongoStore] = None):
         backend = settings.risk_backend.strip().lower()
         if backend not in RISK_BACKENDS:
-            logger.warning(f"[Agent 4] Unknown RISK_BACKEND={backend!r}; using 'auto'.")
-            backend = "auto"
+            logger.warning(f"[Agent 4] Unknown RISK_BACKEND={backend!r}; using 'model'.")
+            backend = "model"
         self.backend = backend
+        # Offline event model + formulas (model mode): no LLM client is created at all.
+        self.offline = None
+        if backend == "model":
+            from agents.risk_model import OfflineRiskScorer
+            self.offline = OfflineRiskScorer(settings.risk_event_model_dir, settings.risk_tfidf_model_path)
         # Groq (primary in auto/groq mode). Kept as self.client/self.model_name for existing callers.
         self.client, self.model_name = (
-            (None, None) if backend == "ollama" else init_groq_llm("[Agent 4]", "Risk scoring")
+            (None, None) if backend in ("model", "ollama") else init_groq_llm("[Agent 4]", "Risk scoring")
         )
         # Local Ollama model (fallback in auto mode, primary in ollama mode).
         self.ollama_client, self.ollama_model = (
-            (None, None) if backend == "groq"
+            (None, None) if backend in ("model", "groq")
             else init_ollama_llm("[Agent 4]", "risk scoring", settings.risk_ollama_model)
         )
         # monotonic time until which Groq is skipped after an API failure (auto mode only)
@@ -89,8 +95,8 @@ class RiskScoringAgent:
 
     @property
     def available(self) -> bool:
-        """True when at least one backend is configured."""
-        return bool(self.client or self.ollama_client)
+        """True when at least one backend is configured (always, in model mode)."""
+        return bool(self.offline or self.client or self.ollama_client)
 
     def _backends(self) -> List[Tuple[str, object, str]]:
         """(label, client, model) in the order to try for the next article."""
@@ -278,7 +284,9 @@ RULES:
 
     def score(self, combined_payload: dict) -> dict:
         """Risk-scores a merged Agents 1–3 payload without writing anything. A failed call returns the fallback
-        dict with `_fallback` set (see _call_llm_risk)."""
+        dict with `_fallback` set (see _call_llm_risk); the offline scorer never fails."""
+        if self.offline:
+            return self.offline.score(combined_payload)
         return self._call_llm_risk(
             combined_payload.get("title", ""),
             combined_payload.get("body", ""),

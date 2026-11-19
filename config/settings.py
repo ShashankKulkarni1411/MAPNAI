@@ -34,10 +34,14 @@ class Settings(BaseSettings):
     # Agent 3: "auto" = Groq LLM when GROQ_API_KEY is set, else extractive TF-IDF;
     # "extractive" = always offline TF-IDF; "llm" = Groq only
     summarizer_backend: str = "auto"
-    # Agent 4: "auto" = Groq, falling back to the local Ollama model when Groq fails (e.g. 429 daily limit)
+    # Agent 4: "model" = offline event model + formulas, no LLM (agents/risk_model.py);
+    # "auto" = Groq, falling back to the local Ollama model when Groq fails (e.g. 429 daily limit)
     # or GROQ_API_KEY is missing; "groq" = Groq only (failures leave the article pending);
     # "ollama" = local model only.
-    risk_backend: str = "auto"
+    risk_backend: str = "model"
+    # Offline event models for RISK_BACKEND=model: DistilRoBERTa first, then TF-IDF, then keyword rules.
+    risk_event_model_dir: str = "models/risk_event"
+    risk_tfidf_model_path: str = "models/risk/event_model.joblib"
     # Ollama's OpenAI-compatible endpoint and the model Agent 4 uses locally.
     ollama_base_url: str = "http://localhost:11434/v1"
     risk_ollama_model: str = "mapnai-risk"

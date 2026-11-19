@@ -197,12 +197,25 @@ NEO4J_URI=bolt://localhost:7687
 NEO4J_PASSWORD=your_password
 ```
 
-Set `GROQ_API_KEY` to enable risk scores and LLM query answers. Agent 3 uses Groq when the key is
+Set `GROQ_API_KEY` to enable LLM query answers (and LLM risk scores with `RISK_BACKEND=auto`). Agent 3 uses Groq when the key is
 set and the offline extractive TF-IDF summarizer otherwise (`SUMMARIZER_BACKEND=extractive` forces
 it). Agent 5 uses its offline answer fallback without the key. News API keys are optional when using RSS
 sources; Bluesky needs no credentials.
 
-**Agent 4 local fallback (Ollama).** With `RISK_BACKEND=auto` (the default), Agent 4 scores with Groq and
+**Agent 4 offline risk model (default).** With `RISK_BACKEND=model` (the default), Agent 4 makes no LLM calls.
+A fine-tuned DistilRoBERTa model predicts the article's event type (routine, injury, legal, integrity, …), which
+sets `event_severity`; the other three factors are formulas over Agent 1–3 outputs. If the DistilRoBERTa folder is
+missing, Agent 4 uses a TF-IDF + logistic regression model, and if that is missing too, keyword rules — so it always
+scores. `risk_model` records which one was used. Design and measured accuracy: `AGENT4_RISK_ARCHITECTURE.md`.
+
+```bash
+# DistilRoBERTa (≈330 MB, not in git): unzip mapnai_risk_event_model.zip into models/ → models/risk_event/config.json
+# or train it on a Kaggle/Colab GPU with scripts/risk/train_event_distilroberta.ipynb
+python -m scripts.risk.train_event_model    # TF-IDF fallback from data/risk/risk_labeled.jsonl (CPU, < 1 min)
+python run_mapnai.py --check                 # "[OK  ] Agent 4 DistilRoBERTa event model"
+```
+
+**Agent 4 with an LLM (Groq / Ollama).** With `RISK_BACKEND=auto`, Agent 4 scores with Groq and
 switches to a local model when Groq fails — e.g. the free tier's daily token limit (HTTP 429) — or has no key.
 After a Groq failure it skips Groq for `RISK_GROQ_COOLDOWN_SECONDS` (default 900). Each score records its
 source in `risk_model` (`groq:<model>` or `ollama:<model>`); scales can differ between models, so filter on it
@@ -618,7 +631,9 @@ No other code changes needed — the pipeline picks up changes automatically.
 | `MIN_ARTICLE_LENGTH` | `100` | Min body length (chars) |
 | `GROQ_API_KEY` | — | Groq key (summaries, risk scores, Agent 5 answers + LangGraph) |
 | `GROQ_MODEL` | `openai/gpt-oss-120b` | Default Groq chat model |
-| `RISK_BACKEND` | `auto` | Agent 4: `auto` (Groq → local Ollama fallback), `groq`, or `ollama` |
+| `RISK_BACKEND` | `model` | Agent 4: `model` (offline event model, no LLM), `auto` (Groq → local Ollama fallback), `groq`, or `ollama` |
+| `RISK_EVENT_MODEL_DIR` | `models/risk_event` | Agent 4 DistilRoBERTa event model |
+| `RISK_TFIDF_MODEL_PATH` | `models/risk/event_model.joblib` | Agent 4 TF-IDF fallback model |
 | `OLLAMA_BASE_URL` | `http://localhost:11434/v1` | Ollama's OpenAI-compatible endpoint |
 | `RISK_OLLAMA_MODEL` | `mapnai-risk` | Local Agent 4 model (built from `scripts/ollama/Modelfile.risk`) |
 | `RISK_GROQ_COOLDOWN_SECONDS` | `900` | After a Groq failure, Agent 4 uses Ollama directly for this long |
