@@ -16,6 +16,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { queryClient } from '@/api/hooks';
 import { ToastHost } from '@/components/ToastHost';
+import { usePush } from '@/lib/push';
 import { useSession } from '@/state/session';
 import { useTheme } from '@/theme/useTheme';
 
@@ -27,6 +28,8 @@ export default function RootLayout() {
     BarlowSemiCondensed_700Bold,
   });
   const hydrated = useSession((s) => s.hydrated);
+  const userId = useSession((s) => s.userId);
+  usePush(hydrated ? userId ?? null : null); // this device gets the user's alerts; a tap opens the story
   const { c, isDark } = useTheme();
 
   if (!fontsLoaded || !hydrated) return <View style={{ flex: 1, backgroundColor: '#0F1B2D' }} />;

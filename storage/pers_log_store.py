@@ -73,6 +73,10 @@ class PersLogStore:
             [("story_id", ASCENDING), ("prompt_version", ASCENDING)], unique=True, name="one_insight_per_story")
         db[self.cfg.insight_watches_collection].create_index(
             [("user_id", ASCENDING), ("story_id", ASCENDING)], unique=True, name="one_watch_per_story")
+        alerts.create_index([("push.status", ASCENDING), ("deliver_after", DESCENDING)])
+        tokens = db[self.cfg.push_tokens_collection]
+        tokens.create_index([("token", ASCENDING)], unique=True)
+        tokens.create_index([("user_id", ASCENDING), ("active", ASCENDING)])
         logger.debug("[PersLog] Indexes verified.")
 
     # ── Entity aliases ───────────────────────────────────────
@@ -295,6 +299,60 @@ class PersLogStore:
         return list(self._col(self.cfg.alerts_collection).find(query, {"_id": 0})
                     .sort("deliver_after", DESCENDING).limit(limit))
 
+    def count_alerts_kind(self, user_id: str, kind: str, start: datetime, end: datetime) -> int:
+        """The user's alerts of one kind delivered in [start, end) (the breaking_global daily cap)."""
+        return self._col(self.cfg.alerts_collection).count_documents(
+            {"user_id": user_id, "kind": kind, "deliver_after": {"$gte": start, "$lt": end}})
+
+    # ── Push (personalization/push.py) ───────────────────────
+
+    def push_token_put(self, user_id: str, token: str, platform: Optional[str], now: datetime) -> Dict:
+        """Register a device token for a user (a token moves to the user who registered it last)."""
+        col = self._col(self.cfg.push_tokens_collection)
+        col.update_one({"token": token},
+                       {"$set": {"user_id": user_id, "platform": platform, "active": True, "updated_at": now,
+                                 "error": None},
+                        "$setOnInsert": {"created_at": now}}, upsert=True)
+        return col.find_one({"token": token}, {"_id": 0})
+
+    def push_token_delete(self, user_id: str, token: str) -> int:
+        return self._col(self.cfg.push_tokens_collection).delete_many(
+            {"user_id": user_id, "token": token}).deleted_count
+
+    def push_tokens_for(self, user_ids: List[str]) -> Dict[str, List[str]]:
+        """{user_id: [active tokens]}."""
+        out: Dict[str, List[str]] = {}
+        if not user_ids:
+            return out
+        for row in self._col(self.cfg.push_tokens_collection).find(
+                {"user_id": {"$in": list(user_ids)}, "active": True}, {"_id": 0, "user_id": 1, "token": 1}):
+            out.setdefault(row["user_id"], []).append(row["token"])
+        return out
+
+    def deactivate_tokens(self, tokens: List[str], reason: str, now: datetime) -> int:
+        if not tokens:
+            return 0
+        return self._col(self.cfg.push_tokens_collection).update_many(
+            {"token": {"$in": list(tokens)}},
+            {"$set": {"active": False, "error": reason, "updated_at": now}}).modified_count
+
+    def count_push_tokens(self) -> int:
+        return self._col(self.cfg.push_tokens_collection).count_documents({"active": True})
+
+    def alerts_to_push(self, now: datetime, limit: int = 1000) -> List[Dict]:
+        """Delivered alerts (deliver_after ≤ now) that have no push state yet, oldest delivery first."""
+        return list(self._col(self.cfg.alerts_collection)
+                    .find({"push": {"$exists": False}, "deliver_after": {"$lte": now}}, {"_id": 0})
+                    .sort("deliver_after", ASCENDING).limit(limit))
+
+    def set_push(self, alert_id: str, state: Dict) -> None:
+        self._col(self.cfg.alerts_collection).update_one({"alert_id": alert_id}, {"$set": {"push": state}})
+
+    def alerts_awaiting_receipts(self, sent_before: datetime, limit: int = 1000) -> List[Dict]:
+        return list(self._col(self.cfg.alerts_collection).find(
+            {"push.status": "sent", "push.receipts_checked_at": None, "push.sent_at": {"$lte": sent_before}},
+            {"_id": 0, "alert_id": 1, "push": 1}).limit(limit))
+
     # ── Render cache ─────────────────────────────────────────
 
     def render_get(self, key: Dict) -> Optional[Dict]:
@@ -369,7 +427,7 @@ class PersLogStore:
             name: self._col(name).delete_many({"user_id": user_id}).deleted_count
             for name in (c.feedback_collection, c.impressions_collection, c.digests_collection,
                          c.proposals_collection, c.alerts_collection, c.comments_collection,
-                         c.insight_watches_collection)
+                         c.insight_watches_collection, c.push_tokens_collection)
         }
 
     def drop_tau_since(self, since: datetime) -> int:

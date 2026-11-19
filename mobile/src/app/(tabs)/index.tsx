@@ -1,12 +1,12 @@
 // H1 Home: a finite brief. The recap of yesterday (or the week) up top, then need, then interest, then what's big
-// for everyone today; then hand off to Flash.
+// for everyone today; then hand off to Flash. Breaking stories (hit news) sit under the alert banners.
 import { router, useScrollToTop } from 'expo-router';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Pressable, RefreshControl, ScrollView, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { api } from '@/api/endpoints';
-import { invalidatePersona, pendingBriefUpdate, useAlerts, useDigest, useHealth, useProfile, useBigToday, useProposals, useRecap, useUserId } from '@/api/hooks';
+import { invalidatePersona, pendingBriefUpdate, useAlerts, useBreaking, useDigest, useHealth, useProfile, useBigToday, useProposals, useRecap, useUserId } from '@/api/hooks';
 import type { StoryItem } from '@/api/types';
 import { Button } from '@/components/Button';
 import { Glyph, SignalBars } from '@/components/Glyph';
@@ -15,6 +15,7 @@ import { openStory, StoryCard } from '@/components/story/StoryCard';
 import { ActionsSheet, WhySheet } from '@/components/story/sheets';
 import { Txt } from '@/components/Txt';
 import { Banner, CardSkeleton, EmptyState, InlineError, SectionTitle } from '@/components/ui';
+import { alertHeadline } from '@/lib/labels';
 import { clockLabel, dayLabel, greeting, hoursSince, isoDate, localDate } from '@/lib/time';
 import { react, useFeedback } from '@/state/feedback';
 import { usePrefs } from '@/state/prefs';
@@ -34,6 +35,7 @@ export default function Home() {
   const alerts = useAlerts();
   const proposals = useProposals();
   const top = useBigToday();
+  const breaking = useBreaking();
   const daily = useRecap('daily');
   const weekly = useRecap('weekly');
   const health = useHealth();
@@ -68,6 +70,8 @@ export default function Home() {
   const shown = useMemo(() => new Set([...items, ...more].map((i) => i.article_id)), [items, more]);
   const big = (top.data ?? []).filter((i) => !shown.has(i.article_id)).slice(0, 5);
   const recentAlerts = (alerts.data ?? []).filter((a) => hoursSince(a.created_at) <= 12).slice(0, 2);
+  const alerted = new Set(recentAlerts.map((a) => a.article_id));
+  const hotNow = (breaking.data ?? []).filter((i) => !alerted.has(i.article_id)).slice(0, 3);
   const follows = profile.data?.exposures ?? [];
   const proposal = proposals.data?.[0];
   const badge = (alerts.data?.length ?? 0) + (proposals.data?.length ?? 0);
@@ -82,7 +86,7 @@ export default function Home() {
     setRefreshing(true);
     try {
       await digest.refresh();
-      await Promise.all([alerts.refetch(), proposals.refetch(), top.refetch(), daily.refetch(), weekly.refetch()]);
+      await Promise.all([alerts.refetch(), proposals.refetch(), top.refetch(), breaking.refetch(), daily.refetch(), weekly.refetch()]);
     } finally {
       setRefreshing(false);
     }
@@ -142,11 +146,29 @@ export default function Home() {
         {recentAlerts.map((a) => (
           <Pressable key={a.alert_id} onPress={() => router.push({ pathname: '/story/[id]', params: { id: a.article_id, ctx: 'alert', note: a.explanation } })}
             accessibilityRole="button" style={{ marginTop: space.sm, borderRadius: radius.card, backgroundColor: c.surface, borderLeftWidth: 4, borderLeftColor: a.tier === 'major' ? c.impact : c.highlight, padding: space.md, gap: 2 }}>
-            <Txt v="metaBold" numberOfLines={1}>{a.entity_name}: {a.title}</Txt>
+            <Txt v="metaBold" numberOfLines={1}>{alertHeadline(a)}</Txt>
             <Txt v="meta" muted numberOfLines={1}>{a.explanation}</Txt>
           </Pressable>
         ))}
         {recentAlerts.length > 0 && <Button label="See all" variant="text" small onPress={() => router.push('/notifications')} style={{ alignSelf: 'flex-start' }} />}
+
+        {/* 3b Breaking now: stories many outlets are carrying right now (the same for everyone) */}
+        {hotNow.length > 0 && (
+          <View style={{ marginTop: space.md, gap: space.sm }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+              <Glyph name="flash" size={16} color={c.impact} />
+              <Txt v="metaBold" accessibilityRole="header">Breaking now</Txt>
+            </View>
+            {hotNow.map((i) => (
+              <Pressable key={i.article_id} onPress={() => openStory(i)} accessibilityRole="button"
+                accessibilityLabel={`${i.hot?.tier === 'breaking' ? 'Breaking' : 'Trending'}: ${i.title}`}
+                style={{ borderRadius: radius.card, backgroundColor: c.surface, borderLeftWidth: 4, borderLeftColor: i.hot?.tier === 'breaking' ? c.impact : c.highlight, padding: space.md, gap: 2 }}>
+                <Txt v="metaBold" numberOfLines={2}>{i.title}</Txt>
+                <Txt v="meta" muted numberOfLines={1}>{i.explanation ?? `${i.hot?.outlets ?? 0} outlets`}</Txt>
+              </Pressable>
+            ))}
+          </View>
+        )}
 
         {/* 4 Catch-up card */}
         {awayHours >= 48 && awayHours !== Infinity && (

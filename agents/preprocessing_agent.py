@@ -12,7 +12,7 @@ Receives raw articles from all fetchers and applies:
 Produces: List[ProcessedArticle] — ready for storage.
 """
 
-from typing import List, Tuple
+from typing import Dict, List, Optional, Tuple
 from datetime import datetime, timedelta, timezone
 
 from utils.models import RawArticle, ProcessedArticle, SourceType, Domain, SentimentLabel
@@ -136,19 +136,26 @@ class PreprocessingAgent:
     One instance per ingestion run.
     """
 
-    def __init__(self, existing_hashes: List[str] = None):
-        self.deduplicator = ArticleDeduplicator(
+    def __init__(self, existing_hashes: List = None, deduplicator: Optional[ArticleDeduplicator] = None):
+        """
+        existing_hashes: stored fingerprints (strings, or {dedup_hash, article_id, source_name} docs) to seed a new
+        deduplicator. deduplicator: an existing one to share across batches (the stream worker keeps one in memory).
+        """
+        self.deduplicator = deduplicator or ArticleDeduplicator(
             simhash_threshold=3,     # Hamming distance ≤ 3 → duplicate
             minhash_threshold=0.5,   # Jaccard ≥ 0.5 → duplicate
         )
         if existing_hashes:
             self.deduplicator.load_existing_hashes(existing_hashes)
+        # original article_id → {other outlet: earliest time it carried the story} (continousexplanation.md §5.5)
+        self.sightings: Dict[str, Dict[str, datetime]] = {}
 
         self.stats = {
             "total_input":       0,
             "failed_quality":    0,
             "non_english":       0,
             "duplicates":        0,
+            "sightings":         0,
             "processed":         0,
         }
 
@@ -183,10 +190,12 @@ class PreprocessingAgent:
 
         # ── Step 4: Deduplication ─────────────────────────────
         sim_hash = self.deduplicator.compute_hash(clean_title, clean_body)
-        if self.deduplicator.is_duplicate(raw.article_id, clean_title, clean_body, sim_hash):
+        match = self.deduplicator.find_duplicate(raw.article_id, clean_title, clean_body, sim_hash)
+        if match:
             self.stats["duplicates"] += 1
+            self._record_sighting(match, raw)
             return None, "duplicate"
-        self.deduplicator.register(sim_hash)
+        self.deduplicator.register(sim_hash, raw.article_id, raw.source_name)
 
         # ── Step 5: Timestamp normalization ──────────────────
         ingested_at = datetime.now(timezone.utc)
@@ -236,6 +245,25 @@ class PreprocessingAgent:
 
         self.stats["processed"] += 1
         return processed, "ok"
+
+    def _record_sighting(self, match: Dict, raw: RawArticle) -> None:
+        """A duplicate from another outlet becomes a sighting of the original (same-outlet repeats are not)."""
+        original = match.get("article_id")
+        if not original or not raw.source_name or match.get("source") == raw.source_name:
+            return
+        now = datetime.now(timezone.utc)
+        at = normalize_timestamp(raw.published_at)
+        at = at if at and at <= now else now
+        outlets = self.sightings.setdefault(original, {})
+        if raw.source_name not in outlets or at < outlets[raw.source_name]:
+            outlets[raw.source_name] = at
+        self.stats["sightings"] = self.stats.get("sightings", 0) + 1
+
+    def pop_sightings(self) -> Dict[str, List[Dict]]:
+        """{original article_id: [{source, at}]} collected so far, then cleared."""
+        out = {a: [{"source": s, "at": t} for s, t in sorted(o.items())] for a, o in self.sightings.items()}
+        self.sightings = {}
+        return out
 
     def process_batch(
         self, raw_articles: List[RawArticle]

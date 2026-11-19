@@ -11,7 +11,11 @@ Pipeline flow:
   3. Enrich with entities (spaCy NER; Agent 1 re-runs NER with fine-tuned BERT)
   3b. Fallback images: Wikipedia image of the main entity for articles still without one
   4. Store to MongoDB + FAISS + Neo4j (simultaneous)
+  4b. Sightings: duplicates from other outlets are recorded on the article they duplicate
   5. Log run statistics
+
+Phases 2-4b are ingest_batch(), shared with the continuous stream (stream_worker.py), so a batch run and the
+stream produce identical articles.
 
 Usage:
   python ingestion_pipeline.py              # single run
@@ -21,7 +25,7 @@ Usage:
 import time
 import argparse
 from datetime import datetime, timezone
-from typing import List
+from typing import Dict, List, Optional
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 from agents.rss_fetcher       import fetch_all_rss_sources
@@ -82,9 +86,10 @@ def _fetch_phase(max_per_source: int = None) -> List[RawArticle]:
     fetch_tasks = {
         "RSS":     lambda: fetch_all_rss_sources(max_per_source=max_per_source),
         "APIs":    lambda: fetch_all_apis(max_per_domain=max_per_source),
-        "Bluesky": lambda: fetch_all_bluesky(),
         "Scraper": lambda: scrape_all_targets(max_per_target=10),
     }
+    if settings.bluesky_ingest_articles:   # raw firehose posts as articles: off by default (mostly noise)
+        fetch_tasks["Bluesky"] = lambda: fetch_all_bluesky()
 
     with ThreadPoolExecutor(max_workers=4, thread_name_prefix="Fetcher") as executor:
         future_to_name = {
@@ -109,13 +114,15 @@ def _fetch_phase(max_per_source: int = None) -> List[RawArticle]:
 
 def _preprocess_phase(
     raw_articles: List[RawArticle],
-    existing_hashes: List[str],
+    existing_hashes: List,
+    agent: Optional[PreprocessingAgent] = None,
 ) -> List[ProcessedArticle]:
     """
     Run preprocessing on all raw articles.
-    Seeds deduplicator with existing DB hashes for cross-run deduplication.
+    Seeds deduplicator with existing DB hashes for cross-run deduplication (or uses `agent`, whose deduplicator
+    may already hold them).
     """
-    agent = PreprocessingAgent(existing_hashes=existing_hashes)
+    agent = agent or PreprocessingAgent(existing_hashes=existing_hashes)
     processed = agent.process_batch(raw_articles)
 
     stats = agent.get_stats()
@@ -151,10 +158,11 @@ def _image_fallback_phase(articles: List[ProcessedArticle]) -> List[ProcessedArt
 
 # ── Phase 4: Store (3-way simultaneous) ──────────────────────
 
-def _store_phase(articles: List[ProcessedArticle]) -> dict:
+def _store_phase(articles: List[ProcessedArticle], save_faiss: bool = True) -> dict:
     """
     Write processed articles to MongoDB, FAISS, and Neo4j simultaneously.
     Each store is independent — failure in one doesn't block others.
+    save_faiss=False leaves the FAISS index in memory (the stream worker saves it periodically).
     """
     if not articles:
         logger.info("[Pipeline] No articles to store.")
@@ -174,7 +182,8 @@ def _store_phase(articles: List[ProcessedArticle]) -> dict:
     try:
         faiss = _get_faiss()
         added = faiss.add_articles(articles)
-        faiss.save()   # persist to disk
+        if save_faiss:
+            faiss.save()   # persist to disk
         store_results["faiss"] = added
     except Exception as e:
         logger.error(f"[Pipeline] FAISS store failed: {e}")
@@ -195,6 +204,68 @@ def _store_phase(articles: List[ProcessedArticle]) -> dict:
         f"Neo4j={store_results['neo4j']}"
     )
     return store_results
+
+
+# ── Phases 2-4b as one call (batch run and stream) ───────────
+
+def ingest_batch(
+    raw_articles: List[RawArticle],
+    existing_hashes: Optional[List] = None,
+    deduplicator=None,
+    save_faiss: bool = True,
+) -> Dict:
+    """
+    Preprocess → article images → NER enrichment → fallback images → store (Mongo + FAISS + Neo4j) → sightings.
+    existing_hashes seeds a new deduplicator; `deduplicator` is a long-lived one (the stream worker's). Each phase
+    is non-fatal, as in the batch run. Returns {input, cleaned, duplicates, quality_failed, stored, store,
+    sightings, article_ids, errors}.
+    """
+    out: Dict = {"input": len(raw_articles), "cleaned": 0, "duplicates": 0, "quality_failed": 0, "stored": 0,
+                 "store": {"mongo": 0, "faiss": 0, "neo4j": 0}, "sightings": 0, "article_ids": [], "errors": []}
+    if not raw_articles:
+        return out
+    agent = PreprocessingAgent(existing_hashes=existing_hashes, deduplicator=deduplicator)
+    try:
+        processed = _preprocess_phase(raw_articles, [], agent=agent)
+    except Exception as e:
+        logger.error(f"[Pipeline] Preprocess phase failed: {e}")
+        out["errors"].append(f"preprocess:{e}")
+        processed = []
+    stats = agent.get_stats()
+    out.update(cleaned=len(processed), duplicates=stats.get("duplicates", 0),
+               quality_failed=stats.get("failed_quality", 0))
+
+    try:
+        processed = _media_phase(processed)
+    except Exception as e:
+        logger.warning(f"[Pipeline] Media phase warning (non-fatal): {e}")
+    try:
+        processed = _enrich_phase(processed)
+    except Exception as e:
+        logger.warning(f"[Pipeline] Enrichment phase warning (non-fatal): {e}")
+        # Continue with unenriched articles
+    try:
+        processed = _image_fallback_phase(processed)
+    except Exception as e:
+        logger.warning(f"[Pipeline] Image fallback warning (non-fatal): {e}")
+
+    try:
+        store_results = _store_phase(processed, save_faiss=save_faiss)
+        out["store"] = store_results
+        out["stored"] = store_results.get("mongo", 0)
+    except Exception as e:
+        logger.error(f"[Pipeline] Store phase failed: {e}")
+        out["errors"].append(f"store:{e}")
+    out["article_ids"] = [a.article_id for a in processed]
+
+    # after the store, so an original from this same batch already exists
+    sightings = agent.pop_sightings()
+    if sightings:
+        try:
+            out["sightings"] = _get_mongo().record_sightings(sightings)
+        except Exception as e:
+            logger.warning(f"[Pipeline] Sightings not recorded (non-fatal): {e}")
+    return out
 
 
 # ── Main Pipeline ─────────────────────────────────────────────
@@ -219,9 +290,9 @@ def run_ingestion_pipeline() -> IngestionRunStats:
         logger.error("[Pipeline] Aborting ingestion run: MongoDB is unavailable.")
         return run_stats
 
-    # ── Seed deduplicator from DB ─────────────────────────────
+    # ── Seed deduplicator from DB: recent fingerprints, with their article and outlet (for sightings)
     try:
-        existing_hashes = mongo.get_existing_hashes()
+        existing_hashes = mongo.get_recent_hash_docs(settings.dedup_seed_days)
     except Exception as e:
         logger.warning(f"[Pipeline] Could not seed deduplicator: {e}")
         existing_hashes = []
@@ -243,43 +314,14 @@ def run_ingestion_pipeline() -> IngestionRunStats:
         run_stats.errors.append(f"fetch:{e}")
         raw_articles = []
 
-    # ── Phase 2: Preprocess ──────────────────────────────────
-    try:
-        processed = _preprocess_phase(raw_articles, existing_hashes)
-        run_stats.total_cleaned    = len(processed)
-        run_stats.total_duplicates = (
-            run_stats.total_fetched - len(processed)
-        )
-    except Exception as e:
-        logger.error(f"[Pipeline] Preprocess phase failed: {e}")
-        run_stats.errors.append(f"preprocess:{e}")
-        processed = []
-
-    # ── Phase 2b: Article images ─────────────────────────────
-    try:
-        processed = _media_phase(processed)
-    except Exception as e:
-        logger.warning(f"[Pipeline] Media phase warning (non-fatal): {e}")
-
-    # ── Phase 3: Enrich ──────────────────────────────────────
-    try:
-        processed = _enrich_phase(processed)
-    except Exception as e:
-        logger.warning(f"[Pipeline] Enrichment phase warning (non-fatal): {e}")
-        # Continue with unenriched articles
-
-    try:
-        processed = _image_fallback_phase(processed)
-    except Exception as e:
-        logger.warning(f"[Pipeline] Image fallback warning (non-fatal): {e}")
-
-    # ── Phase 4: Store ────────────────────────────────────────
-    try:
-        store_results = _store_phase(processed)
-        run_stats.total_stored = store_results.get("mongo", 0)
-    except Exception as e:
-        logger.error(f"[Pipeline] Store phase failed: {e}")
-        run_stats.errors.append(f"store:{e}")
+    # ── Phases 2-4b: preprocess, images, enrich, store, sightings ─
+    batch = ingest_batch(raw_articles, existing_hashes=existing_hashes)
+    run_stats.total_cleaned    = batch["cleaned"]
+    run_stats.total_duplicates = run_stats.total_fetched - batch["cleaned"]
+    run_stats.total_stored     = batch["stored"]
+    run_stats.errors.extend(batch["errors"])
+    if batch["sightings"]:
+        logger.info(f"[Pipeline] Recorded {batch['sightings']} sightings from other outlets")
 
     # ── Finalize ─────────────────────────────────────────────
     run_stats.completed_at = datetime.now(timezone.utc)

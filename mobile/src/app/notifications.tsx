@@ -11,6 +11,7 @@ import type { Alert } from '@/api/types';
 import { Button } from '@/components/Button';
 import { Txt } from '@/components/Txt';
 import { CardSkeleton, EmptyState, IconButton, InlineError, Segmented, TopBar } from '@/components/ui';
+import { alertHeadline } from '@/lib/labels';
 import { ageLabel, hoursSince } from '@/lib/time';
 import { radius, space } from '@/theme/tokens';
 import { useTheme } from '@/theme/useTheme';
@@ -57,16 +58,16 @@ export default function Notifications() {
             {list.map((a) => {
               const unread = !read.includes(a.alert_id);
               return (
-                <Pressable key={a.alert_id} accessibilityRole="button" accessibilityLabel={`${unread ? 'Unread. ' : ''}${a.entity_name}: ${a.title}`}
+                <Pressable key={a.alert_id} accessibilityRole="button" accessibilityLabel={`${unread ? 'Unread. ' : ''}${alertHeadline(a)}`}
                   onPress={() => { markRead([a.alert_id]); router.push({ pathname: '/story/[id]', params: { id: a.article_id, ctx: 'alert', note: a.explanation } }); }}
                   style={{ padding: space.md, borderRadius: radius.card, backgroundColor: c.surface, borderLeftWidth: 4, borderLeftColor: a.tier === 'major' ? c.impact : c.highlight, gap: 4 }}>
                   <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
                     {unread && <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: c.ink }} />}
-                    <Txt v="label" color={a.tier === 'major' ? c.impact : c.ink2}>{a.tier === 'major' ? 'Major' : 'High impact'}</Txt>
+                    <Txt v="label" color={a.tier === 'major' ? c.impact : c.ink2}>{a.kind && a.kind !== 'exposure' ? 'Breaking' : a.tier === 'major' ? 'Major' : 'High impact'}</Txt>
                     <Txt v="meta" muted>{ageLabel(a.created_at)}</Txt>
-                    {a.deliver_after && <Txt v="label" muted>Held overnight</Txt>}
+                    {a.deferred && <Txt v="label" muted>Held overnight</Txt>}
                   </View>
-                  <Txt v="compactHeadline">{a.entity_name}: {a.title}</Txt>
+                  <Txt v="compactHeadline">{alertHeadline(a)}</Txt>
                   <Txt v="meta" muted>{a.explanation}</Txt>
                 </Pressable>
               );

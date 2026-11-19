@@ -45,6 +45,7 @@ export const sectionLabel: Record<Section, string> = {
   big_today: 'Big today',
   feed: 'More for you',
   just_in: 'Just in',
+  breaking: 'Breaking',
   recap: 'Recap',
 };
 
@@ -56,6 +57,7 @@ export const sectionMeaning: Record<Section, string> = {
   big_today: 'Big today: one of today’s most covered stories, shown to everyone.',
   feed: 'More for you: ranked from your latest reading.',
   just_in: 'Just in: big news about something you follow, as it happened.',
+  breaking: 'Breaking: a story many outlets are reporting right now, shown to everyone.',
   recap: 'Recap: one of the biggest stories of the day or week, the same for every reader.',
 };
 
@@ -92,4 +94,11 @@ export function thetaLevel(theta: number): { level: 1 | 2 | 3 | 4 | 5; label: st
 
 export function titleCaseKey(key: string): string {
   return key.replace(/\b\w/g, (m) => m.toUpperCase());
+}
+
+// An alert's headline: 'Breaking: …' for hit news, '<who it's about>: …' for an exposure alert
+export function alertHeadline(a: { kind?: string; entity_name?: string | null; title?: string }): string {
+  const title = a.title ?? '';
+  if (a.kind && a.kind !== 'exposure') return `Breaking: ${title}`;
+  return a.entity_name ? `${a.entity_name}: ${title}` : title;
 }

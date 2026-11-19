@@ -12,6 +12,7 @@ export type Section =
   | 'big_today'
   | 'feed'
   | 'just_in'
+  | 'breaking'
   | 'recap';
 export type RiskLevel = 'MONITOR' | 'ALERT' | 'ESCALATE' | null;
 
@@ -32,7 +33,15 @@ export type Exposure = {
 
 export type Style = { tone: 'plain' | 'analyst'; length: 'short' | 'medium'; jargon: 'low' | 'high' };
 
-export type AlertPrefs = { max_per_day: number; quiet_start: string; quiet_end: string; tz: string };
+export type AlertPrefs = {
+  max_per_day: number;
+  quiet_start: string;
+  quiet_end: string;
+  tz: string;
+  // Hit news: breaking stories about something in your map (on by default) / major breaking news for everyone
+  breaking_for_you?: boolean;
+  breaking_global?: boolean;
+};
 
 export type Profile = {
   user_id: string;
@@ -72,7 +81,7 @@ export type Health = {
 // ── Shared item shape (digest, feed, Big today, search) ───
 
 export type ExplanationParts = {
-  kind: 'direct' | 'connected' | 'similar' | 'topic' | 'explore' | 'big_today' | 'alert' | 'recap';
+  kind: 'direct' | 'connected' | 'similar' | 'topic' | 'explore' | 'big_today' | 'alert' | 'recap' | 'hot';
   seed_name?: string;
   seed_weight?: WeightLevel;
   role?: Role;
@@ -123,7 +132,13 @@ export type StoryItem = {
   explanation?: string;
   explanation_parts?: ExplanationParts;
   another_angle?: { url: string; source_name?: string } | null;
+  hot?: HotInfo | null; // set while the story is breaking or trending
 };
+
+// Hit news: how fast a story is spreading (H in [0, 1]); outlets = distinct outlets carrying it,
+// velocity_outlets = those that arrived in the last hour
+export type HotTier = 'breaking' | 'trending';
+export type HotInfo = { tier: HotTier; score: number; outlets: number; velocity_outlets: number };
 
 export type Digest = {
   user_id: string;
@@ -201,19 +216,24 @@ export type Comment = {
   created_at: string;
 };
 
+export type AlertKind = 'exposure' | 'breaking_for_you' | 'breaking_global';
+
 export type Alert = {
   alert_id: string;
+  kind?: AlertKind;
   article_id: string;
   cluster_id?: string;
   explanation: string;
   created_at: string;
-  deliver_after?: string;
+  deliver_after?: string; // always set: when the alert is (or was) delivered
+  deferred?: boolean; // true only when quiet hours held the alert back
   // Proposed hydration
   title?: string;
   source_name?: string;
-  entity_name?: string;
+  entity_name?: string | null;
   tier?: 'major' | 'high';
   cluster_size?: number;
+  hot?: HotInfo | null;
 };
 
 export type Proposal = {

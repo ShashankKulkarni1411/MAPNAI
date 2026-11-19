@@ -29,7 +29,8 @@
       "expo-secure-store",
       "expo-web-browser",
       "expo-localization",
-      "expo-image"
+      "expo-image",
+      ["expo-notifications", { "color": "#0F1B2D" }]
     ],
     "scheme": "mapnai",
     "backgroundColor": "#0F1B2D",

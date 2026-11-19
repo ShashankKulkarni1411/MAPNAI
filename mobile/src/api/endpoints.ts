@@ -81,6 +81,17 @@ export const api = {
   alerts: (id: string, since?: string): Promise<Alert[]> =>
     built ? http(`/v1/users/${enc(id)}/alerts`, { query: { since } }) : mock.alerts(id),
 
+  // Expo push token of this device, so alerts arrive as notifications
+  registerPushToken: (id: string, token: string, platform: string) =>
+    built
+      ? http(`/v1/users/${enc(id)}/push_tokens`, { method: 'POST', body: { token, platform } })
+      : mock.registerPushToken(id, token, platform),
+
+  unregisterPushToken: (id: string, token: string) =>
+    built
+      ? http(`/v1/users/${enc(id)}/push_tokens`, { method: 'DELETE', query: { token } })
+      : mock.unregisterPushToken(id, token),
+
   proposals: (id: string): Promise<Proposal[]> =>
     built
       ? http<any[]>(`/v1/users/${enc(id)}/proposals`, { query: { status: 'pending' } }).then((rows) => rows.map(toProposal))
@@ -101,6 +112,10 @@ export const api = {
     built
       ? http('/v1/articles/top', { query: { hours, limit, after_recap: afterRecap || undefined, tz } })
       : mock.top(hours, limit),
+
+  // Hit news in general: breaking (and trending) sports / entertainment stories, breaking first
+  breaking: (hours = 12, limit = 10, userId?: string | null): Promise<StoryItem[]> =>
+    built ? http('/v1/articles/breaking', { query: { hours, limit, user_id: userId ?? undefined } }) : mock.breaking(limit),
 
   recap: (kind: RecapKind, tz: string, userId?: string | null, period?: string): Promise<Recap> =>
     built

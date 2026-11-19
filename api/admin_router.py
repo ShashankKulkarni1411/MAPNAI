@@ -66,6 +66,27 @@ def run_job(
     return result
 
 
+@router.get("/sources")
+def sources(svc: PersonalizationService = Depends(get_service)):
+    """
+    The continuous stream: the worker's heartbeat and every source's polling state (adaptive interval, last status,
+    304 share, error share, silent for 7 days), failing sources first.
+    """
+    now = svc.clock()
+    return {"stream": svc.stream_health(now), "sources": svc.sources.health(now)}
+
+
+@router.get("/hot")
+def hot(
+    hours: int = Query(default=24, ge=1, le=24 * 7),
+    cluster_id: Optional[str] = Query(default=None),
+    svc: PersonalizationService = Depends(get_service),
+):
+    """hot_history: every tier change and big score move in the last `hours` (one story with cluster_id)."""
+    from datetime import timedelta
+    return svc.articles.hot_history(svc.clock() - timedelta(hours=hours), cluster_id)
+
+
 class RecapEdit(BaseModel):
     exclude: Optional[List[str]] = Field(default=None, description="article ids whose stories leave the recap; "
                                                                     "null keeps the current list")

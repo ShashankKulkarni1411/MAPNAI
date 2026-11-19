@@ -36,6 +36,8 @@ from config.personalization import pers_settings
 from personalization import candidates, clustering, explain, interest, materiality, scoring, slate, spread
 from personalization import alerts as alert_rules
 from personalization import feedback as feedback_rules
+from personalization import hotness as hot_rules
+from personalization import push as push_rules
 from personalization import insights as insight_rules
 from personalization import metrics as pers_metrics
 from personalization import recap as recap_rules
@@ -46,6 +48,7 @@ from storage.mongo_store import MongoStore
 from storage.pers_article_store import PersArticleStore
 from storage.pers_log_store import PersLogStore
 from storage.persona_store import PersonaStore
+from storage.source_state_store import SourceStateStore
 from utils.logger import logger
 
 _HHMM = re.compile(r"^([01]\d|2[0-3]):[0-5]\d$")
@@ -107,12 +110,15 @@ class PersonalizationService:
         clock: Callable[[], datetime] = None,
         llm_factory: Callable[[], Tuple[Optional[object], Optional[str]]] = None,
         query_agent_factory: Callable[[], object] = None,
+        push_client=None,
     ):
         self.cfg = cfg or pers_settings
         self.mongo = mongo or MongoStore()
         self.personas = PersonaStore(self.mongo, self.cfg)
         self.logs = PersLogStore(self.mongo, self.cfg)
         self.articles = PersArticleStore(self.mongo, self.cfg)
+        self.sources = SourceStateStore(self.mongo)          # the stream worker's state (prominence, heartbeat)
+        self._push_client = push_client
         self.exposures = exposures or ExposureStore(cfg=self.cfg)
         self._vectors = vectors
         self.clock = clock or (lambda: datetime.now(timezone.utc))
@@ -204,6 +210,9 @@ class PersonalizationService:
                     ZoneInfo(str(value))
                 except (ZoneInfoNotFoundError, ValueError):
                     raise InvalidInput(f"alert_prefs.tz {value!r} is not a known time zone")
+            elif field in ("breaking_for_you", "breaking_global"):
+                if not isinstance(value, bool):
+                    raise InvalidInput(f"alert_prefs.{field} must be true or false")
             else:
                 raise InvalidInput(f"alert_prefs field {field!r} must be one of {list(self.cfg.alert_prefs_default)}")
             out[field] = value
@@ -1007,7 +1016,8 @@ class PersonalizationService:
         why = (f"{explain.why_exposure(entry, c, names)} "
                f"{explain.why_need(item['need'], item['m'], item['hits'], c, names)}")
         return {
-            "alert_id": str(uuid.uuid4()), "user_id": item["user_id"], "article_id": item["article_id"],
+            "alert_id": str(uuid.uuid4()), "kind": "exposure", "user_id": item["user_id"],
+            "article_id": item["article_id"],
             "cluster_id": item["cluster_id"], "title": doc.get(c.title_field), "url": doc.get(c.url_field),
             "source_name": doc.get(c.source_field), "topic": doc.get(c.topic_field),
             "published_at": doc.get(c.published_field),
@@ -1091,7 +1101,197 @@ class PersonalizationService:
         self.articles.mark_alert_scanned(
             {d[c.id_field]: d["materiality"].get("computed_at") for d in docs if d.get("materiality")}, now)
         stats.update({"created": len(created), "deferred": deferred, "dropped": dropped, "alerts": created})
+
+        try:
+            stats["breaking"] = self._breaking_alerts(now, rows)
+        except Exception as e:
+            logger.error(f"[Personalization] breaking alerts failed: {type(e).__name__}: {e}")
+            stats["breaking"] = {"error": f"{type(e).__name__}: {e}"}
+        if c.enable_push:
+            try:
+                stats["push"] = self.push_alerts(now)
+            except Exception as e:
+                logger.error(f"[Personalization] push failed: {type(e).__name__}: {e}")
+                stats["push"] = {"error": f"{type(e).__name__}: {e}"}
         return stats
+
+    def _breaking_alerts(self, now: datetime, rows: Dict[str, Dict]) -> Dict:
+        """
+        Hit news for the user (continousexplanation.md §5.9). Every story currently breaking in hot_domains:
+          breaking_for_you  readers with alert_prefs.breaking_for_you whose pi_topk holds one of the story's
+                            entities with pi >= breaking_min_pi;
+          breaking_global   readers who opted in (alert_prefs.breaking_global), for stories with H >=
+                            breaking_global_min_h, at most breaking_global_max_per_day a day.
+        Both share the exposure alerts' rules: one alert per (user, cluster), max_per_day, quiet hours.
+        """
+        c = self.cfg
+        stats: Dict = {"clusters": 0, "for_you": 0, "global": 0, "deferred": 0,
+                       "dropped": {"already_alerted": 0, "capped": 0, "global_capped": 0, "race": 0}}
+        clusters = [cl for cl in self.articles.hot_clusters([hot_rules.BREAKING], now - timedelta(minutes=30))
+                    if cl["hot"].get("domain") in c.hot_domains]
+        if not clusters:
+            return stats
+        stats["clusters"] = len(clusters)
+        clusters.sort(key=lambda cl: hot_rules.rank_key(cl["hot"]))
+        member_ids = [a for cl in clusters for a in cl.get("members") or []]
+        docs = {d[c.id_field]: d for d in self.articles.by_ids(member_ids, self._story_projection())}
+        aliases = self.logs.alias_map()
+
+        readers = dict(rows)
+        for r in self.personas.breaking_global_rows():
+            readers.setdefault(r["user_id"], r)
+
+        for cl in clusters:
+            members = [docs[a] for a in cl.get("members") or [] if a in docs]
+            if not members:
+                continue
+            lead = max(members, key=lambda d: (((d.get("materiality") or {}).get("m") or 0.0),
+                                               d[c.id_field] == cl.get("first_report"), d[c.id_field]))
+            keys = candidates.resolve_keys(sorted({k for d in members for k in candidates.doc_entity_keys(d, c)}),
+                                           aliases)
+            h = cl["hot"]
+            for user_id, row in sorted(readers.items()):
+                prefs = alert_rules.prefs(row.get("alert_prefs"), c)
+                pi = {e["entity"]: e for e in row.get("pi_topk") or []}
+                hits = [x for x in slate.pi_hits(keys, pi) if float(x["score"]) >= c.breaking_min_pi]
+                if hits and prefs.get("breaking_for_you", True):
+                    kind = "breaking_for_you"
+                elif prefs.get("breaking_global") and float(h.get("score") or 0.0) >= c.breaking_global_min_h:
+                    kind, hits = "breaking_global", []
+                else:
+                    continue
+                if self.logs.alerted_clusters(user_id, [cl["cluster_id"]]):
+                    stats["dropped"]["already_alerted"] += 1
+                    continue
+                deliver, is_deferred = alert_rules.deliver_after(now, prefs, c.tz)
+                day = alert_rules.day_bounds(deliver, alert_rules.zone(prefs.get("tz"), c.tz))
+                if self.logs.count_alerts(user_id, *day) >= int(prefs["max_per_day"]):
+                    stats["dropped"]["capped"] += 1
+                    continue
+                if kind == "breaking_global" and \
+                        self.logs.count_alerts_kind(user_id, kind, *day) >= c.breaking_global_max_per_day:
+                    stats["dropped"]["global_capped"] += 1
+                    continue
+                names = self._display_names(user_id, {lead[c.id_field]: lead}, hits[:1]) if hits else {}
+                alert = self._breaking_alert_doc(kind, user_id, cl, lead, hits, names, row, now, deliver,
+                                                 is_deferred)
+                if self.logs.add_alert(alert):
+                    stats["for_you" if kind == "breaking_for_you" else "global"] += 1
+                    stats["deferred"] += is_deferred
+                else:
+                    stats["dropped"]["race"] += 1
+        return stats
+
+    def _breaking_alert_doc(self, kind: str, user_id: str, cl: Dict, doc: Dict, hits: List[Dict],
+                            names: Dict[str, str], row: Dict, now: datetime, deliver: datetime,
+                            deferred: bool) -> Dict:
+        c = self.cfg
+        h = cl["hot"]
+        why = hot_rules.explain(h) + "."
+        entry = hits[0] if hits else None
+        if entry:
+            why = f"{why} {explain.why_exposure(entry, c, names)}"
+        return {
+            "alert_id": str(uuid.uuid4()), "kind": kind, "user_id": user_id, "article_id": doc[c.id_field],
+            "cluster_id": cl["cluster_id"], "title": doc.get(c.title_field), "url": doc.get(c.url_field),
+            "source_name": doc.get(c.source_field), "topic": doc.get(c.topic_field),
+            "published_at": doc.get(c.published_field),
+            "need": None, "m": (doc.get("materiality") or {}).get("m"),
+            "m_parts": self._m_parts(doc.get("materiality")),
+            "entity": entry["entity"] if entry else None, "path": entry["path"] if entry else None,
+            "explanation": why, "hot": self._hot_out(h),
+            "created_at": now, "deliver_after": deliver, "deferred": deferred,
+            "policy_version": c.policy_version, "persona_version": row.get("persona_version"),
+        }
+
+    # -- J2. Push --------------------------------------------------
+
+    @property
+    def push_client(self) -> push_rules.ExpoPushClient:
+        if self._push_client is None:
+            self._push_client = push_rules.ExpoPushClient(self.cfg)
+        return self._push_client
+
+    def register_push_token(self, user_id: str, token: str, platform: Optional[str] = None) -> Dict:
+        self._require_persona(user_id)
+        token = str(token or "").strip()
+        if not push_rules.valid_token(token):
+            raise InvalidInput("token must be an Expo push token (ExponentPushToken[...])")
+        if platform is not None and platform not in ("ios", "android", "web"):
+            raise InvalidInput("platform must be ios, android or web")
+        row = self.logs.push_token_put(user_id, token, platform, self.clock())
+        return {"user_id": user_id, "token": token, "platform": platform, "active": bool(row.get("active"))}
+
+    def unregister_push_token(self, user_id: str, token: str) -> Dict:
+        self._require_persona(user_id)
+        return {"user_id": user_id, "token": token, "deleted": self.logs.push_token_delete(user_id, token)}
+
+    def push_alerts(self, now: Optional[datetime] = None) -> Dict:
+        """
+        Send every delivered alert that hasn't been pushed (one message per active device token), and read the
+        receipts of pushes sent >= push_receipt_delay_min ago. An alert older than push_max_age_h is not pushed
+        (still listed in the app). DeviceNotRegistered in a ticket or a receipt deactivates that token.
+        """
+        c = self.cfg
+        now = now or self.clock()
+        out = {"alerts": 0, "messages": 0, "sent": 0, "errors": 0, "stale": 0, "no_token": 0,
+               "tokens_deactivated": 0, "receipts_checked": 0}
+        pending = self.logs.alerts_to_push(now)
+        fresh = []
+        for a in pending:
+            if (scoring.parse_ts(a["deliver_after"]) or now) < now - timedelta(hours=c.push_max_age_h):
+                self.logs.set_push(a["alert_id"], {"status": "stale", "at": now})
+                out["stale"] += 1
+            else:
+                fresh.append(a)
+        tokens = self.logs.push_tokens_for(sorted({a["user_id"] for a in fresh}))
+        messages, owners = [], []
+        for a in fresh:
+            if not tokens.get(a["user_id"]):
+                self.logs.set_push(a["alert_id"], {"status": "no_token", "at": now})
+                out["no_token"] += 1
+                continue
+            for t in tokens[a["user_id"]]:
+                messages.append(push_rules.build_message(a, t))
+                owners.append((a["alert_id"], t))
+        out["alerts"] = len(fresh) - out["no_token"]
+        out["messages"] = len(messages)
+
+        gone: List[str] = []
+        if messages:
+            tickets = self.push_client.send(messages)
+            per_alert: Dict[str, List[Dict]] = {}
+            for (alert_id, token), ticket in zip(owners, tickets):
+                err = push_rules.ticket_error(ticket)
+                per_alert.setdefault(alert_id, []).append({"token": token, "id": ticket.get("id"), "error": err})
+                if err:
+                    out["errors"] += 1
+                    if err == push_rules.DEVICE_GONE:
+                        gone.append(token)
+                else:
+                    out["sent"] += 1
+            for alert_id, rows in per_alert.items():
+                ok = any(r["id"] and not r["error"] for r in rows)
+                self.logs.set_push(alert_id, {"status": "sent" if ok else "failed", "sent_at": now, "tickets": rows,
+                                              "receipts_checked_at": None})
+
+        # receipts of earlier pushes
+        waiting = self.logs.alerts_awaiting_receipts(now - timedelta(minutes=c.push_receipt_delay_min))
+        ids = [t["id"] for a in waiting for t in a["push"].get("tickets") or [] if t.get("id")]
+        if ids:
+            receipts = self.push_client.receipts(ids)
+            for a in waiting:
+                rows = a["push"].get("tickets") or []
+                for t in rows:
+                    rec = receipts.get(t.get("id") or "")
+                    if rec is not None:
+                        t["receipt"] = push_rules.ticket_error(rec) or "ok"
+                        if t["receipt"] == push_rules.DEVICE_GONE:
+                            gone.append(t["token"])
+                self.logs.set_push(a["alert_id"], {**a["push"], "tickets": rows, "receipts_checked_at": now})
+                out["receipts_checked"] += 1
+        out["tokens_deactivated"] = self.logs.deactivate_tokens(sorted(set(gone)), push_rules.DEVICE_GONE, now)
+        return out
 
     def alerts(self, user_id: str, since: Optional[datetime] = None, include_pending: bool = False,
                limit: int = 50) -> List[Dict]:
@@ -1107,15 +1307,18 @@ class PersonalizationService:
         docs = {d[c.id_field]: d for d in self.articles.by_ids(
             [r["article_id"] for r in rows], {"_id": 0, c.id_field: 1, "cluster_size": 1, c.entities_field: 1})}
         sizes = {a: d.get("cluster_size") or 1 for a, d in docs.items()}
-        names = self._display_names(user_id, docs, [{"entity": r["entity"], "path": r["path"]} for r in rows]) \
-            if rows else {}
+        paths = [{"entity": r["entity"], "path": r["path"]} for r in rows if r.get("path")]
+        names = self._display_names(user_id, docs, paths) if paths else {}
         for r in rows:
             for f in ("created_at", "deliver_after"):
                 r[f] = scoring.parse_ts(r[f])                  # Mongo hands back naive UTC
             r["delivered"] = r["deliver_after"] <= now
             # for the app: the exposure that fired it, Major vs High, and how many outlets carry the story
-            r["entity_name"] = names.get(r["path"]["seed"], r["path"]["seed"])
-            r["tier"] = "major" if (r.get("m") or 0.0) >= c.alert_major_m else "high"
+            r.setdefault("kind", "exposure")
+            seed = (r.get("path") or {}).get("seed")
+            r["entity_name"] = names.get(seed, seed) if seed else None
+            r["tier"] = "major" if r["kind"] != "exposure" or (r.get("m") or 0.0) >= c.alert_major_m else "high"
+            r.pop("push", None)
             r["cluster_size"] = sizes.get(r["article_id"], 1)
         return rows
 
@@ -1191,7 +1394,8 @@ class PersonalizationService:
         c = self.cfg
         fields = [c.id_field, c.title_field, c.topic_field, c.url_field, c.source_field, c.published_field,
                   c.entities_field, "entity_keys", "cluster_id", "cluster_size", "first_report", "materiality",
-                  "summary_short", "summary_long", "topic_tags", "risk_level", "urgency_flag", "media", "author", *more]
+                  "summary_short", "summary_long", "topic_tags", "risk_level", "urgency_flag", "media", "author", "hot",
+                  *more]
         return {"_id": 0, **{f: 1 for f in fields}}
 
     def _story_item(self, doc: Dict, **extra) -> Dict:
@@ -1215,6 +1419,7 @@ class PersonalizationService:
             "first_report": doc.get("first_report") == doc[c.id_field], "risk_level": doc.get("risk_level"),
             "unscored": bool((doc.get("materiality") or {}).get("unscored")),
             "urgency_flag": bool(doc.get("urgency_flag")),
+            "hot": self._hot_out(doc.get("hot")),
             **extra,
         }
 
@@ -1317,7 +1522,9 @@ class PersonalizationService:
             start = recap_rules.daily_period(recap_rules.latest_daily(now, z, c), z, c)["end"]
             hours = max(0.0, (now - start).total_seconds() / 3600)
         docs = self.articles.window(hours, now, self._story_projection())
-        docs.sort(key=lambda d: (-((d.get("materiality") or {}).get("m") or 0.0), d[c.id_field]))
+        w = c.top_hot_weight          # (1 − w)·m + w·H: a story spreading fast rises (H is 0 until the job scores it)
+        docs.sort(key=lambda d: (-((1 - w) * ((d.get("materiality") or {}).get("m") or 0.0)
+                                   + w * ((d.get("hot") or {}).get("score") or 0.0)), d[c.id_field]))
         best: Dict[str, Dict] = {}
         for d in docs:
             best.setdefault(d.get("cluster_id") or d[c.id_field], d)
@@ -1331,6 +1538,119 @@ class PersonalizationService:
                 explanation=f"Covered by {n} sources" if n > 1 else "One of the most significant stories today",
                 **counts.get(d[c.id_field], {})))
         return out
+
+    # ── Hit news: hotness (personalization/hotness.py) ───────
+
+    def compute_hotness(self, now: Optional[datetime] = None) -> Dict:
+        """
+        The hotness job body (every 5 min, after clustering): H and its tier for every cluster with an article in
+        the last hot_window_h (an unclustered article is its own cluster), written to the cluster doc (full record)
+        and to its window articles ({score, tier, outlets, computed_at}); tier changes and big moves go to
+        hot_history; articles and clusters that left the window cool back to normal.
+        """
+        c = self.cfg
+        now = now or self.clock()
+        docs = self.articles.hot_window(c.hot_window_h, now)
+        groups: Dict[str, List[Dict]] = {}
+        for d in docs:
+            groups.setdefault(d.get("cluster_id") or d[c.id_field], []).append(d)
+
+        try:
+            signals = self.sources.prominence_since(now - timedelta(hours=c.hot_prominence_window_h))
+        except Exception as e:
+            logger.warning(f"[Personalization] prominence unavailable: {type(e).__name__}: {e}")
+            signals = []
+        index = hot_rules.ProminenceIndex(signals, c.hot_prominence_jaccard)
+        social = self.articles.social_counts(now - timedelta(minutes=c.hot_social_window_min))
+        prev = self.articles.get_clusters(list(groups))
+
+        cluster_hot, article_hot, history = {}, {}, []
+        tiers = {hot_rules.BREAKING: 0, hot_rules.TRENDING: 0, hot_rules.NORMAL: 0}
+        for cid, members in groups.items():
+            rows = [{"article_id": d[c.id_field], "source": d.get(c.source_field),
+                     "published": d.get(c.published_field), "ingested": d.get("ingested_at"),
+                     "url": d.get(c.url_field), "title": d.get(c.title_field), "sightings": d.get("sightings"),
+                     "risk_score": d.get(c.risk_field),
+                     "urgency_flag": d.get("urgency_flag"), "domain": d.get(c.topic_field)} for d in members]
+            h = hot_rules.hotness(rows, now, c, index, social.get(cid))
+            before = (prev.get(cid) or {}).get("hot") or (members[0].get("hot") if len(members) == 1 else None)
+            since = (before or {}).get("breaking_since") if (before or {}).get("tier") == hot_rules.BREAKING else None
+            record = {**h, "computed_at": now,
+                      "breaking_since": (since or now) if h["tier"] == hot_rules.BREAKING else None}
+            tiers[h["tier"]] += 1
+            if cid in prev:
+                cluster_hot[cid] = record
+            short = {"score": h["score"], "tier": h["tier"], "outlets": h["outlets"],
+                     "velocity_outlets": h["velocity_outlets"], "computed_at": now}
+            for d in members:
+                old = d.get("hot") or {}
+                if old.get("tier") != short["tier"] or abs((old.get("score") or 0.0) - short["score"]) >= 0.01 \
+                        or old.get("outlets") != short["outlets"] or short["tier"] != hot_rules.NORMAL:
+                    article_hot[d[c.id_field]] = short
+            if hot_rules.history_due(before, h, c):
+                history.append({"cluster_id": cid, "t": now, "score": h["score"], "tier": h["tier"],
+                                "prev_tier": (before or {}).get("tier", hot_rules.NORMAL),
+                                "outlets": h["outlets"], "velocity_outlets": h["velocity_outlets"],
+                                "components": h["components"], "domain": h["domain"],
+                                "first_seen": h["first_seen"]})
+
+        written = self.articles.set_hot(cluster_hot, article_hot)
+        cooled = self.articles.cool_outside([d[c.id_field] for d in docs], now)
+        self.articles.append_hot_history(history)
+        scores = [r["score"] for r in cluster_hot.values()] + [a["score"] for a in article_hot.values()]
+        return {"window_h": c.hot_window_h, "clusters": len(groups), "articles": len(docs),
+                "breaking": tiers[hot_rules.BREAKING], "trending": tiers[hot_rules.TRENDING],
+                "max_score": round(max(scores), 4) if scores else None, "articles_written": written,
+                "cooled": cooled, "history_rows": len(history), "prominence_items": len(index),
+                "social_clusters": len(social)}
+
+    def breaking(self, hours: Optional[float] = None, limit: int = 10, include_trending: bool = True,
+                 user_id: Optional[str] = None) -> List[Dict]:
+        """
+        Hit news in general: the current breaking (and trending) stories in hot_domains, one StoryItem per story —
+        its most material article, else its first report — breaking first, then by H. hours: first reported
+        within this many hours (default breaking_window_h).
+        """
+        c = self.cfg
+        now = self.clock()
+        hours = c.breaking_window_h if hours is None else hours
+        tiers = [hot_rules.BREAKING] + ([hot_rules.TRENDING] if include_trending else [])
+        clusters = self.articles.hot_clusters(tiers, now - timedelta(minutes=30))
+        clusters = [cl for cl in clusters
+                    if (cl["hot"].get("domain") in c.hot_domains)
+                    and (scoring.parse_ts(cl["hot"].get("first_seen")) or now) >= now - timedelta(hours=hours)]
+        clusters.sort(key=lambda cl: hot_rules.rank_key(cl["hot"]))
+        clusters = clusters[:limit]
+        if not clusters:
+            return []
+        ids = [a for cl in clusters for a in cl.get("members") or []]
+        docs: Dict[str, List[Dict]] = {}
+        for d in self.articles.by_ids(ids, self._story_projection()):
+            docs.setdefault(d.get("cluster_id"), []).append(d)
+        out, picked = [], []
+        for cl in clusters:
+            members = docs.get(cl["cluster_id"]) or []
+            if not members:
+                continue
+            best = max(members, key=lambda d: (((d.get("materiality") or {}).get("m") or 0.0),
+                                               d[c.id_field] == cl.get("first_report"), d[c.id_field]))
+            picked.append((cl, best))
+        counts = self._engagement([d[c.id_field] for _, d in picked], user_id)
+        for cl, d in picked:
+            h = cl["hot"]
+            out.append(self._story_item(
+                d, section="breaking", hot=self._hot_out(h),
+                explanation=hot_rules.explain(h), explanation_parts={"kind": "hot", "tier": h["tier"]},
+                **counts.get(d[c.id_field], {})))
+        return out
+
+    @staticmethod
+    def _hot_out(h: Optional[Dict]) -> Optional[Dict]:
+        """The app's hot badge: {tier, score, outlets, velocity_outlets} for breaking / trending stories only."""
+        if not h or h.get("tier") not in (hot_rules.BREAKING, hot_rules.TRENDING):
+            return None
+        return {"tier": h["tier"], "score": round(float(h.get("score") or 0.0), 3),
+                "outlets": int(h.get("outlets") or 0), "velocity_outlets": int(h.get("velocity_outlets") or 0)}
 
     # ── N. Recaps (personalization/recap.py) ─────────────────
 
@@ -1946,6 +2266,20 @@ class PersonalizationService:
         c = self.cfg
         now = now or self.clock()
         stats: Dict = {"window_h": c.cluster_window_h}
+        rescore_since = now - timedelta(days=c.rescore_window_d)
+
+        # skip guard (the job runs every 5 minutes): nothing unclustered, no article missing its entity keys and
+        # no new A4 score → nothing to do
+        rescore_docs = self.articles.rescore_candidates(rescore_since)
+        pending_rescore = [d for d in rescore_docs
+                           if not d.get("materiality")
+                           or (d.get("materiality") or {}).get("risk_seen_at") != d.get("risk_processed_at")]
+        if (not pending_rescore and self.articles.count_missing_entity_keys() == 0
+                and self.articles.count_unclustered(c.cluster_window_h, now) == 0):
+            stats.update({"skipped": "nothing new", "new_articles": 0, "joined": 0, "new_clusters": 0,
+                          "merge_candidates": 0, "clusters_changed": 0, "materiality_written": 0, "rescored": 0,
+                          "unscored": 0, "entity_keys_set": 0, "vectors_added": 0})
+            return stats
 
         try:
             stats["name_lower_synced"] = self.exposures.sync_name_lower()
@@ -2016,7 +2350,7 @@ class PersonalizationService:
         stats["clusters_changed"] = len(members)
 
         rescored = 0
-        for doc in self.articles.rescore_candidates():
+        for doc in self.articles.rescore_candidates(rescore_since):
             a = doc[c.id_field]
             seen = (doc.get("materiality") or {})
             if a in mat_updates or (seen and seen.get("risk_seen_at") == doc.get("risk_processed_at")):
@@ -2136,5 +2470,34 @@ class PersonalizationService:
             logger.error(f"[Personalization] FAISS health failed: {e}")
             out["faiss"] = {"ok": False, "error": type(e).__name__}
 
+        out["stream"] = self.stream_health(now)       # informational: the API serves without the stream worker
         out["ok"] = all(out[k].get("ok") for k in ("mongo", "neo4j", "faiss"))
         return out
+
+    def stream_health(self, now: Optional[datetime] = None) -> Dict:
+        """
+        The stream worker's last heartbeat: running = a tick within 3 × stream tick (or 2 minutes). Plus per-source
+        counts (failing, silent) and the hot stories right now.
+        """
+        from config.settings import settings as ingest_settings
+        now = now or self.clock()
+        try:
+            hb = self.sources.status()
+            rows = self.sources.health(now)
+        except Exception as e:
+            return {"ok": False, "error": type(e).__name__}
+        if not hb:
+            return {"ok": False, "running": False, "reason": "no heartbeat (stream_worker.py not started)",
+                    "sources": len(rows)}
+        last = hb.get("last_tick_at")
+        limit = max(120.0, 3 * float(hb.get("tick_seconds") or ingest_settings.stream_tick_seconds))
+        alive = bool(hb.get("running")) and last is not None and (now - last).total_seconds() <= limit
+        return {
+            "ok": alive, "running": alive, "last_tick_at": last, "started_at": hb.get("started_at"),
+            "last_flush_at": hb.get("last_flush_at"), "ticks": hb.get("ticks"), "flushes": hb.get("flushes"),
+            "buffer": hb.get("buffer"), "totals": hb.get("totals"), "dedup_size": hb.get("dedup_size"),
+            "social": hb.get("social"),
+            "sources": len(rows), "sources_failing": sum(1 for r in rows if r["consecutive_failures"]),
+            "sources_silent": sum(1 for r in rows if r["silent"]),
+            "push_tokens": self.logs.count_push_tokens(),
+        }

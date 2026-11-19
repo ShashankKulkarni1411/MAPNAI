@@ -81,6 +81,13 @@ class AlertPrefsPatch(BaseModel):
     quiet_start: Optional[str] = None
     quiet_end: Optional[str] = None
     tz: Optional[str] = None
+    breaking_for_you: Optional[bool] = None
+    breaking_global: Optional[bool] = None
+
+
+class PushTokenIn(BaseModel):
+    token: str = Field(min_length=1, max_length=200, description="Expo push token: ExponentPushToken[...]")
+    platform: Optional[str] = Field(default=None, description="ios | android | web")
 
 
 # ── A. Entities / users / onboarding ─────────────────────────
@@ -194,6 +201,17 @@ def list_alerts(
     return svc.alerts(user_id, since, include_pending, limit)
 
 
+@router.post("/users/{user_id}/push_tokens", status_code=status.HTTP_201_CREATED)
+def register_push_token(user_id: str, body: PushTokenIn, svc: PersonalizationService = Depends(get_service)):
+    return svc.register_push_token(user_id, body.token, body.platform)
+
+
+@router.delete("/users/{user_id}/push_tokens")
+def unregister_push_token(user_id: str, token: str = Query(min_length=1),
+                          svc: PersonalizationService = Depends(get_service)):
+    return svc.unregister_push_token(user_id, token)
+
+
 # ── M. App views ─────────────────────────────────────────────
 
 class AskIn(BaseModel):
@@ -227,6 +245,18 @@ def top_articles(
     svc: PersonalizationService = Depends(get_service),
 ):
     return svc.top(hours, limit, after_recap, tz)
+
+
+@router.get("/articles/breaking")
+def breaking_articles(
+    hours: int = Query(default=pers_settings.breaking_window_h, ge=1, le=72,
+                       description="stories first reported within this many hours"),
+    limit: int = Query(default=10, ge=1, le=50),
+    include_trending: bool = Query(default=True, description="also trending (not only breaking) stories"),
+    user_id: Optional[str] = Query(default=None, description="the viewer, for liked / saved marks"),
+    svc: PersonalizationService = Depends(get_service),
+):
+    return svc.breaking(hours, limit, include_trending, user_id)
 
 
 # ── N. Recaps ────────────────────────────────────────────────

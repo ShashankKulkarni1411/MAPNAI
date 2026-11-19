@@ -10,7 +10,7 @@ Provides:
 """
 
 import re
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from typing import List, Optional, Dict, Any
 from pymongo import MongoClient, UpdateOne, ASCENDING, DESCENDING
 from pymongo.errors import BulkWriteError, ConnectionFailure, ServerSelectionTimeoutError
@@ -18,6 +18,11 @@ from pymongo.errors import BulkWriteError, ConnectionFailure, ServerSelectionTim
 from config.settings import settings
 from utils.models import ProcessedArticle
 from utils.logger import logger
+
+
+# Pending queues: the hottest stories first (personalization hotness job writes hot.score on every article of a hot
+# cluster; articles without it sort after them), then the queue's own recency order
+HOT_FIRST = [("hot.score", DESCENDING)]
 
 
 def mask_uri(uri: str) -> str:
@@ -76,6 +81,7 @@ class MongoStore:
         col.create_index([("classification_processed", ASCENDING)])
         col.create_index([("summarization_processed", ASCENDING)])
         col.create_index([("risk_processed", ASCENDING)])
+        col.create_index([("hot.score", DESCENDING)])          # hottest-first agent queues
         # Text index for full-text search (backup to vector store)
         col.create_index([("title", "text"), ("body", "text")])
         logger.debug("[MongoDB] Indexes verified.")
@@ -249,6 +255,7 @@ class MongoStore:
             "risk_reasoning",
             "risk_level",
             "risk_model",
+            "risk_shared_from",
         }
         filtered_data = {k: v for k, v in risk_data.items() if k in allowed_keys}
         if not filtered_data:
@@ -291,6 +298,81 @@ class MongoStore:
             return hashes
         except Exception as e:
             logger.warning(f"[MongoDB] Could not load existing hashes: {e}")
+            return []
+
+    def get_recent_hash_docs(self, days: int = 7) -> List[Dict]:
+        """
+        {dedup_hash, article_id, source_name} of the articles ingested in the last `days` days, to seed the
+        deduplicator (cross-run duplicates and sightings). Rows from before ingested_ts existed are matched on the
+        ISO ingested_at string.
+        """
+        cutoff = datetime.now(timezone.utc) - timedelta(days=days)
+        query = {
+            "dedup_hash": {"$nin": [None, ""]},
+            "$or": [
+                {"ingested_ts": {"$gte": cutoff}},
+                {"ingested_ts": {"$exists": False}, "ingested_at": {"$gte": cutoff.date().isoformat()}},
+            ],
+        }
+        try:
+            docs = list(self.db["processed_articles"].find(
+                query, {"_id": 0, "dedup_hash": 1, "article_id": 1, "source_name": 1}))
+            logger.info(f"[MongoDB] Loaded {len(docs)} fingerprints from the last {days} days for deduplication.")
+            return docs
+        except Exception as e:
+            logger.warning(f"[MongoDB] Could not load recent fingerprints: {e}")
+            return []
+
+    def record_sightings(self, sightings: Dict[str, List[Dict]]) -> int:
+        """
+        sightings: {original article_id: [{source, at}]} → each outlet is appended to the article's `sightings`
+        list once (a later sighting from the same outlet is ignored). Returns the sightings written.
+        """
+        ops = []
+        now = datetime.now(timezone.utc)
+        for article_id, rows in (sightings or {}).items():
+            for row in rows:
+                if not row.get("source"):
+                    continue
+                ops.append(UpdateOne(
+                    {"article_id": article_id, "sightings.source": {"$ne": row["source"]}},
+                    {"$push": {"sightings": {"source": row["source"], "at": row.get("at") or now}},
+                     "$set": {"last_sighting_at": now}},
+                ))
+        if not ops:
+            return 0
+        try:
+            return self.db["processed_articles"].bulk_write(ops, ordered=False).modified_count
+        except Exception as e:
+            logger.warning(f"[MongoDB] Could not record sightings: {e}")
+            return 0
+
+    def find_cluster_risk(self, cluster_id: str, exclude_article_id: str) -> Optional[Dict]:
+        """
+        A risk-scored article of the same event cluster whose score came from the model (not itself shared), for
+        Agent 4's risk sharing. The most recently scored one; None when there is none.
+        """
+        if not cluster_id:
+            return None
+        try:
+            docs = list(self.db["processed_articles"].find(
+                {"cluster_id": cluster_id, "article_id": {"$ne": exclude_article_id}, "risk_processed": True,
+                 "risk_score": {"$ne": None}, "risk_shared_from": {"$exists": False}},
+                {"_id": 0, "article_id": 1, "risk_score": 1, "risk_confidence": 1, "risk_level": 1,
+                 "risk_reasoning": 1, "action_recommendation": 1, "risk_model": 1, "risk_processed_at": 1},
+            ).sort("risk_processed_at", DESCENDING).limit(1))
+            return docs[0] if docs else None
+        except Exception as e:
+            logger.warning(f"[MongoDB] find_cluster_risk failed for {cluster_id}: {e}")
+            return None
+
+    def get_articles_by_ids(self, article_ids: List[str]) -> List[Dict]:
+        if not article_ids:
+            return []
+        try:
+            return list(self.db["processed_articles"].find({"article_id": {"$in": list(article_ids)}}, {"_id": 0}))
+        except Exception as e:
+            logger.error(f"[MongoDB] get_articles_by_ids error: {e}")
             return []
 
     def get_article_by_id(self, article_id: str) -> Optional[Dict]:
@@ -357,7 +439,7 @@ class MongoStore:
             cursor = (
                 self.db["processed_articles"]
                 .find(query, {"_id": 0})
-                .sort("ingested_at", DESCENDING)
+                .sort(HOT_FIRST + [("ingested_at", DESCENDING)])
                 .skip(skip)
                 .limit(limit)
             )
@@ -434,7 +516,7 @@ class MongoStore:
             cursor = (
                 self.db["processed_articles"]
                 .find(query, {"_id": 0})
-                .sort("ner_processed_at", DESCENDING)
+                .sort(HOT_FIRST + [("ner_processed_at", DESCENDING)])
                 .skip(skip)
                 .limit(limit)
             )
@@ -485,7 +567,7 @@ class MongoStore:
             cursor = (
                 self.db["processed_articles"]
                 .find(query, {"_id": 0})
-                .sort("classification_processed_at", DESCENDING)
+                .sort(HOT_FIRST + [("classification_processed_at", DESCENDING)])
                 .skip(skip)
                 .limit(limit)
             )
@@ -536,7 +618,7 @@ class MongoStore:
             cursor = (
                 self.db["processed_articles"]
                 .find(query, {"_id": 0})
-                .sort("summarization_processed_at", DESCENDING)
+                .sort(HOT_FIRST + [("summarization_processed_at", DESCENDING)])
                 .skip(skip)
                 .limit(limit)
             )

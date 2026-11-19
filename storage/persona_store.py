@@ -171,5 +171,11 @@ class PersonaStore:
             {"pi_topk.0": {"$exists": True}},
             {"_id": 0, "user_id": 1, "pi_topk": 1, "alert_prefs": 1, "persona_version": 1}))
 
+    def breaking_global_rows(self) -> List[Dict]:
+        """The pi_rows shape for every persona that opted in to major breaking news (alert_prefs.breaking_global)."""
+        return list(self.personas.find(
+            {"alert_prefs.breaking_global": True},
+            {"_id": 0, "user_id": 1, "pi_topk": 1, "alert_prefs": 1, "persona_version": 1}))
+
     def count(self) -> int:
         return self.personas.estimated_document_count()

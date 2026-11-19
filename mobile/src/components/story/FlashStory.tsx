@@ -326,7 +326,8 @@ export function FlashStory({ item, index, total, inBrief, height, showHint, onWh
             </View>
           </View>
         ) : (
-          <Txt v="label" color={c.ink}>{item.section === 'big_today' ? 'Outside your usual: a big story today' : sectionLabel.feed}</Txt>
+          <Txt v="label" color={c.ink}>{item.section === 'breaking' ? 'Breaking now · many outlets are reporting this'
+            : item.section === 'big_today' ? 'Outside your usual: a big story today' : sectionLabel.feed}</Txt>
         )}
         {showHint && (
           <View style={{ alignSelf: 'center', backgroundColor: c.scrim, borderRadius: radius.chip, paddingHorizontal: 14, paddingVertical: 6 }}>

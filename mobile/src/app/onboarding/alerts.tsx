@@ -1,6 +1,5 @@
 // O5 Alerts and notifications: set expectations, then ask for push permission at the right moment.
-// Device registration (POST /v1/users/{id}/devices) is Proposed; we only ask the OS for permission here.
-import Constants, { ExecutionEnvironment } from 'expo-constants';
+// With permission, the device's push token is registered (POST /v1/users/{id}/push_tokens, lib/push.ts).
 import * as Localization from 'expo-localization';
 import { router } from 'expo-router';
 import { useState } from 'react';
@@ -15,20 +14,10 @@ import { OnboardingTop } from '@/components/OnboardingTop';
 import { FormScreen } from '@/components/Screen';
 import { Txt } from '@/components/Txt';
 import { InlineError, Pill, Segmented } from '@/components/ui';
+import { askPushPermission, inExpoGo, registerPush } from '@/lib/push';
 import { useSession } from '@/state/session';
 import { radius, space } from '@/theme/tokens';
 import { useTheme } from '@/theme/useTheme';
-
-// Expo Go (SDK 53+) throws as soon as expo-notifications is imported on Android, and has no push on any platform,
-// so the module is loaded only when asking, and only outside Expo Go (development / store builds).
-const inExpoGo = Constants.executionEnvironment === ExecutionEnvironment.StoreClient;
-
-async function askPushPermission(): Promise<boolean> {
-  if (inExpoGo) return false;
-  const Notifications = require('expo-notifications') as typeof import('expo-notifications');
-  const res = await Notifications.requestPermissionsAsync().catch(() => ({ granted: false }));
-  return res.granted;
-}
 
 export default function Alerts() {
   const { c } = useTheme();
@@ -50,7 +39,9 @@ export default function Alerts() {
       await api.patchAlertPrefs(s.userId!, { max_per_day: max, quiet_start: '22:00', quiet_end: '07:00', tz });
       // Weekly / daily recap preferences are Proposed fields; kept local for now
       if (askPush) {
-        if (!(await askPushPermission())) {
+        if (await askPushPermission()) {
+          void registerPush(s.userId!);
+        } else {
           setNote(inExpoGo ? 'Push alerts need the installed app, not Expo Go. Your alert settings are saved.'
             : 'You can turn alerts on later in Settings.');
           await new Promise((r) => setTimeout(r, 1200));

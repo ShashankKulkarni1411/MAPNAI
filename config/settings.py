@@ -109,6 +109,39 @@ class Settings(BaseSettings):
     media_fallback: bool = True
     # Wikimedia throttles anonymous clients hard unless the User-Agent names the project and a contact
     wikimedia_user_agent: str = "MAPNAI/1.0 (https://github.com/ShashankKulkarni1411/MAPNAI) news-images"
+    # Duplicate fingerprints older than this are not loaded: an old story doesn't come back as a duplicate, and the
+    # lookup stays small however large the archive grows
+    dedup_seed_days: int = 7
+    # Raw Bluesky firehose posts as articles (random public posts: mostly noise). Off; the stream worker can use
+    # Bluesky as a social signal instead (stream_social_enabled)
+    bluesky_ingest_articles: bool = False
+
+    # ── Continuous stream (stream_worker.py; continousexplanation.md §5) ──
+    stream_tick_seconds: float = 15.0          # how often the worker looks for due sources
+    stream_flush_seconds: float = 120.0        # micro-batch: flush new items at least this often …
+    stream_flush_max: int = 200                # … or as soon as this many are waiting
+    stream_poll_workers: int = 8               # feeds downloaded in parallel
+    stream_initial_interval_s: float = 900.0   # a new source's first polling interval
+    stream_min_interval_top_s: float = 120.0   # top-stories feeds may be polled this often …
+    stream_min_interval_s: float = 300.0       # … section feeds this often …
+    stream_max_interval_s: float = 1200.0      # … and nobody less often than this (20 min: scripts/stream_benchmark.py
+                                               # polling — fewer requests than fixed 15-min polling, same p90 delay)
+    stream_seen_keep: int = 500                # item keys remembered per source (feeds carry ≤ 50 items)
+    stream_api_interval_minutes: float = 60.0  # news APIs (NewsAPI / GNews free tiers: ~100 requests a day)
+    stream_scraper_interval_minutes: float = 30.0
+    stream_faiss_save_seconds: float = 600.0   # the FAISS index is written to disk at most this often
+    stream_reseed_hours: float = 24.0          # rebuild the in-memory duplicate index from Mongo this often
+    # Agents 1-2 (local models) run on every flush; Agents 3-4 (LLM) on at most this many articles per flush,
+    # hottest stories first (0 = leave them to `python pipeline.py --schedule`)
+    stream_run_agents: bool = True
+    stream_llm_per_flush: int = 20
+    # Bluesky Jetstream social signal for trending stories (agents/social_signal.py)
+    stream_social_enabled: bool = False
+    stream_social_url: str = "wss://jetstream2.us-east.bsky.network/subscribe?wantedCollections=app.bsky.feed.post"
+    stream_social_bucket_minutes: int = 10
+    stream_social_refresh_seconds: float = 300.0   # reload the watched stories this often
+    # Agent 4: reuse the risk score of an article in the same event cluster instead of another LLM call
+    risk_share_in_cluster: bool = True
 
     # ── Language ─────────────────────────────────────────────
     primary_language: str = "en"

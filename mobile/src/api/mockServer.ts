@@ -7,7 +7,8 @@ import { ApiError } from './client';
 import { ARTICLES, COMENTIONS, ENTITIES, FixtureArticle, INSIGHTS } from './fixtures';
 import type {
   Alert, AlertPrefs, AskAnswer, Comment, Digest, EntityHit, Exposure, FeedbackType, FeedPage, Headline, Health,
-  Insight, Insights, Profile, Proposal, Recap, RecapKind, Role, SearchPage, Section, StoryDetail, StoryItem, Style, WeightLevel,
+  EngineTopic, HotInfo, Insight, Insights, Profile, Proposal, Recap, RecapKind, Role, SearchPage, Section, StoryDetail,
+  StoryItem, Style, WeightLevel,
 } from './types';
 
 const TAU = 0.2;
@@ -67,7 +68,7 @@ function demoUser(user_id: string): MockUser {
   return {
     user_id, name: 'Demo reader', topics: { sports: 1.0, entertainment_movies: 0.6 },
     style: { tone: 'plain', length: 'short', jargon: 'low' },
-    alert_prefs: { max_per_day: 3, quiet_start: '22:00', quiet_end: '07:00', tz: 'Asia/Kolkata' },
+    alert_prefs: { max_per_day: 3, quiet_start: '22:00', quiet_end: '07:00', tz: 'Asia/Kolkata', breaking_for_you: true, breaking_global: false },
     exposures: [follow('jasprit bumrah', 3), follow('yash raj films', 2)],
     beta: {}, history: [], saved: [], rejected: [], persona_version: 1, created_at: nowIso(),
   };
@@ -115,6 +116,17 @@ function need(a: FixtureArticle, pi: ReturnType<typeof seeds>) {
     }
   }
   return { need: a.m * best, hit };
+}
+
+// Hit news in the demo: a fresh story many outlets carry is breaking, a widely carried one trending (the engine
+// scores breadth, velocity, front-page prominence and severity; continousexplanation.md §5.8)
+const HOT_TOPICS: EngineTopic[] = ['sports', 'entertainment_movies'];
+
+function mockHot(a: FixtureArticle): HotInfo | null {
+  if (a.ageH > 12 || a.sources < 4) return null;
+  const score = Math.round(Math.min(1, (a.sources / 10) * 0.6 + (a.urgent ? 0.25 : 0) + Math.max(0, 0.15 - a.ageH * 0.02)) * 1000) / 1000;
+  const tier = a.sources >= 7 && a.ageH <= 3 ? 'breaking' : 'trending';
+  return { tier, score, outlets: a.sources, velocity_outlets: a.ageH <= 1 ? a.sources : Math.max(1, Math.round(a.sources / (a.ageH + 1))) };
 }
 
 function toItem(a: FixtureArticle, section?: Section, slot?: number, extra?: Partial<StoryItem>): StoryItem {
@@ -232,7 +244,7 @@ export const mock = {
     const user_id = uuid();
     d.users[user_id] = {
       user_id, name, topics: {}, style: { tone: 'plain', length: 'short', jargon: 'low' },
-      alert_prefs: { max_per_day: 3, quiet_start: '22:00', quiet_end: '07:00', tz: 'Asia/Kolkata' },
+      alert_prefs: { max_per_day: 3, quiet_start: '22:00', quiet_end: '07:00', tz: 'Asia/Kolkata', breaking_for_you: true, breaking_global: false },
       exposures: [], beta: {}, history: [], saved: [], rejected: [], persona_version: 1, created_at: nowIso(),
     };
     await save();
@@ -393,7 +405,34 @@ export const mock = {
       .map((a) => toItem(a, 'big_today', undefined, {
         explanation: `Covered by ${a.sources} sources today`,
         explanation_parts: { kind: 'big_today' },
+        hot: mockHot(a),
       }));
+  },
+
+  async breaking(limit = 10): Promise<StoryItem[]> {
+    await delay(150);
+    const rank = (a: FixtureArticle) => { const h = mockHot(a)!; return (h.tier === 'breaking' ? 1 : 0) + h.score; };
+    return ARTICLES.filter((a) => HOT_TOPICS.includes(a.topic) && mockHot(a))
+      .sort((a, b) => rank(b) - rank(a))
+      .slice(0, limit)
+      .map((a) => {
+        const hot = mockHot(a)!;
+        return toItem(a, 'breaking', undefined, {
+          hot,
+          explanation: `${hot.tier === 'breaking' ? 'Breaking' : 'Trending'} · ${hot.outlets} outlets, ${hot.velocity_outlets} in the last hour`,
+          explanation_parts: { kind: 'hot' },
+        });
+      });
+  },
+
+  async registerPushToken(id: string, token: string, platform: string) {
+    await delay(50);
+    return { user_id: id, token, platform, active: true };
+  },
+
+  async unregisterPushToken(id: string, token: string) {
+    await delay(50);
+    return { user_id: id, token, deleted: 1 };
   },
 
   // Recaps from the fixtures: the biggest stories by m with at least 3 (daily) / 2 (weekly top) per domain.
@@ -563,7 +602,7 @@ export const mock = {
       .filter((x) => x.need >= 0.5 && x.a.m >= 0.6 && x.hit && !x.hit.via)
       .slice(0, u.alert_prefs.max_per_day)
       .map(({ a, hit }) => ({
-        alert_id: `al-${a.id}`, article_id: a.id, cluster_id: `c-${a.id}`, created_at: ago(a.ageH),
+        alert_id: `al-${a.id}`, kind: 'exposure' as const, article_id: a.id, cluster_id: `c-${a.id}`, created_at: ago(a.ageH),
         explanation: `You follow ${hit!.seed.name} (${hit!.seed.weight === 3 ? 'Essential' : 'Important'}).`,
         title: a.title, source_name: a.source, entity_name: hit!.seed.name,
         tier: a.risk === 'ESCALATE' || a.m >= 0.8 ? 'major' : 'high', cluster_size: a.sources,

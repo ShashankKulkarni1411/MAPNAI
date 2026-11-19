@@ -1,4 +1,5 @@
-// F1 Flash: one story per screen. Must know first, then For you / New for you, then every overflow item,
+// F1 Flash: one story per screen. Up to two breaking stories first (hit news, the same for everyone), then
+// Must know, then For you / New for you, then every overflow item,
 // then the "caught up" divider, then ranked continuation pages (Proposed /feed). Night-navy by default.
 // Each story is full-bleed over its ingested image (components/story/FlashStory); the next images are prefetched.
 import { useInfiniteQuery } from '@tanstack/react-query';
@@ -10,7 +11,7 @@ import { FlatList, LayoutChangeEvent, Pressable, View, ViewToken } from 'react-n
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { api } from '@/api/endpoints';
-import { useBigToday, useDigest, useUserId } from '@/api/hooks';
+import { useBigToday, useBreaking, useDigest, useUserId } from '@/api/hooks';
 import type { StoryItem } from '@/api/types';
 import { Button } from '@/components/Button';
 import { FlashStory, heroImage } from '@/components/story/FlashStory';
@@ -34,6 +35,7 @@ export default function Flash() {
   const uid = useUserId();
   const digest = useDigest();
   const top = useBigToday();
+  const breaking = useBreaking();
   const [h, setH] = useState(0);
   const [index, setIndex] = useState(0);
   const [why, setWhy] = useState<StoryItem | null>(null);
@@ -63,8 +65,17 @@ export default function Flash() {
     getNextPageParam: (last) => (last.exhausted ? undefined : last.next_cursor),
   });
 
+  // Breaking stories not already in the brief lead the stack
+  const hot = useMemo(() => {
+    const inBrief = new Set(briefIds);
+    return (breaking.data ?? []).filter((i) => i.hot?.tier === 'breaking' && !inBrief.has(i.article_id)).slice(0, 2);
+  }, [breaking.data, briefIds]);
+
   const rows: Row[] = useMemo(() => {
-    const out: Row[] = brief.map((item) => ({ kind: 'story', item, brief: true }));
+    const out: Row[] = [
+      ...hot.map((item): Row => ({ kind: 'story', item, brief: false })),
+      ...brief.map((item): Row => ({ kind: 'story', item, brief: true })),
+    ];
     if (!digest.data) return out;
     out.push({
       kind: 'divider',
@@ -74,7 +85,7 @@ export default function Flash() {
         explore: brief.filter((i) => i.section === 'explore').length,
       },
     });
-    const seen = new Set(briefIds);
+    const seen = new Set([...briefIds, ...hot.map((i) => i.article_id)]);
     const bigQueue = (top.data ?? []).filter((i) => !seen.has(i.article_id));
     (feed.data?.pages ?? []).forEach((p) => {
       p.items.forEach((item) => {
@@ -91,7 +102,7 @@ export default function Flash() {
     });
     out.push(feed.hasNextPage || feed.isFetching ? { kind: 'loading' } : { kind: 'end' });
     return out;
-  }, [brief, briefIds, digest.data, feed.data, feed.hasNextPage, feed.isFetching, top.data]);
+  }, [hot, brief, briefIds, digest.data, feed.data, feed.hasNextPage, feed.isFetching, top.data]);
 
   // Dwell: active foreground time on a card, capped at 120 s; sent above 15 s
   const shownAt = useRef<{ id: string; t: number } | null>(null);
@@ -125,7 +136,7 @@ export default function Flash() {
   const onLayout = (e: LayoutChangeEvent) => setH(e.nativeEvent.layout.height);
 
   const renderStory = (item: StoryItem, i: number, inBrief: boolean) => (
-    <FlashStory item={item} index={i} total={briefCount} inBrief={inBrief} height={h}
+    <FlashStory item={item} index={inBrief ? i - hot.length : i} total={briefCount} inBrief={inBrief} height={h}
       showHint={i === 0 && !hintSeen}
       onWhy={() => setWhy(item)} onActions={() => setActions(item)} onComments={() => setComments(item)}
       onNext={() => goTo(i + 1)} onPrev={() => goTo(i - 1)} />

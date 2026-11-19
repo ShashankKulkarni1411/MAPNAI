@@ -1,7 +1,9 @@
 """
 MAPNAI — config/sources.py
 Defines the RSS feeds (including government feeds) and the domain keyword hints.
-Add / remove feeds here without touching any agent code. News API queries live in
+Add / remove feeds here without touching any agent code.
+The Reuters feeds stay listed but inactive: Reuters ended its public RSS and feeds.reuters.com no longer resolves
+(checked 2026-11-19). The stream worker reports dead or silent feeds at /v1/admin/sources. News API queries live in
 agents/api_fetcher.py and scraper targets in agents/web_scraper.py.
 
 Note: Reddit has been fully replaced by the Bluesky public Firehose.
@@ -22,11 +24,17 @@ class RSSSource:
     domain: str          # finance | geopolitics | technology | health | supply_chain | sports | entertainment_movies | general
     language: str = "en"
     active: bool = True
+    # "section": a normal feed. "top_stories": an editor-curated front page — its items also count as prominence for
+    # the hotness score (personalization/hotness.py). See continousexplanation.md §5.1.
+    role: str = "section"
+    # False: the feed is a prominence signal only (titles/links recorded, items never stored as articles), e.g.
+    # Google News, whose items are redirect links without article text
+    store_items: bool = True
 
 
 # ── RSS Feeds — Finance ──────────────────────────────────────
 FINANCE_RSS: List[RSSSource] = [
-    RSSSource("Reuters Business",     "https://feeds.reuters.com/reuters/businessNews",        "finance"),
+    RSSSource("Reuters Business",     "https://feeds.reuters.com/reuters/businessNews",        "finance", active=False),
     RSSSource("Bloomberg Markets",    "https://feeds.bloomberg.com/markets/news.rss",          "finance"),
     RSSSource("CNBC Finance",         "https://www.cnbc.com/id/10000664/device/rss/rss.html",  "finance"),
     RSSSource("Financial Times",      "https://www.ft.com/rss/home",                           "finance"),
@@ -40,7 +48,7 @@ FINANCE_RSS: List[RSSSource] = [
 
 # ── RSS Feeds — Geopolitics ──────────────────────────────────
 GEOPOLITICS_RSS: List[RSSSource] = [
-    RSSSource("Reuters World",        "https://feeds.reuters.com/reuters/worldNews",           "geopolitics"),
+    RSSSource("Reuters World",        "https://feeds.reuters.com/reuters/worldNews",           "geopolitics", active=False),
     RSSSource("BBC World",            "http://feeds.bbci.co.uk/news/world/rss.xml",            "geopolitics"),
     RSSSource("Al Jazeera",           "https://www.aljazeera.com/xml/rss/all.xml",             "geopolitics"),
     RSSSource("Foreign Policy",       "https://foreignpolicy.com/feed/",                       "geopolitics"),
@@ -65,7 +73,7 @@ TECHNOLOGY_RSS: List[RSSSource] = [
 # ── RSS Feeds — Health ───────────────────────────────────────
 HEALTH_RSS: List[RSSSource] = [
     RSSSource("WHO News",             "https://www.who.int/rss-feeds/news-english.xml",        "health"),
-    RSSSource("Reuters Health",       "https://feeds.reuters.com/reuters/healthNews",          "health"),
+    RSSSource("Reuters Health",       "https://feeds.reuters.com/reuters/healthNews",          "health", active=False),
     RSSSource("NIH News",             "https://www.nih.gov/news-events/news-releases/feed.xml","health"),
     RSSSource("CDC Media",            "https://tools.cdc.gov/api/v2/resources/media/132608.rss","health"),
     RSSSource("STAT News",            "https://www.statnews.com/feed/",                        "health"),
@@ -76,7 +84,7 @@ HEALTH_RSS: List[RSSSource] = [
 SUPPLY_CHAIN_RSS: List[RSSSource] = [
     RSSSource("Supply Chain Dive",    "https://www.supplychaindive.com/feeds/news/",           "supply_chain"),
     RSSSource("Logistics Management", "https://www.logisticsmgmt.com/rss/all",                 "supply_chain"),
-    RSSSource("Reuters Commodities",  "https://feeds.reuters.com/reuters/companyNews",         "supply_chain"),
+    RSSSource("Reuters Commodities",  "https://feeds.reuters.com/reuters/companyNews",         "supply_chain", active=False),
     RSSSource("Freightos",            "https://www.freightos.com/feed/",                       "supply_chain"),
 ]
 
@@ -122,6 +130,25 @@ GOVERNMENT_RSS: List[RSSSource] = [
     RSSSource("PIB India",            "https://pib.gov.in/RssMain.aspx",                       "geopolitics"),
 ]
 
+# ── Top stories (editor-curated front pages) ─────────────────
+# Prominence signal for hit-news detection. Stored feeds also deliver articles; Google News is a signal only
+# (store_items=False). Google's topic URLs redirect to /rss/topics/<id> (requests follows the redirect).
+_GN = "hl=en-IN&gl=IN&ceid=IN:en"
+TOP_STORIES_RSS: List[RSSSource] = [
+    RSSSource("Times of India Top Stories", "https://timesofindia.indiatimes.com/rssfeedstopstories.cms", "general",
+              role="top_stories"),
+    RSSSource("BBC News Front Page",  "https://feeds.bbci.co.uk/news/rss.xml",              "general",
+              role="top_stories"),
+    RSSSource("Google News India",    f"https://news.google.com/rss?{_GN}",                 "general",
+              role="top_stories", store_items=False),
+    RSSSource("Google News India Sports",
+              f"https://news.google.com/rss/headlines/section/topic/SPORTS?{_GN}",          "sports",
+              role="top_stories", store_items=False),
+    RSSSource("Google News India Entertainment",
+              f"https://news.google.com/rss/headlines/section/topic/ENTERTAINMENT?{_GN}",   "entertainment_movies",
+              role="top_stories", store_items=False),
+]
+
 # ── Bluesky Firehose ─────────────────────────────────────────
 # No source list required — the Firehose is a single public WebSocket stream
 # that delivers ALL network posts in real-time.
@@ -138,6 +165,10 @@ ALL_RSS_SOURCES: List[RSSSource] = (
     + SPORTS_RSS
     + ENTERTAINMENT_MOVIES_RSS
 )
+
+# ── The stream worker's sources: every feed above plus the top-stories feeds ─
+# (the batch pipeline keeps ALL_RSS_SOURCES, so a batch run never stores Google News items)
+STREAM_RSS_SOURCES: List[RSSSource] = ALL_RSS_SOURCES + TOP_STORIES_RSS
 
 # ── Domain keyword hints for auto-classification ─────────────
 DOMAIN_KEYWORDS: dict = {

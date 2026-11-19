@@ -34,13 +34,16 @@ def svc():
 # ── Scheduler ────────────────────────────────────────────────
 
 class TestScheduler:
-    def test_eight_jobs_on_their_crons_in_the_configured_tz(self, svc):
+    def test_nine_jobs_on_their_crons_in_the_configured_tz(self, svc):
         sched = jobs.build_scheduler(svc, CFG)
         by_id = {j.id: j for j in sched.get_jobs()}
-        assert sorted(by_id) == ["alerts", "cluster", "digests", "pi_topk", "proposals", "recap_daily",
+        assert sorted(by_id) == ["alerts", "cluster", "digests", "hotness", "pi_topk", "proposals", "recap_daily",
                                  "recap_weekly", "tau"]
         assert str(by_id["alerts"].trigger.timezone) == "Asia/Kolkata"
-        assert "minute='*/5'" in str(by_id["alerts"].trigger)
+        # the stream chain: cluster at :00/:05…, hotness a minute later, alerts (and push) a minute after that
+        assert "minute='*/5'" in str(by_id["cluster"].trigger)
+        assert "minute='1-59/5'" in str(by_id["hotness"].trigger)
+        assert "minute='2-59/5'" in str(by_id["alerts"].trigger)
         assert "day_of_week='mon'" in str(by_id["proposals"].trigger)
         assert "hour='5'" in str(by_id["digests"].trigger) and "minute='30'" in str(by_id["digests"].trigger)
         assert "hour='7'" in str(by_id["recap_daily"].trigger) and "minute='10'" in str(by_id["recap_daily"].trigger)
@@ -50,7 +53,7 @@ class TestScheduler:
         assert by_id["cluster"].max_instances == 1 and by_id["cluster"].coalesce is True
 
     def test_empty_cron_unschedules_a_job(self, svc):
-        cfg = CFG.model_copy(update={"job_alerts": "", "job_proposals": "  ", "job_recap_daily": "",
+        cfg = CFG.model_copy(update={"job_alerts": "", "job_hotness": "", "job_proposals": "  ", "job_recap_daily": "",
                                      "job_recap_weekly": ""})
         assert sorted(jobs.schedule_table(cfg)) == ["cluster", "digests", "pi_topk", "tau"]
         assert sorted(j.id for j in jobs.build_scheduler(svc, cfg).get_jobs()) == \
@@ -58,7 +61,7 @@ class TestScheduler:
 
     def test_status_before_start_and_without_scheduler(self, svc):
         status = jobs.scheduler_status(jobs.build_scheduler(svc, CFG))
-        assert status["running"] is False and len(status["jobs"]) == 8
+        assert status["running"] is False and len(status["jobs"]) == 9
         assert all(j["next_run"] is None for j in status["jobs"].values())
         assert jobs.scheduler_status(None) == {"running": False, "jobs": {}}
 
@@ -78,7 +81,7 @@ class TestScheduler:
             sched = app.state.scheduler
             assert sched is not None and sched.running
             h = client.get("/v1/personalization/health").json()["scheduler"]
-            assert h["running"] is True and len(h["jobs"]) == 8
+            assert h["running"] is True and len(h["jobs"]) == 9
             assert all(j["next_run"] for j in h["jobs"].values())
             assert all(job.args[0] is svc for job in sched.get_jobs())     # jobs share the endpoints' service
         assert not sched.running

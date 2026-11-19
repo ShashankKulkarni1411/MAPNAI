@@ -38,6 +38,7 @@ from agents.pipeline_bridge import (
     mongo_doc_to_agent4_payload,
     enrich_with_similar_articles,
 )
+from config.settings import settings
 from storage.mongo_store import MongoStore
 from storage.faiss_store import FAISSStore
 from utils.logger import logger
@@ -90,6 +91,7 @@ def _process_one_article(
     faiss_store: Optional[FAISSStore],
     agents: Set[int],
     stats: Dict,
+    mongo: Optional[MongoStore] = None,
 ) -> None:
     article_id = doc.get("article_id", "?")
     payload: Optional[dict] = None
@@ -163,7 +165,11 @@ def _process_one_article(
 
         # ── Agent 4: Risk Scoring ─────────────────────────────
         if 4 in agents:
-            if not doc.get("risk_processed"):
+            shared = _shared_risk(doc, mongo) if not doc.get("risk_processed") else None
+            if shared and mongo.update_article_risk(article_id, shared):
+                stats["risk_shared"] = stats.get("risk_shared", 0) + 1
+                logger.debug(f"[Pipeline] Risk for {article_id[:8]} shared from {shared['risk_shared_from'][:8]}")
+            elif not doc.get("risk_processed"):
                 agent4_input = mongo_doc_to_agent4_payload(doc, upstream=payload)
                 payload = risk_scorer.process_article(agent4_input)
                 if payload.pop("risk_skipped", False):
@@ -183,39 +189,109 @@ def _process_one_article(
         stats["errors"].append({"article_id": article_id, "error": str(e)})
 
 
+_SHARED_RISK_FIELDS = ("risk_score", "risk_confidence", "risk_level", "risk_reasoning", "action_recommendation",
+                       "risk_model")
+
+
+def _shared_risk(doc: dict, mongo: Optional[MongoStore]) -> Optional[dict]:
+    """
+    Risk sharing (continousexplanation.md §5.6): when another article of the same event cluster already has a
+    model-made Agent 4 score, reuse it instead of another LLM call. None when sharing is off, the article has no
+    cluster yet, or no cluster-mate is scored.
+    """
+    if mongo is None or not settings.risk_share_in_cluster or not doc.get("cluster_id"):
+        return None
+    sibling = mongo.find_cluster_risk(doc["cluster_id"], doc.get("article_id"))
+    if not sibling or sibling.get("risk_score") is None:
+        return None
+    return {**{k: sibling.get(k) for k in _SHARED_RISK_FIELDS if k in sibling},
+            "risk_shared_from": sibling["article_id"]}
+
+
+class AgentPool:
+    """
+    Agents 1–4, the FAISS store and the Mongo store, loaded once and reused by every run_agent_pipeline call
+    (the stream worker keeps one for its lifetime instead of reloading the models per run). Agents are created on
+    first use. The FAISS store can be the ingestion store, so similar-article context sees the newest vectors.
+    """
+
+    def __init__(self, mongo: Optional[MongoStore] = None, faiss_store: Optional[FAISSStore] = None):
+        self.mongo = mongo or MongoStore()
+        self.faiss_store = faiss_store
+        self._faiss_tried = faiss_store is not None
+        self.ner_agent = self.classifier = self.summarizer = self.risk_scorer = None
+
+    def ensure(self, agents: Set[int]) -> "AgentPool":
+        if 1 in agents and self.ner_agent is None:
+            self.ner_agent = NERAgent(mongo_store=self.mongo)
+        if 2 in agents and self.classifier is None:
+            self.classifier = EventClassifierAgent(mongo_store=self.mongo)
+        if 3 in agents and self.summarizer is None:
+            self.summarizer = SummarizationAgent(mongo_store=self.mongo)
+        if 4 in agents and self.risk_scorer is None:
+            self.risk_scorer = RiskScoringAgent(mongo_store=self.mongo)
+        if (2 in agents or 3 in agents) and not self._faiss_tried:
+            self._faiss_tried = True
+            self.faiss_store = _load_faiss()
+        return self
+
+    def close(self) -> None:
+        _close_all(self.ner_agent, self.classifier, self.summarizer, self.risk_scorer, self.mongo)
+        self.ner_agent = self.classifier = self.summarizer = self.risk_scorer = None
+
+
+def _load_faiss() -> Optional[FAISSStore]:
+    try:
+        store = FAISSStore()
+        logger.info(f"[Pipeline] FAISS loaded — {store.total_vectors} vectors")
+        return store
+    except Exception as e:
+        logger.warning(f"[Pipeline] FAISS unavailable (continuing without similar articles): {e}")
+        return None
+
+
 def run_agent_pipeline(
     limit: int = 100,
     skip: int = 0,
     agents: Optional[Set[int]] = None,
     article_id: Optional[str] = None,
+    pool: Optional[AgentPool] = None,
+    article_ids: Optional[List[str]] = None,
 ) -> Dict:
     """
     Run Agents 1–4 on articles from MongoDB (+ FAISS context).
+    pool: reuse loaded agents (nothing is loaded or closed here). article_ids: exactly these articles (the stream
+    worker's newly stored ones) instead of the pending queues.
     """
     agents = agents or {1, 2, 3, 4}
-    mongo = MongoStore()
+    mongo = pool.mongo if pool else MongoStore()
     if not mongo.is_available():
         # Agents 1-4 read their work queue from MongoDB; nothing to do without it
         return {"agents_run": sorted(agents), "pending_found": 0, "articles_ok": 0,
                 "errors": [{"error": "MongoDB unavailable"}]}
-    faiss_store: Optional[FAISSStore] = None
-    if 2 in agents or 3 in agents:
-        try:
-            faiss_store = FAISSStore()
-            logger.info(f"[Pipeline] FAISS loaded — {faiss_store.total_vectors} vectors")
-        except Exception as e:
-            logger.warning(f"[Pipeline] FAISS unavailable (continuing without similar articles): {e}")
+    if pool:
+        pool.ensure(agents)
+        faiss_store = pool.faiss_store if (2 in agents or 3 in agents) else None
+        ner_agent = pool.ner_agent if 1 in agents else None
+        classifier = pool.classifier if 2 in agents else None
+        summarizer = pool.summarizer if 3 in agents else None
+        risk_scorer = pool.risk_scorer if 4 in agents else None
+    else:
+        faiss_store = _load_faiss() if (2 in agents or 3 in agents) else None
+        ner_agent = NERAgent(mongo_store=mongo) if 1 in agents else None
+        classifier = (
+            EventClassifierAgent(mongo_store=mongo) if 2 in agents else None
+        )
+        summarizer = (
+            SummarizationAgent(mongo_store=mongo) if 3 in agents else None
+        )
+        risk_scorer = (
+            RiskScoringAgent(mongo_store=mongo) if 4 in agents else None
+        )
 
-    ner_agent = NERAgent(mongo_store=mongo) if 1 in agents else None
-    classifier = (
-        EventClassifierAgent(mongo_store=mongo) if 2 in agents else None
-    )
-    summarizer = (
-        SummarizationAgent(mongo_store=mongo) if 3 in agents else None
-    )
-    risk_scorer = (
-        RiskScoringAgent(mongo_store=mongo) if 4 in agents else None
-    )
+    def finish():
+        if not pool:
+            _close_all(ner_agent, classifier, summarizer, risk_scorer, mongo)
 
     stats = {
         "agents_run": sorted(agents),
@@ -227,6 +303,7 @@ def run_agent_pipeline(
         "summarized": 0,
         "risk_scored": 0,
         "risk_skipped": 0,
+        "risk_shared": 0,
         "out_of_scope": 0,
         "total_entities": 0,
         "errors": [],
@@ -236,17 +313,11 @@ def run_agent_pipeline(
         doc = mongo.get_article_by_id(article_id)
         if not doc:
             logger.error(f"[Pipeline] No article found: {article_id}")
-            if ner_agent:
-                ner_agent.close()
-            if classifier:
-                classifier.close()
-            if summarizer:
-                summarizer.close()
-            if risk_scorer:
-                risk_scorer.close()
-            mongo.close()
+            finish()
             return stats
         docs = [doc]
+    elif article_ids is not None:
+        docs = mongo.get_articles_by_ids(article_ids)
     else:
         docs = _collect_pending_docs(mongo, agents, limit, skip)
 
@@ -257,7 +328,7 @@ def run_agent_pipeline(
             "[Pipeline] No articles to process for agents "
             f"{sorted(agents)}. Run ingestion first."
         )
-        _close_all(ner_agent, classifier, summarizer, risk_scorer, mongo)
+        finish()
         return stats
 
     logger.info(
@@ -274,6 +345,7 @@ def run_agent_pipeline(
             faiss_store=faiss_store,
             agents=agents,
             stats=stats,
+            mongo=mongo,
         )
 
     stats["remaining_pending_ner"] = mongo.count_articles_pending_ner()
@@ -291,11 +363,11 @@ def run_agent_pipeline(
         f"[Pipeline] Done — ok={stats['articles_ok']} | failed={stats['failed']} | "
         f"ner={stats['ner_processed']} | classified={stats['classified']} | "
         f"summarized={stats['summarized']} | risk_scored={stats['risk_scored']} | "
-        f"risk_skipped={stats['risk_skipped']} | "
+        f"risk_skipped={stats['risk_skipped']} | risk_shared={stats['risk_shared']} | "
         f"out_of_scope={stats['out_of_scope']}"
     )
 
-    _close_all(ner_agent, classifier, summarizer, risk_scorer, mongo)
+    finish()
     return stats
 
 

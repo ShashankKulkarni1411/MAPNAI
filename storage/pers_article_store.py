@@ -46,9 +46,15 @@ class PersArticleStore:
         arts.create_index([(c.published_field, DESCENDING), ("materiality.m", DESCENDING)])
         arts.create_index([("published_ts", DESCENDING)])
         arts.create_index([("ingested_ts", DESCENDING)])
+        arts.create_index([("hot.tier", ASCENDING)])
         clusters = db[c.clusters_collection]
         clusters.create_index([("cluster_id", ASCENDING)], unique=True)
         clusters.create_index([("updated_at", DESCENDING)])
+        clusters.create_index([("hot.tier", ASCENDING), ("hot.computed_at", DESCENDING)])
+        db[c.hot_history_collection].create_index([("t", DESCENDING)])
+        db[c.hot_history_collection].create_index([("cluster_id", ASCENDING), ("t", ASCENDING)])
+        db[c.social_collection].create_index([("cluster_id", ASCENDING), ("bucket", ASCENDING)], unique=True)
+        db[c.social_collection].create_index([("bucket", DESCENDING)])
         logger.debug("[PersArticles] Indexes verified.")
 
     def _projection(self) -> Dict:
@@ -121,13 +127,82 @@ class PersArticleStore:
         return list(self.articles.find({"entity_keys": {"$exists": False}},
                                        {"_id": 0, c.id_field: 1, c.entities_field: 1}))
 
-    def rescore_candidates(self) -> List[Dict]:
-        """Clustered articles with no materiality yet, or that A4 has scored (callers compare risk_seen_at)."""
-        return list(self.articles.find(
-            {"cluster_id": {"$exists": True},
-             "$or": [{"materiality": {"$exists": False}}, {"risk_processed_at": {"$exists": True}}]},
-            self._projection(),
-        ))
+    def rescore_candidates(self, since: Optional[datetime] = None) -> List[Dict]:
+        """
+        Clustered articles with no materiality yet, or that A4 has scored (callers compare risk_seen_at).
+        since: only articles ingested from then on (rows from before ingested_ts existed are always included), so
+        the every-5-minutes cluster job doesn't rescan the whole archive.
+        """
+        query: Dict = {"cluster_id": {"$exists": True},
+                       "$or": [{"materiality": {"$exists": False}}, {"risk_processed_at": {"$exists": True}}]}
+        if since is not None:
+            query = {"$and": [query, {"$or": [{"ingested_ts": {"$gte": since}},
+                                              {"ingested_ts": {"$exists": False}}]}]}
+        return list(self.articles.find(query, self._projection()))
+
+    def count_unclustered(self, hours: int, now: datetime) -> int:
+        """Articles in the clustering window without a cluster yet (the cluster job's skip guard)."""
+        c = self.cfg
+        cutoff = now - timedelta(hours=hours)
+        coarse = (cutoff - timedelta(days=1)).date().isoformat()
+        docs = self.articles.find({c.published_field: {"$gte": coarse}, "cluster_id": {"$exists": False}},
+                                  {"_id": 0, c.published_field: 1})
+        return sum(1 for d in docs if (ts := parse_ts(d.get(c.published_field))) and cutoff <= ts <= now)
+
+    def count_missing_entity_keys(self) -> int:
+        return self.articles.count_documents({"entity_keys": {"$exists": False}})
+
+    # ── Hotness (personalization/hotness.py) ─────────────────
+
+    def hot_window(self, hours: int, now: datetime) -> List[Dict]:
+        """The window's articles with what hotness needs (sources, times, sightings, URL, title, risk, urgency)."""
+        c = self.cfg
+        fields = [c.id_field, c.title_field, c.topic_field, c.url_field, c.source_field, c.published_field,
+                  "ingested_at", "cluster_id", "sightings", c.risk_field, "urgency_flag", "hot", "materiality",
+                  "first_report"]
+        return self.window(hours, now, {"_id": 0, **{f: 1 for f in fields}})
+
+    def set_hot(self, clusters: Dict[str, Dict], articles: Dict[str, Dict]) -> int:
+        """$set `hot` on existing cluster docs (no upsert) and on articles. Returns articles modified."""
+        for cid, hot in clusters.items():
+            self.clusters.update_one({"cluster_id": cid}, {"$set": {"hot": hot}})
+        return self._bulk([UpdateOne({self.cfg.id_field: a}, {"$set": {"hot": h}}) for a, h in articles.items()])
+
+    def cool_outside(self, keep_ids: List[str], now: datetime) -> int:
+        """Articles still marked hot that left the hotness window: back to normal, so no old story keeps a badge."""
+        res = self.articles.update_many(
+            {"hot.tier": {"$in": ["breaking", "trending"]}, self.cfg.id_field: {"$nin": list(keep_ids)}},
+            {"$set": {"hot.tier": "normal", "hot.score": 0.0, "hot.computed_at": now}},
+        )
+        self.clusters.update_many(
+            {"hot.tier": {"$in": ["breaking", "trending"]}, "hot.computed_at": {"$lt": now}},
+            {"$set": {"hot.tier": "normal", "hot.score": 0.0, "hot.computed_at": now}},
+        )
+        return res.modified_count
+
+    def hot_clusters(self, tiers: List[str], since: datetime) -> List[Dict]:
+        """Cluster docs whose current tier is one of `tiers`, scored since `since`."""
+        return list(self.clusters.find({"hot.tier": {"$in": list(tiers)}, "hot.computed_at": {"$gte": since}},
+                                       {"_id": 0}))
+
+    def append_hot_history(self, rows: List[Dict]) -> int:
+        if not rows:
+            return 0
+        return len(self.mongo.db[self.cfg.hot_history_collection].insert_many([dict(r) for r in rows]).inserted_ids)
+
+    def hot_history(self, since: datetime, cluster_id: Optional[str] = None) -> List[Dict]:
+        query: Dict = {"t": {"$gte": since}}
+        if cluster_id:
+            query["cluster_id"] = cluster_id
+        return list(self.mongo.db[self.cfg.hot_history_collection].find(query, {"_id": 0}).sort("t", ASCENDING))
+
+    def social_counts(self, since: datetime) -> Dict[str, int]:
+        """{cluster_id: Bluesky posts counted since `since`} (agents/social_signal.py); {} when it isn't running."""
+        out: Dict[str, int] = {}
+        for row in self.mongo.db[self.cfg.social_collection].find({"bucket": {"$gte": since}},
+                                                                  {"_id": 0, "cluster_id": 1, "count": 1}):
+            out[row["cluster_id"]] = out.get(row["cluster_id"], 0) + int(row.get("count") or 0)
+        return out
 
     def get_clusters(self, cluster_ids: List[str]) -> Dict[str, Dict]:
         if not cluster_ids:

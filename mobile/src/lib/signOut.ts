@@ -4,10 +4,12 @@ import { router } from 'expo-router';
 
 import { queryClient } from '@/api/hooks';
 import { flushAll } from '@/state/feedback';
+import { unregisterPush } from '@/lib/push';
 import { useAskHistory } from '@/state/askHistory';
 import { useSession } from '@/state/session';
 
 export function signOutEverywhere() {
+  void unregisterPush(useSession.getState().userId ?? null); // this device stops getting the user's alerts
   flushAll();
   useAskHistory.getState().clear();
   queryClient.clear();

@@ -251,6 +251,25 @@ Custom interval:
 python ingestion_pipeline.py --schedule --interval 60
 ```
 
+### 4b. Or run the continuous stream
+
+Instead of a fixed 30-minute batch, `stream_worker.py` polls every feed on its own adaptive interval (2–20 min,
+conditional GET, only unseen items), flushes new items through the same ingestion phases every 2 minutes, and runs
+Agents 1–2 on them (Agents 3–4 on the hottest pending articles). The API's jobs then cluster, score hotness
+(breaking / trending), alert and push every 5 minutes. Details and the cost analysis: `continousexplanation.md`.
+
+```bash
+python stream_worker.py                      # run until Ctrl+C
+python stream_worker.py --once               # one pass over every source, then exit
+python stream_worker.py --no-agents          # ingest only
+python stream_worker.py --llm-per-flush 0    # no LLM calls from the worker
+docker compose up -d stream                  # in Docker
+```
+
+Watch it at `GET /v1/admin/sources` (heartbeat and every source's polling state), `GET /v1/admin/hot` (tier
+changes) and `GET /v1/personalization/health` (`stream`). Offline tools: `python scripts/stream_benchmark.py dedup|polling`
+and `python scripts/replay_hotness.py --days 3` (how the hotness tiers would have fired on stored articles).
+
 ### 5. Get the Agent 2 classifier model
 
 Agent 2 classifies articles with MAPNAI's own fine-tuned model into two categories —
@@ -379,13 +398,17 @@ Demo personas (`scripts/seed_demo_personas.py`; a re-run replaces them):
 | GET | `/users/{id}/digest?refresh=` | Today's digest (cached per user and day) |
 | POST | `/feedback` | `{user_id, article_id, type}`, type ∈ open, more, less, dwell (`value` = seconds), save, needed, not_needed, missed |
 | GET | `/users/{id}/proposals` | Suggested exposures; `POST …/proposals/{pid}/accept` or `/reject` |
-| GET | `/users/{id}/alerts?since=&include_pending=` | Alerts, newest first |
+| GET | `/users/{id}/alerts?since=&include_pending=` | Alerts, newest first (`kind`: exposure, breaking_for_you, breaking_global) |
+| POST / DELETE | `/users/{id}/push_tokens` | Register `{token, platform}` / remove `?token=` an Expo push token for this device |
 | GET | `/articles/{aid}/render?user_id=` | Style rewrite plus the reader's brief (`text, why, brief, fallback`) |
-| GET | `/articles/top?after_recap=true&tz=` | Big today: everything since the newest daily recap ended (or the last `hours`) |
+| GET | `/articles/top?after_recap=true&tz=` | Big today: everything since the newest daily recap ended (or the last `hours`), ranked by 0.7·m + 0.3·hotness |
+| GET | `/articles/breaking?hours=12&include_trending=` | Hit news: breaking (then trending) sports / entertainment stories, one per story |
 | GET | `/recaps/daily?tz=&date=&user_id=` | The day before, in the device's time zone (ready at 07:00): up to 10 stories, ≥ 3 per domain |
 | GET | `/recaps/weekly?tz=&week=&user_id=` | Monday to Sunday 22:00: Stories of the week (5) + 1–2 per day, at most 20 |
 | POST | `/admin/recaps/{kind}/rebuild?period=&tz=` | New version of a recap, body `{exclude: [article ids], pin: [article ids]}` |
-| GET | `/personalization/health` | Mongo, Neo4j, the vector index, the last run of each job, the scheduler |
+| GET | `/personalization/health` | Mongo, Neo4j, the vector index, the last run of each job, the scheduler, the stream worker's heartbeat |
+| GET | `/admin/sources` | The stream worker's heartbeat and every source's polling state, failing sources first |
+| GET | `/admin/hot?hours=&cluster_id=` | Hotness tier changes (`hot_history`) |
 | GET | `/admin/metrics?days=7` | Serving, read rate per section, must_know precision and miss rate, τ history, proposals, alerts, render fallbacks, the article window, jobs |
 | GET | `/admin/jobs` | Every job, its cron, the scheduler's next run times, the last run |
 | POST | `/admin/jobs/{name}/run?user=&rescan=` | Run a job now. 404 unknown job, 409 while a run holds the lease |
@@ -394,14 +417,15 @@ There is no auth, so keep the API bound to 127.0.0.1 (the `run_api.py` default).
 
 ### Jobs
 
-`python run_api.py` starts an in-process APScheduler with eight cron jobs in `PERS_TZ` (default Asia/Kolkata). Each
+`python run_api.py` starts an in-process APScheduler with nine cron jobs in `PERS_TZ` (default Asia/Kolkata). Each
 run is recorded in `job_runs` under a lease, so a manual run and a scheduled run never overlap. Run uvicorn with
 **one worker**, or set `PERS_SCHEDULER_ENABLED=false` on the extra workers.
 
 | Job | Default cron | What it does |
 |---|---|---|
-| `cluster` | `5 * * * *` | Entity keys, sync of the personalization index, event clustering, materiality (new and rescored articles) |
-| `alerts` | `*/5 * * * *` | Alerts for articles with need ≥ 0.5 and m ≥ 0.6 on users' exposures |
+| `cluster` | `*/5 * * * *` | Entity keys, sync of the personalization index, event clustering, materiality (new and rescored articles); skipped when nothing is new |
+| `hotness` | `1-59/5 * * * *` | Hotness H and tier (breaking / trending / normal) of every story of the last 24 h |
+| `alerts` | `2-59/5 * * * *` | Alerts for articles with need ≥ 0.5 and m ≥ 0.6 on users' exposures, breaking alerts, then Expo push |
 | `pi_topk` | `0 1 * * *` | Recompute exposure spread for every user |
 | `tau` | `30 2 * * *` | One adaptive step of τ from last week's needed/missed feedback |
 | `digests` | `30 5 * * *` | Precompute today's digests |
@@ -536,7 +560,7 @@ Every article that exits the preprocessing stage is a `ProcessedArticle`:
 
 Two-stage deduplication (as per MAPNAI spec Section 3):
 
-1. **SimHash** (Charikar 2002): 64-bit fingerprint on title + first 500 chars. Hamming distance ≤ 3 → duplicate. Fast O(n) in-memory scan per run. DB seeding for cross-run deduplication.
+1. **SimHash** (Charikar 2002): 64-bit fingerprint on title + first 500 chars. Hamming distance ≤ 3 → duplicate. A banded index (4 × 16-bit bands; two fingerprints within 3 bits share a band) makes the lookup exact and ~µs per article instead of a linear scan. Seeded from the last `DEDUP_SEED_DAYS` days for cross-run deduplication. A duplicate from another outlet is kept as a *sighting* on the original (`sightings: [{source, at}]`), which feeds hotness.
 
 2. **MinHash LSH** (datasketch): Jaccard similarity via LSH. Threshold ≥ 0.5 → duplicate. Catches paraphrase duplicates (same story, different wording) that SimHash misses.
 

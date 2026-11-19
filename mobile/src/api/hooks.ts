@@ -112,6 +112,18 @@ export function useWatchInsight() {
   });
 }
 
+// Breaking / trending stories: the hotness job runs every 5 minutes, so refetch on that rhythm
+export function useBreaking() {
+  const uid = useUserId();
+  return useQuery({
+    queryKey: ['breaking', uid],
+    queryFn: () => api.breaking(12, 10, uid || null),
+    staleTime: 2 * 60_000,
+    refetchInterval: 5 * 60_000,
+    retry: 1,
+  });
+}
+
 export function useAlerts() {
   const uid = useUserId();
   return useQuery({ queryKey: ['alerts', uid], queryFn: () => api.alerts(uid), enabled: !!uid, staleTime: 5 * 60_000 });

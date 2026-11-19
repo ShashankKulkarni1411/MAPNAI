@@ -1,7 +1,7 @@
 """
 MAPNAI — personalization/jobs.py
 Personalization jobs. Each run is recorded in `job_runs` and holds a lease, so two workers (or a manual run
-during a scheduled one) never run the same job at once. build_scheduler() registers the eight periodic jobs on an
+during a scheduled one) never run the same job at once. build_scheduler() registers the nine periodic jobs on an
 APScheduler BackgroundScheduler (cron in PERS_TZ); the API starts it in its lifespan (PERS_SCHEDULER_ENABLED).
 An empty cron string (e.g. PERS_JOB_ALERTS="") leaves that job unscheduled.
 
@@ -11,6 +11,7 @@ An empty cron string (e.g. PERS_JOB_ALERTS="") leaves that job unscheduled.
     python -m personalization.jobs digests [--user USER_ID ...]
     python -m personalization.jobs tau
     python -m personalization.jobs proposals [--user USER_ID ...]
+    python -m personalization.jobs hotness            # H and tier of every story in the last 24 h
     python -m personalization.jobs alerts [--rescan]
     python -m personalization.jobs recap_daily        # yesterday's recap in PERS_TZ, unless already built
     python -m personalization.jobs recap_weekly       # the week that ended last Sunday 22:00
@@ -26,7 +27,7 @@ from utils.logger import logger
 
 
 def job_cluster(svc) -> Dict:
-    """Hourly: name_lower → entity_keys → pers FAISS sync → clustering → materiality (new + rescore)."""
+    """Every 5 min (skipped when nothing is new): name_lower → entity_keys → pers FAISS sync → clustering → materiality (new + rescore)."""
     return svc.cluster_articles()
 
 
@@ -73,8 +74,16 @@ def job_proposals(svc, user_ids: Optional[List[str]] = None) -> Dict:
     return svc.run_proposals(user_ids)
 
 
+def job_hotness(svc) -> Dict:
+    """Every 5 min, a minute after clustering: hotness H and tier (breaking / trending / normal) of every story."""
+    return svc.compute_hotness()
+
+
 def job_alerts(svc, rescan: bool = False) -> Dict:
-    """Every 5 min: alert users about material articles on their exposures (rescan: the whole window again)."""
+    """
+    Every 5 min, a minute after hotness: alert users about material articles on their exposures (rescan: the
+    whole window again) and about breaking stories, then push the delivered alerts.
+    """
     return svc.run_alerts(rescan=rescan)
 
 
@@ -90,7 +99,7 @@ def job_recap_weekly(svc) -> Dict:
 
 JOBS: Dict[str, Callable] = {"cluster": job_cluster, "recluster": job_recluster, "pi_topk": job_pi_topk,
                              "digests": job_digests, "tau": job_tau, "proposals": job_proposals,
-                             "alerts": job_alerts, "recap_daily": job_recap_daily,
+                             "alerts": job_alerts, "hotness": job_hotness, "recap_daily": job_recap_daily,
                              "recap_weekly": job_recap_weekly}
 PER_USER = ("pi_topk", "digests", "proposals")
 
@@ -115,7 +124,8 @@ def run_job(svc, name: str, **kwargs) -> Dict:
 
 
 # job name → the config field holding its cron expression (recluster is manual only)
-SCHEDULED: Dict[str, str] = {"pi_topk": "job_pi_topk", "cluster": "job_cluster", "alerts": "job_alerts",
+SCHEDULED: Dict[str, str] = {"pi_topk": "job_pi_topk", "cluster": "job_cluster", "hotness": "job_hotness",
+                             "alerts": "job_alerts",
                              "tau": "job_tau", "proposals": "job_proposals", "digests": "job_digests",
                              "recap_daily": "job_recap_daily", "recap_weekly": "job_recap_weekly"}
 

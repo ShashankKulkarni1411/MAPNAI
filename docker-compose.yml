@@ -5,6 +5,7 @@
 #   docker compose run --rm mapnai python run_mapnai.py --check    check services, models, keys
 #   docker compose run --rm mapnai python -m pytest                run the tests
 #   docker compose up -d mongo neo4j               start only the local databases
+#   docker compose up -d stream                    start the continuous news stream (stream_worker.py)
 #   docker compose down                            stop everything (data is kept in named volumes)
 #
 # Secrets come from .env (never baked into the image).
@@ -31,6 +32,27 @@ services:
     depends_on:
       - neo4j
     restart: "no"
+
+  # Continuous news stream (stream_worker.py): adaptive polling, micro-batch ingestion, Agents 1-4.
+  #   docker compose up -d stream          start it in the background
+  #   docker compose logs -f stream        follow it
+  stream:
+    image: mapnai:latest
+    container_name: mapnai-stream
+    command: python stream_worker.py
+    env_file: .env
+    environment:
+      MONGO_URI: ${MONGO_URI_DOCKER:-${MONGO_URI:-mongodb://mongo:27017}}
+      NEO4J_URI: bolt://neo4j:7687
+      NEO4J_USER: neo4j
+      NEO4J_PASSWORD: ${NEO4J_PASSWORD:-mapnai-local-dev}
+    volumes:
+      - ./models:/app/models
+      - ./data:/app/data
+      - ./logs:/app/logs
+    depends_on:
+      - neo4j
+    restart: unless-stopped
 
   mongo:
     image: mongo:7

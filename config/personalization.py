@@ -107,6 +107,8 @@ class PersonalizationSettings(BaseSettings):
     prior_strength: float = 3.0          # α = 1 + 3w, β = 1 + 3(1 − w)
     alert_prefs_default: Dict = {
         "max_per_day": 3, "quiet_start": "22:00", "quiet_end": "07:00", "tz": "Asia/Kolkata",
+        # breaking news about something in the reader's exposure map (on) / major breaking news for everyone (opt-in)
+        "breaking_for_you": True, "breaking_global": False,
     }
     onboarding_headlines: int = 10
     onboarding_max_items: int = 50
@@ -228,6 +230,58 @@ class PersonalizationSettings(BaseSettings):
     alert_min_m: float = 0.6
     alert_lookback_h: int = 48
     alert_major_m: float = 0.8           # the app labels an alert Major from this materiality up, else High
+    # breaking alerts (continousexplanation.md §5.9): a `breaking` cluster in hot_domains alerts a reader whose
+    # pi_topk holds one of its entities with pi ≥ breaking_min_pi (breaking_for_you), and — for readers who opted in
+    # (alert_prefs.breaking_global) — every story with H ≥ breaking_global_min_h, at most
+    # breaking_global_max_per_day a day. Both count towards max_per_day and keep one alert per (user, cluster).
+    breaking_min_pi: float = 0.2
+    breaking_global_min_h: float = 0.75
+    breaking_global_max_per_day: int = 2
+
+    # ── J2. Push (Expo push service; personalization/push.py) ─
+    enable_push: bool = True
+    push_tokens_collection: str = "push_tokens"
+    push_url: str = "https://exp.host/--/api/v2/push/send"
+    push_receipts_url: str = "https://exp.host/--/api/v2/push/getReceipts"
+    push_batch: int = 100                # messages per request (Expo's limit)
+    push_max_age_h: float = 6.0          # an alert older than this is not pushed (still listed in the app)
+    push_receipt_delay_min: float = 15.0  # receipts are asked for this long after the send
+    push_timeout_s: float = 10.0
+    push_access_token: str = ""          # optional: Expo "enhanced push security" access token
+
+    # ── J3. Hotness (personalization/hotness.py; continousexplanation.md §5.8) ─
+    # H = (Σ w·component over the components present / Σ w) × 0.5^(hours since the last new outlet / half-life)
+    hot_window_h: int = 24               # clusters with an article this recent are scored
+    hot_w_breadth: float = 0.30
+    hot_w_velocity: float = 0.30
+    hot_w_prominence: float = 0.20
+    hot_w_severity: float = 0.20
+    hot_w_social: float = 0.10
+    hot_breadth_scale: float = 2.0       # breadth = 1 − exp(−Σ cred(outlets) / scale)
+    hot_velocity_scale: float = 1.5      # velocity = 1 − exp(−Σ cred(outlets arrived in the velocity window) / scale)
+    hot_velocity_window_min: int = 60
+    hot_social_scale: float = 20.0       # social = 1 − exp(−posts in the social window / scale)
+    hot_social_window_min: int = 30
+    hot_urgent_severity: float = 0.7     # severity when only Agent 2's urgency flag is known
+    hot_half_life_h: float = 6.0
+    hot_prominence_window_h: int = 24
+    hot_prominence_jaccard: float = 0.5  # a front-page title matches a cluster article's title from this Jaccard up
+    hot_breaking_h: float = 0.65
+    hot_trending_h: float = 0.45
+    hot_breaking_min_credible: int = 3   # outlets with credibility ≥ hot_credible_min …
+    hot_credible_min: float = 0.6
+    hot_breaking_fast_min: int = 90      # … that carried the story within this many minutes of the first report
+    hot_breaking_max_age_h: float = 12.0  # a story first reported longer ago than this is not "breaking"
+    hot_trending_min_outlets: int = 2
+    hot_history_min_delta: float = 0.05  # hot_history gets a row on every tier change or a score move this big
+    hot_domain_scale: Dict[str, float] = {}   # per-domain divisor of breadth/velocity sums (1.0 when absent)
+    hot_domains: List[str] = ["sports", "entertainment_movies"]   # hits shown in the app and pushed
+    hot_history_collection: str = "hot_history"
+    prominence_collection: str = "prominence"
+    social_collection: str = "social_signals"
+    top_hot_weight: float = 0.3          # Big today ranks by (1 − w)·m + w·H
+    breaking_window_h: int = 12          # GET /v1/articles/breaking looks this far back
+    rescore_window_d: int = 8            # the cluster job rescans A4-scored articles ingested this recently
 
     # ── K. Render ────────────────────────────────────────────
     render_prompt_version: str = "r2"    # part of the cache key: bump it when the prompt or style rules change
@@ -315,8 +369,11 @@ class PersonalizationSettings(BaseSettings):
 
     # ── L. Jobs (cron, in tz) ────────────────────────────────
     job_pi_topk: str = "0 1 * * *"
-    job_cluster: str = "5 * * * *"
-    job_alerts: str = "*/5 * * * *"
+    # continuous stream: cluster every 5 min (skipped when nothing is new), hotness one minute later, alerts (and
+    # push) one minute after that
+    job_cluster: str = "*/5 * * * *"
+    job_hotness: str = "1-59/5 * * * *"
+    job_alerts: str = "2-59/5 * * * *"
     job_tau: str = "30 2 * * *"
     job_proposals: str = "0 3 * * mon"
     job_digests: str = "30 5 * * *"
