@@ -119,7 +119,13 @@ def test_success_writes_risk_model_to_mongo(monkeypatch):
     assert article_id == "a1" and data["risk_model"] == "groq:big-model" and data["risk_score"] == 40
 
 
-@pytest.mark.parametrize("backend", ["AUTO", "bogus"])
-def test_backend_name_normalized(monkeypatch, backend):
-    agent = make_agent(monkeypatch, backend, FakeClient([]), FakeClient([]))
+def test_backend_name_normalized(monkeypatch):
+    agent = make_agent(monkeypatch, "AUTO", FakeClient([]), FakeClient([]))
     assert agent.backend == "auto"
+
+
+def test_unknown_backend_uses_offline_model(monkeypatch, tmp_path):
+    monkeypatch.setattr(a4.settings, "risk_event_model_dir", str(tmp_path / "none"))
+    monkeypatch.setattr(a4.settings, "risk_tfidf_model_path", str(tmp_path / "none.joblib"))
+    agent = make_agent(monkeypatch, "bogus", FakeClient([]), FakeClient([]))
+    assert agent.backend == "model" and agent.client is None and agent.ollama_client is None

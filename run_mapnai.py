@@ -102,11 +102,17 @@ def check_setup() -> bool:
 
     has_groq = bool(settings.groq_api_key)
     results.append((False, has_groq, "GROQ_API_KEY (Agent 4 risk, Agent 5 answers)",
-                    "Agent 4 uses the local Ollama model (or leaves articles pending); "
-                    "Agent 3 uses extractive summaries"))
+                    "Agent 3 uses extractive summaries; Agent 4 needs it only for RISK_BACKEND=auto/groq"))
 
     risk_backend = settings.risk_backend.strip().lower()
-    if risk_backend != "groq":
+    if risk_backend == "model":
+        results.append((False, Path(settings.risk_event_model_dir, "model.safetensors").exists(),
+                        "Agent 4 DistilRoBERTa event model",
+                        f"unzip mapnai_risk_event_model.zip into models/ (expects {settings.risk_event_model_dir}); "
+                        "until then Agent 4 uses the TF-IDF model or keyword rules"))
+        results.append((False, Path(settings.risk_tfidf_model_path).exists(), "Agent 4 TF-IDF fallback model",
+                        "python -m scripts.risk.train_event_model"))
+    elif risk_backend != "groq":
         results.append((False, *_check_ollama(settings.ollama_base_url, settings.risk_ollama_model)))
 
     ok = True
